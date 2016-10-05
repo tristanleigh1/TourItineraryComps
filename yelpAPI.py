@@ -4,6 +4,19 @@ import urllib
 import urllib2
 import json
 import base64
+import time
+
+def calculate_popularity(business, result_dict):
+	popularity = 0
+	max_number_of_reviews = 0
+	for i in result_dict['businesses']:
+		if i['rating'] == business['rating'] and i['review_count'] > max_number_of_reviews:
+			max_number_of_reviews = i['review_count']
+	
+	popularity = (business['rating'] - 1) * 20 + (business['review_count']/float(max_number_of_reviews)) * 20
+	return popularity
+
+start = time.time()
 
 client_id = 'utuJWCc9bdvLlOHfbkXThA'
 secret = '812V05KxL5KMsYgPTksEl6ZzqILBf9Nv5spXvmtU3M9FAgpxQEYHPLW0QnDP24J8' 
@@ -30,8 +43,13 @@ response = urllib2.urlopen(request)
 html = response.read()
 result_dict = json.loads(html)
 
-print 'Printing restaurants with a rating of 4 or more stars'
+print 'Printing restaurants with a rating of 3 or more stars'
 for b in result_dict['businesses']:
-	if b['rating'] >= 4:
-		print b['rating'], 'stars\t\t', b['name'] 
+	if b['rating'] >= 3:
+		print b['rating'], 'stars\t\t', 'Popularity Score: ' + "{:.3f}".format(calculate_popularity(b, result_dict)) + '/100.\t\t', b['name']
 		print
+
+end = time.time()
+print 'API call runtime: ' + "{:.5f}".format(end - start) + ' seconds.'
+
+
