@@ -32,11 +32,11 @@ result = urllib2.urlopen(url, encoded_args).read().decode()
 result = json.loads(result)
 access_token = result['access_token']
 
-lat = '37.786882'
-lon = '-122.399972'
+lat = '52.370216'
+lon = '4.895168'
 
 print 'Finding restaurants that deliver near latitude ' + lat + ' and longitude ' + lon
-query_url = 'https://api.yelp.com/v3/transactions/delivery/search?latitude=%s&longitude=%s' % (lat, lon)
+query_url = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s' % (lat, lon)
 request = urllib2.Request(query_url, None, {"Authorization": "Bearer %s" %access_token})
 response = urllib2.urlopen(request)
 
