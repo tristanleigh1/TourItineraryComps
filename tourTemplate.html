@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Prototype</title>
+    <!-- <link rel="stylesheet" href="designTemplate.css"> -->
+  </head>
+  <body>
+    <div class="header">
+      <h1>Choose your Itinerary</h1>
+    </div>
+    <div class = userInput>
+      <form>
+        <p> Start Destination: <input type="text" name="startDestination"> </p>
+        <p> End Destination: <input type="text" name="endDestination"> </p>
+        <p> Walking Preference:
+        <input type="radio" name="walkPreference" value="Short" checked> Short
+        <input type="radio" name="walkPreference" value="Medium"> Medium
+        <input type="radio" name="walkPreference" value="Long"> Long </p>
+        <p> POI Preferences:
+        <input type="checkBox" name="POIChoice" value="Museum" checked> Museum
+        <input type="checkBox" name="POIChoice" value="Landmark"> Landmark
+        <input type="checkBox" name="POIChoice" value="Park"> Park
+        <input type="checkBox" name="POIChoice" value="Mall"> Mall
+        <input type="checkBox" name="POIChoice" value="Arcade"> Arcade </p>
+        <p class=goButton>
+        <input type="submit" value="Make my Tour!">
+      </p>
+      </form>
+    </div>
+  </body>
+</html>
