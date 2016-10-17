@@ -76,8 +76,12 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.path.join(BASE_DIR, 'db.postgresql'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'iui',
+        'USER': 'iui',
+        'PASSWORD': 'tourApp6',
+        'HOST': '127.0.0.1',
+        'PORT': '',
     }
 }
 
