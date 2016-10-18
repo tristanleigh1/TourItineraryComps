@@ -9,9 +9,9 @@ class POI(models.Model):
     city = models.CharField(max_length=100)
     num_stars = models.DecimalField(max_digits=2, decimal_places=1)
     num_reviews = models.IntegerField()
-    phone_number = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=100, null=True)
     price = models.CharField(max_length=5)
-    picture_url = models.CharField(max_length=2083)
+    picture_url = models.CharField(max_length=2083, null=True)
     summary = models.TextField()
     
     def __str__(self):
@@ -19,7 +19,6 @@ class POI(models.Model):
     
 class Category_Type(models.Model):
     category_name = models.CharField(max_length=200, primary_key=True)
-    max_num_reviews = models.IntegerField()
     
     def __str__(self):
         return self.category_name
