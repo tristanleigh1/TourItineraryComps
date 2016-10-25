@@ -14,7 +14,7 @@
         var map = new google.maps.Map(document.getElementById('map'));
         directionsDisplay.setMap(map);
         var locations = [
-            {title: 'marker1', position: {lat: 44.9817, lng: -93.2778}},
+            {title: 'marker1', position: {lat: {{ poi.latitude }}, lng: {{ poi.longitude }}}},
             {title: 'marker2', position: {lat: 44.9737, lng: -93.2577}},
             {title: 'marker3', position: {lat: 44.9698, lng: -93.2738}}
         ];
@@ -108,6 +108,10 @@
     <p>Just Playing Around With Google Maps</p>
   </div>
 </div>
+<div>
+    {{ poi.latitude }}
+</div>
+
 <div class="row">
   <div id="map" style="height:500px;"></div>
 </div>

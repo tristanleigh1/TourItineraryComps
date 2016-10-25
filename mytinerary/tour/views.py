@@ -1,10 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 
+from .models import *
 # Create your views here.
 #GET: tour/
 def index(request):
     return render(request, 'tour/index.html')
 
-#POST: tour/map/
+#GET: tour/map/
 def map(request):
-    return render(request, 'tour/map.html')
+    poi = get_object_or_404(POI, pk=1)
+    return render(request, 'tour/map.html', {'poi': poi})
