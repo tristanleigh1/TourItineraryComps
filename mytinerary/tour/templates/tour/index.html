@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+
+<html>
+  <head>
+    <title>Prototype</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'tour/stylesheet.css' %}" />
+  </head>
+  <body>
+    <div class="header">
+      <h1>Choose your Itinerary</h1>
+    </div>
+    <div class="userInput">
+      <form action="/tour/map/" method="GET">
+        <p class="formTitle"> Start Destination: <input type="text" name="startDestination"> </p>
+        <p class="formTitle"> End Destination: <input type="text" name="endDestination"> </p>
+        <p class="formTitle"> Walking Preference:
+        <p class="formTitle"> Couple Blocks <input type="range" name="points" min="0" max="10"> No Limit
+        <!-- <input type="radio" name="walkPreference" value="Short" checked> Short
+        <input type="radio" name="walkPreference" value="Medium"> Medium
+        <input type="radio" name="walkPreference" value="Long"> Long </p> -->
+        <p class="formTitle"> POI Preferences:
+        <input type="checkBox" name="POIChoice" value="Museum" checked> Museum
+        <input type="checkBox" name="POIChoice" value="Landmark"> Landmark
+        <input type="checkBox" name="POIChoice" value="Park"> Park
+        <input type="checkBox" name="POIChoice" value="Mall"> Mall</p>
+        <p class=goButton>
+        <input type="submit" value="Make my Tour!">
+      </p>
+      </form>
+    </div>
+  </body>
+</html>
