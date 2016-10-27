@@ -14,9 +14,12 @@
         var map = new google.maps.Map(document.getElementById('map'));
         directionsDisplay.setMap(map);
         var locations = [
-            {title: 'marker1', position: {lat: {{ poi.latitude }}, lng: {{ poi.longitude }}}},
-            {title: 'marker2', position: {lat: 44.9737, lng: -93.2577}},
-            {title: 'marker3', position: {lat: 44.9698, lng: -93.2738}}
+            {% for poi in poi_list.all %}
+                {title: 'marker3', position: {lat: {{ poi.latitude }}, lng: {{ poi.longitude }}}}
+//            {title: 'marker1', position: {lat: {{ poi.latitude }}, lng: {{ poi.longitude }}}},
+//            {title: 'marker2', position: {lat: 44.9737, lng: -93.2577}},
+//            {title: 'marker3', position: {lat: 44.9698, lng: -93.2738}}
+            {% endfor %}
         ];
         var markers = [];
         var infoWindow = new google.maps.InfoWindow({content: 'cool place to visit'});
@@ -74,50 +77,30 @@
       background-color: #f2f2f2;
       padding: 25px;
     }
+    #map {
+        height:500px;
+        width:500px;
+    }
   </style>
 
 </head>
 <body>
-
-<nav class="navbar navbar-inverse">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="#">Google Maps API</a>
+    <div id="header">
+        <div id="title"></div>
+        <div id="menu-buttons"></div>
     </div>
-    <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Home</a></li>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Contact</a></li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-      </ul>
+    <div id="body">
+        <div id="map-container">
+            <div id="filter-bar"></div>
+            <div class="row">
+                <div id="map" style="height:500px;width:500px"></div>
+            </div>
+            <div id="buttons"></div>
+        </div>
+        <div id = "sidebar"></div>
     </div>
-  </div>
-</nav>
-
-<div class="jumbotron">
-  <div class="container text-center">
-    <h1>Google Maps API</h1>
-    <p>Just Playing Around With Google Maps</p>
-  </div>
-</div>
-<div>
-    {{ poi.latitude }}
-</div>
-
-<div class="row">
-  <div id="map" style="height:500px;"></div>
-</div>
-
-<script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM&callback=initialize">
-</script>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM&callback=initialize">
+    </script>
 </body>
 </html>

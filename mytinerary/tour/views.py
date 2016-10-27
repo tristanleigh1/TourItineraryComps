@@ -8,5 +8,7 @@ def index(request):
 
 #GET: tour/map/
 def map(request):
-    poi = get_object_or_404(POI, pk=1)
-    return render(request, 'tour/map.html', {'poi': poi})
+#    poi = get_object_or_404(POI, pk=1)
+    poi_list = POI.objects.all()
+    context = {'poi_list': poi_list}
+    return render(request, 'tour/map.html', context)
