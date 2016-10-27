@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 from django.db import models
 
 class POI(models.Model):
-    business_name = models.CharField(max_length=200)
-    latitude = models.DecimalField(max_digits=8, decimal_places=6)
-    longitude = models.DecimalField(max_digits=8, decimal_places=6)
+    business_name = models.CharField(max_length=400)
+    latitude = models.DecimalField(max_digits=12, decimal_places=9)
+    longitude = models.DecimalField(max_digits=12, decimal_places=9)
     address = models.CharField(max_length=500)
     city = models.CharField(max_length=100)
     num_stars = models.DecimalField(max_digits=2, decimal_places=1)

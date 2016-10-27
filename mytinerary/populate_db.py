@@ -7,7 +7,6 @@ from urllib.error import HTTPError
 import json
 import base64
 import time
-from decimal import Decimal
 
 client_id = 'utuJWCc9bdvLlOHfbkXThA'
 secret = '812V05KxL5KMsYgPTksEl6ZzqILBf9Nv5spXvmtU3M9FAgpxQEYHPLW0QnDP24J8' 
@@ -24,13 +23,13 @@ result = json.loads(result)
 access_token = result['access_token']
 print("Loading data...")
 
-#list_of_cities = [('37.774929', '-122.419416'), ('44.977753', '-93.265011'), ('40.712784', '-74.005941'), ('51.507351', '-0.127758'), ('40.416775', '-3.703790')]
-list_of_cities = ['San Francisco', 'Minneapolis', 'New York', 'London', 'Madrid']
+list_of_cities = [('37.774929', '-122.419416'), ('44.977753', '-93.265011'), ('40.712784', '-74.005941'), ('51.507351', '-0.127758'), ('40.416775', '-3.703790')]
+#list_of_cities = ['San Francisco', 'Minneapolis', 'New York', 'London', 'Madrid']
 result_dict = {}
 
-for i, city in enumerate(list_of_cities):
-    query_url = 'https://api.yelp.com/v3/businesses/search?location=%s' % (city)
-    #query_url = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s' % (coordinates[0], coordinates[1])
+for i, coordinates in enumerate(list_of_cities):
+    #query_url = 'https://api.yelp.com/v3/businesses/search?location=%s' % (city)
+    query_url = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&limit=%s' % (coordinates[0], coordinates[1], '50')
     request = urllib.request.Request(query_url, None, {"Authorization": "Bearer %s" %access_token})
     try:
         response = urllib.request.urlopen(request).read().decode('utf-8')
@@ -38,15 +37,15 @@ for i, city in enumerate(list_of_cities):
         response = e.read()
     data = json.loads(response)
     result_dict[i] = data['businesses']
-print(result_dict)
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
-os.environ["DJANGO_SETTINGS_MODULE"] = "mysite.settings"
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mytinerary.settings")
+os.environ["DJANGO_SETTINGS_MODULE"] = "mytinerary.settings"
 import django
 django.setup()
 
-from pois.models import POI
-from pois.models import Category_Type
-from pois.models import POI_Type
+from tour.models import POI
+from tour.models import Category_Type
+from tour.models import POI_Type
 
 print("Storing data...")
 for i in range(0,len(list_of_cities)):
@@ -74,25 +73,39 @@ for i in range(0,len(list_of_cities)):
             #wiki_response = urllib.request.urlopen(wiki_request).read().decode('utf-8')
             #wiki_dict = json.loads(wiki_response)
             #
-        
-            p = POI(business_name = b.get('name','N/A'),
-                    latitude = b['coordinates']['latitude'],
-                    longitude = b['coordinates']['longitude'],
-                    address = address_string,
-                    city = b['location']['city'],
-                    num_stars = b.get('rating',0),
-                    num_reviews = b.get('review_count',0),
-                    phone_number = b.get('phone','N/A'),
-                    price = b.get('price','N/A'),
-                    picture_url = b.get('image_url','N/A'),
-                    summary = "")
-                    #summary = wiki_dict['extract'])
+            p = POI.objects.filter(business_name = b.get('name', 'N/A'), city = b['location']['city'])
+            if p:
+                p.update(business_name = b.get('name','N/A'),
+                            latitude = b['coordinates']['latitude'],
+                            longitude = b['coordinates']['longitude'],
+                            address = address_string,
+                            city = b['location']['city'],
+                            num_stars = b.get('rating',0),
+                            num_reviews = b.get('review_count',0),
+                            phone_number = b.get('phone','N/A'),
+                            price = b.get('price','N/A'),
+                            picture_url = b.get('image_url','N/A'),
+                            summary = "")
+            else:
+                p = POI(business_name = b.get('name','N/A'),
+                        latitude = b['coordinates']['latitude'],
+                        longitude = b['coordinates']['longitude'],
+                        address = address_string,
+                        city = b['location']['city'],
+                        num_stars = b.get('rating',0),
+                        num_reviews = b.get('review_count',0),
+                        phone_number = b.get('phone','N/A'),
+                        price = b.get('price','N/A'),
+                        picture_url = b.get('image_url','N/A'),
+                        summary = "")
+                        #summary = wiki_dict['extract'])
 
-            p.save()
+                p.save()
         
             # not 100% sure this works either
             for category in b['categories']:
                 obj, created = Category_Type.objects.get_or_create(category_name = category['title'])
-                poi_cat = POI_Type(category_name = obj, poi_id = p)
-                poi_cat.save()
+                if created:
+                    poi_cat = POI_Type(category_name = obj, poi_id = p)
+                    poi_cat.save()
 print("Complete!")
