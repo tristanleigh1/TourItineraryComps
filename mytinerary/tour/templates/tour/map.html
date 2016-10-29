@@ -9,17 +9,19 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script>
       function initialize() {
+        
         var directionsService = new google.maps.DirectionsService;
         var directionsDisplay = new google.maps.DirectionsRenderer;
+        directionsDisplay.setOptions( { suppressMarkers: true } );
+
         var map = new google.maps.Map(document.getElementById('map'));
         directionsDisplay.setMap(map);
         var locations = [
+            {title: '{{origin.address}}', position: {lat: {{ origin.latitude|stringformat:"f" }}, lng: {{ origin.longitude|stringformat:"f" }}}},
             {% for poi in poi_list.all %}
-                {title: 'marker3', position: {lat: {{ poi.latitude }}, lng: {{ poi.longitude }}}}
-//            {title: 'marker1', position: {lat: {{ poi.latitude }}, lng: {{ poi.longitude }}}},
-//            {title: 'marker2', position: {lat: 44.9737, lng: -93.2577}},
-//            {title: 'marker3', position: {lat: 44.9698, lng: -93.2738}}
+                {title: '{{poi.address}}', position: {lat: {{ poi.latitude|stringformat:"f" }}, lng: {{ poi.longitude|stringformat:"f" }}}},
             {% endfor %}
+            {title: '{{destination.address}}', position: {lat: {{ destination.latitude|stringformat:"f" }}, lng: {{ destination.longitude|stringformat:"f" }}}},
         ];
         var markers = [];
         var infoWindow = new google.maps.InfoWindow({content: 'cool place to visit'});
@@ -40,7 +42,7 @@
 
         calculateAndDisplayRoute(directionsService, directionsDisplay);
       }
-
+      
       function createInfoWindow(marker, window) {
           if (window.marker != marker) {
               window.marker = marker;
@@ -51,9 +53,15 @@
 
       function calculateAndDisplayRoute(directionsService, directionsDisplay) {
         directionsService.route({
-          origin: 'Stone Arch Bridge, 100 Portland Ave, Minneapolis, MN 55401',
-          destination: 'Walker Art Center, 1750 Hennepin Ave, Minneapolis, MN 55403',
-		  waypoints: [{location: 'Target Center, 600 First Avenue North, Minneapolis, MN 55403'},{location: 'Dakota Jazz Club & Restaurant, 1010 Nicollet Mall, Minneapolis, MN 55403'}],
+          origin: '{{origin.address}}',
+          destination: '{{destination.address}}',
+		  waypoints: [
+              {% for poi in poi_list.all %}
+                {location: '{{poi.address}}'},
+              {% endfor %}
+          ],
+//              {location: 'Target Center, 600 First Avenue North, Minneapolis, MN 55403'},
+//                      {location: 'Dakota Jazz Club & Restaurant, 1010 Nicollet Mall, Minneapolis, MN 55403'}],
           travelMode: 'WALKING',
           optimizeWaypoints: true
         }, function(response, status) {
@@ -66,20 +74,17 @@
       }
     </script>
   <style>
-    /* Remove the navbar's default margin-bottom and rounded borders */
     .navbar {
       margin-bottom: 0;
       border-radius: 0;
     }
-
-    /* Add a gray background color and some padding to the footer */
     footer {
       background-color: #f2f2f2;
       padding: 25px;
     }
     #map {
-        height:500px;
-        width:500px;
+        height:800px;
+        width:800px;
     }
   </style>
 
@@ -93,7 +98,7 @@
         <div id="map-container">
             <div id="filter-bar"></div>
             <div class="row">
-                <div id="map" style="height:500px;width:500px"></div>
+                <div id="map"></div>
             </div>
             <div id="buttons"></div>
         </div>
