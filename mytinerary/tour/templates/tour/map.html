@@ -90,6 +90,7 @@
 
 </head>
 <body>
+    <h2>A walking tour for {{city}}:</h2>
     <div id="header">
         <div id="title"></div>
         <div id="menu-buttons"></div>
@@ -107,5 +108,16 @@
     <script async defer
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM&callback=initialize">
     </script>
+    <p>You want to start at: {{start_choice}}. </p>
+    <p>You want to end at: {{end_choice}}. </p>
+    <p>You want to walk: {{slider_val}} kilometers. </p>
+    <p>Here are some places you could go: </p>
+    <ul>
+        {% for poi in poi_list.all %}
+            <li>{{poi.address}}</li>
+        {% endfor %}
+    </ul>
+    <a href="/tour/">New tour?</a>
 </body>
+
 </html>

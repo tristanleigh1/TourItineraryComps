@@ -4,7 +4,13 @@
   <head>
     <title>Prototype</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'tour/stylesheet.css' %}" />
+    <!--link rel="stylesheet" type="text/css" href="{% static 'tour/stylesheet.css' %}" /-->
+    <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+    <script>
+        function showVal(newVal){
+            document.getElementById("valBox").innerHTML=newVal;
+        }
+    </script>
   </head>
   <body>
     <div class="header">
@@ -12,13 +18,25 @@
     </div>
     <div class="userInput">
       <form action="/tour/map/" method="GET">
+        <p class="formTitle"> Select City: <select name="city">
+            <option value="London">London</option>
+            <option value="Madrid">Madrid</option>
+            <option value="Minneapolis">Minneapolis</option>
+            <option value="New York">New York</option>
+            <option value="San Francisco">San Francisco</option>
+        </select></p>
         <p class="formTitle"> Start Destination: <input type="text" name="startDestination"> </p>
         <p class="formTitle"> End Destination: <input type="text" name="endDestination"> </p>
         <p class="formTitle"> Walking Preference:
-        <p class="formTitle"> Couple Blocks <input type="range" name="points" min="0" max="10"> No Limit
-        <!-- <input type="radio" name="walkPreference" value="Short" checked> Short
+        <!-- <p class="formTitle"> Couple Blocks <input type="range" name="points" min="0" max="10"> No Limit
+        <input type="radio" name="walkPreference" value="Short" checked> Short
         <input type="radio" name="walkPreference" value="Medium"> Medium
         <input type="radio" name="walkPreference" value="Long"> Long </p> -->
+    
+        <input type="range" name="points" min="0" max="10" step="1" 
+            oninput="showVal(this.value)" onchange="showVal(this.value)">
+        <span id="valBox">5</span>&nbsp; kilometers </p>
+        
         <p class="formTitle"> POI Preferences:
         <input type="checkBox" name="POIChoice" value="Museum" checked> Museum
         <input type="checkBox" name="POIChoice" value="Landmark"> Landmark
