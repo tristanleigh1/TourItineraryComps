@@ -5,7 +5,7 @@
     <title>Prototype</title>
     {% load static %}
     <!--link rel="stylesheet" type="text/css" href="{% static 'tour/stylesheet.css' %}" /-->
-    <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+    <link rel="stylesheet" type="text/css" href='{% static "tour/stylesheet.css" %}' />
     <script>
         function showVal(newVal){
             document.getElementById("valBox").innerHTML=newVal;
