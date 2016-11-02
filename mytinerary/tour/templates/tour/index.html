@@ -6,11 +6,6 @@
     {% load static %}
     <!--link rel="stylesheet" type="text/css" href="{% static 'tour/stylesheet.css' %}" /-->
     <link rel="stylesheet" type="text/css" href='{% static "tour/stylesheet.css" %}' />
-    <script>
-        function showVal(newVal){
-            document.getElementById("valBox").innerHTML=newVal;
-        }
-    </script>
   </head>
   <body>
     <div class="header">
@@ -18,15 +13,20 @@
     </div>
     <div class="userInput">
       <form action="/tour/map/" method="GET">
-        <p class="formTitle"> Select City: <select name="city">
+        <p class="formTitle"> Select City: <select name="city" id="citySelect">
             <option value="London">London</option>
             <option value="Madrid">Madrid</option>
             <option value="Minneapolis">Minneapolis</option>
             <option value="New York">New York</option>
             <option value="San Francisco">San Francisco</option>
         </select></p>
-        <p class="formTitle"> Start Destination: <input type="text" name="startDestination"> </p>
-        <p class="formTitle"> End Destination: <input type="text" name="endDestination"> </p>
+        <p class="formTitle"> Start Destination: 
+            <input  type="text"
+                    id="autocomplete"
+                    placeholder="Enter an Address"
+                    onFocus="geolocate()"
+                    name="startDestination"> </p>
+        <p class="formTitle"> End Destination: <input type="text" id="end" name="endDestination"> </p>
         <p class="formTitle"> Walking Preference:
         <!-- <p class="formTitle"> Couple Blocks <input type="range" name="points" min="0" max="10"> No Limit
         <input type="radio" name="walkPreference" value="Short" checked> Short
@@ -47,5 +47,77 @@
       </p>
       </form>
     </div>
+    
+    
+    <script>
+    
+    function showVal(newVal){
+        document.getElementById("valBox").innerHTML=newVal;
+    }
+        
+      // This example displays an address form, using the autocomplete feature
+      // of the Google Places API to help users fill in the information.
+
+      // This example requires the Places library. Include the libraries=places
+      // parameter when you first load the API. For example:
+      // <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM&libraries=places">
+
+      function initAutocomplete() {
+        // Create the autocomplete object, restricting the search to geographical
+        // location types.
+        autocomplete = new google.maps.places.Autocomplete(
+            /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
+            {types: ['address']});
+
+        // When the user selects an address from the dropdown, populate the address
+        // fields in the form.
+        autocomplete.addListener('place_changed', selectEndDest);
+      }
+      
+      function selectEndDest() {
+        document.getElementById("end").focus(); // ID set by OnFocusIn 
+      }
+
+      // Bias the autocomplete object to the user's geographical location,
+      // as supplied by the browser's 'navigator.geolocation' object.
+      function geolocate() {
+        /*if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var geolocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            var circle = new google.maps.Circle({
+              center: geolocation,
+              radius: position.coords.accuracy
+            });
+            autocomplete.setBounds(circle.getBounds());
+          });*/
+        
+        var geolocations = {
+            'London': {
+                lat: 51.507,
+                lng: -0.127
+            },
+            'Madrid': {
+                lat: 40.416, 
+                lng: -3.704
+            }
+        }
+        
+        var city = document.getElementById('citySelect').value;
+        console.log(city);
+        
+        var circle = new google.maps.Circle({
+              center: geolocations[city],
+              radius: 100000 // 100 km
+            });
+        autocomplete.setBounds(circle.getBounds()); 
+      }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM&libraries=places&callback=initAutocomplete"
+        async defer></script>
+        
+        
   </body>
 </html>
