@@ -77,7 +77,7 @@ for i in range(0,len(list_of_cities)):
                     address_string += b['location']['country']
             
                 lat = b['coordinates']['latitude']
-                lon = b['coordinates']['latitude']
+                lon = b['coordinates']['longitude']
                 if not lat:
                     lat = list_of_cities[i][0]
 
@@ -90,6 +90,9 @@ for i in range(0,len(list_of_cities)):
                 #wiki_response = urllib.request.urlopen(wiki_request).read().decode('utf-8')
                 #wiki_dict = json.loads(wiki_response)
                 #
+
+                #import wikipedia
+                #print(wikipedia.summary(b['name']))
                 p = POI.objects.filter(business_name = b.get('name', 'N/A'), city = b['location']['city'])
                 if p:
                     p.update(business_name = b.get('name','N/A'),
