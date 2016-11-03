@@ -9,40 +9,40 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script>
       function initialize() {
-        
+
         var directionsService = new google.maps.DirectionsService;
         var directionsDisplay = new google.maps.DirectionsRenderer;
         directionsDisplay.setOptions( { suppressMarkers: true } );
 
         var map = new google.maps.Map(document.getElementById('map'));
         directionsDisplay.setMap(map);
-//        var locations = [
-//            {title: '{{origin.address}}', position: {lat: {{ origin.latitude|stringformat:"f" }}, lng: {{ origin.longitude|stringformat:"f" }}}},
-//            {% for poi in poi_list.all %}
-//                {title: '{{poi.address}}', position: {lat: {{ poi.latitude|stringformat:"f" }}, lng: {{ poi.longitude|stringformat:"f" }}}},
-//            {% endfor %}
-//            {title: '{{destination.address}}', position: {lat: {{ destination.latitude|stringformat:"f" }}, lng: {{ destination.longitude|stringformat:"f" }}}},
-//        ];
-//        var markers = [];
-//        var infoWindow = new google.maps.InfoWindow({content: 'cool place to visit'});
-//        for (var i = 0; i < locations.length; i++) {
-//            var position = locations[i].position;
-//            var title = locations[i].title;
-//            var marker = new google.maps.Marker({
-//                map: map,
-//                position: position,
-//                title: title,
-//                id: i
-//            });
-//            markers.push(marker);
-//            marker.addListener('click', function() {
-//                createInfoWindow(this, infoWindow);
-//            });
-//        }
+       var locations = [
+           {title: '{{origin.address}}', position: {lat: {{ origin.latitude|stringformat:"f" }}, lng: {{ origin.longitude|stringformat:"f" }}}},
+           {% for poi in poi_list.all %}
+               {title: '{{poi.address}}', position: {lat: {{ poi.latitude|stringformat:"f" }}, lng: {{ poi.longitude|stringformat:"f" }}}},
+           {% endfor %}
+           {title: '{{destination.address}}', position: {lat: {{ destination.latitude|stringformat:"f" }}, lng: {{ destination.longitude|stringformat:"f" }}}},
+       ];
+       var markers = [];
+       var infoWindow = new google.maps.InfoWindow({content: 'cool place to visit'});
+       for (var i = 0; i < locations.length; i++) {
+           var position = locations[i].position;
+           var title = locations[i].title;
+           var marker = new google.maps.Marker({
+               map: map,
+               position: position,
+               title: title,
+               id: i
+           });
+           markers.push(marker);
+           marker.addListener('click', function() {
+               createInfoWindow(this, infoWindow);
+           });
+       }
 
         calculateAndDisplayRoute(directionsService, directionsDisplay);
       }
-      
+
       function createInfoWindow(marker, window) {
           if (window.marker != marker) {
               window.marker = marker;
@@ -51,81 +51,55 @@
           }
       }
 
-//      function calculateAndDisplayRoute(directionsService, directionsDisplay) {
-//        directionsService.route({
-//          origin: '{{origin.address}}',
-//          destination: '{{destination.address}}',
-//		  waypoints: [
-//              {% for poi in poi_list.all %}
-//                {location: '{{poi.address}}'},
-//              {% endfor %}
-////              {location: 'Target Center, 600 First Avenue North, Minneapolis, MN 55403'},
-////              {location: 'Dakota Jazz Club & Restaurant, 1010 Nicollet Mall, Minneapolis, MN 55403'},
-//          ],
-//          travelMode: 'WALKING',
-//          optimizeWaypoints: true
-//        }, function(response, status) {
-//          if (status === 'OK') {
-//            directionsDisplay.setDirections(response);
-//          } else {
-//            window.alert('Directions request failed due to ' + status);
-//          }
-//        });
-//      }
-      
-      function calculateAndDisplayRoute(directionsService, directionsDisplay) {
-        directionsService.route({
-          origin: '100 Portland Ave, Minneapolis, MN 55401',
-          destination: 'Dakota Jazz Club & Restaurant, 1010 Nicollet Mall, Minneapolis, MN 55403',
+     function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+       directionsService.route({
+         origin: '{{origin.address}}',
+         destination: '{{destination.address}}',
 		  waypoints: [
-              {location: 'Target Center, 600 First Avenue North, Minneapolis, MN 55403'},
-              {location: '401 Chicago Ave, Minneapolis, MN 55415'},
-          ],
-          travelMode: 'WALKING',
-          optimizeWaypoints: true
-        }, function(response, status) {
-          if (status === 'OK') {
-            directionsDisplay.setDirections(response);
-          } else {
-            window.alert('Directions request failed due to ' + status);
-          }
-        });
-      }
-    </script>
-  <style>
-    #map-container {
-        position: absolute;
-    }
-    #filter-bar {
-        border: solid 2px black;
-        height: 40px;
-        width: 800px;
-    }
-    #filter-bar li {
-        float: left;
-        padding: 9px;
-        list-style-type: none;
-    }
-    #map {
-        margin-left: 15px;
-        height:800px;
-        width: 800px;
-    }
-    #sidebar {
-        position: absolute;
-        height: 840px;
-        width: 200px;
-        margin-left: 800px;
-        border: solid 2px black;
-    }
-  </style>
+             {% for poi in poi_list.all %}
+               {location: '{{poi.address}}'},
+             {% endfor %}
+         ],
+         travelMode: 'WALKING',
+         optimizeWaypoints: true
+       }, function(response, status) {
+         if (status === 'OK') {
+           directionsDisplay.setDirections(response);
+         } else {
+           window.alert('Directions request failed due to ' + status);
+         }
+       });
+     }
 
+      // function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+      //   directionsService.route({
+      //     origin: '100 Portland Ave, Minneapolis, MN 55401',
+      //     destination: 'Dakota Jazz Club & Restaurant, 1010 Nicollet Mall, Minneapolis, MN 55403',
+		  // waypoints: [
+      //         {location: 'Target Center, 600 First Avenue North, Minneapolis, MN 55403'},
+      //         {location: '401 Chicago Ave, Minneapolis, MN 55415'},
+      //     ],
+      //     travelMode: 'WALKING',
+      //     optimizeWaypoints: true
+      //   }, function(response, status) {
+      //     if (status === 'OK') {
+      //       directionsDisplay.setDirections(response);
+      //     } else {
+      //       window.alert('Directions request failed due to ' + status);
+      //     }
+      //   });
+      // }
+    </script>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href='{% static "tour/map.css" %}' />
 </head>
 <body>
-    <h2>A walking tour for {{city}}:</h2>
-    <div id="header">
-        <div id="title"></div>
-        <div id="menu-buttons"></div>
+    <div class="header">
+      <div class="title">
+        <h1>Mytinerary</h1>
+      </div>
+      <div class="menu-buttons">
+        <a href="/tour/" id="home">Home</a><a href="#" id="about-us">About Us</a><a href="#" id="questions">Questions</a>
     </div>
     <div id="body">
         <div id="map-container">
@@ -147,13 +121,29 @@
         <div id="sidebar">
             <h2>My Tour</h2>
             <p>Total Distance: ((something dynamic))</p>
-            <ul>
-                <li>1.</li>
-                <li>2.</li>
-                <li>3.</li>
-            </ul>
+            <!-- <ul> -->
+                <button class="accordion">{{origin.address}}</button>
+                <div class="panel"><p>I am a professor of computer science at Carleton College, where I teach Introduction to Computer Science, Data Stuctures, Programming Languages, Artificial Intelligence, Database Systems, Data Mining, and other occasional courses. My research interests span across solving machine learning and data mining problems, collaborative human/computing systems, and computer science education. Being able to help solve important real-world problems by applying computing-based data analysis techniques is really rewarding. I have also maintained a long term interest in support vector machines, clustering, and text mining. Most recently, I have been working on an approach for helping students better understand the Git version control system.</p></div>
+                {% for poi in poi_list.all %}
+                  <button class="accordion">{{poi.address}}</button>
+                  <div class="panel"><p>I am a professor of computer science at Carleton College, where I teach Introduction to Computer Science, Data Stuctures, Programming Languages, Artificial Intelligence, Database Systems, Data Mining, and other occasional courses. My research interests span across solving machine learning and data mining problems, collaborative human/computing systems, and computer science education. Being able to help solve important real-world problems by applying computing-based data analysis techniques is really rewarding. I have also maintained a long term interest in support vector machines, clustering, and text mining. Most recently, I have been working on an approach for helping students better understand the Git version control system.</p></div>
+                {% endfor %}
+                <button class="accordion">{{destination.address}}</button>
+                <div class="panel"><p>I am a professor of computer science at Carleton College, where I teach Introduction to Computer Science, Data Stuctures, Programming Languages, Artificial Intelligence, Database Systems, Data Mining, and other occasional courses. My research interests span across solving machine learning and data mining problems, collaborative human/computing systems, and computer science education. Being able to help solve important real-world problems by applying computing-based data analysis techniques is really rewarding. I have also maintained a long term interest in support vector machines, clustering, and text mining. Most recently, I have been working on an approach for helping students better understand the Git version control system.</p></div>
+            <!-- </ul> -->
         </div>
     </div>
+    <script>
+    var acc = document.getElementsByClassName("accordion");
+    var i;
+
+    for (i = 0; i < acc.length; i++) {
+        acc[i].onclick = function(){
+            this.classList.toggle("active");
+            this.nextElementSibling.classList.toggle("show");
+      }
+    }
+    </script>
     <script async defer
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM&callback=initialize">
     </script>

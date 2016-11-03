@@ -14,34 +14,46 @@
   </head>
   <body>
     <div class="header">
-      <h1>Choose your Itinerary</h1>
+      <div class="title">
+        <h1>Mytinerary</h1>
+      </div>
+      <div class="menu-buttons">
+        <a href="#" id="home">Home</a><a href="#" id="about-us">About Us</a><a href="#" id="questions">Questions</a>
     </div>
+
+
     <div class="userInput">
       <form action="/tour/map/" method="GET">
-        <p class="formTitle"> Select City: <select name="city">
+        <nav class="segmented-control">
+          <input type="radio" name=mode value="start-to-end" id="start-to-end">
+          <label for="start-to-end">Start to End Mode</label>
+          <input type="radio" name=mode value="exploratory" id="exploratory">
+          <label for="exploratory">Exploratory Mode</label>
+        </nav>
+        <div class="formTitle"> Choose city to explore: <select name="city">
             <option value="London">London</option>
             <option value="Madrid">Madrid</option>
             <option value="Minneapolis">Minneapolis</option>
             <option value="New York">New York</option>
             <option value="San Francisco">San Francisco</option>
-        </select></p>
-        <p class="formTitle"> Start Destination: <input type="text" name="startDestination"> </p>
-        <p class="formTitle"> End Destination: <input type="text" name="endDestination"> </p>
-        <p class="formTitle"> Walking Preference:
+        </select></div>
+        <div class="formTitle"> Start Destination: <input type="text" name="startDestination"> </div>
+        <div class="formTitle"> End Destination: <input type="text" name="endDestination"> </div>
+        <div class="formTitle"> Walking Preference:
         <!-- <p class="formTitle"> Couple Blocks <input type="range" name="points" min="0" max="10"> No Limit
         <input type="radio" name="walkPreference" value="Short" checked> Short
         <input type="radio" name="walkPreference" value="Medium"> Medium
         <input type="radio" name="walkPreference" value="Long"> Long </p> -->
-    
-        <input type="range" name="points" min="0" max="10" step="1" 
+
+        <input type="range" name="points" min="0" max="10" step="1"
             oninput="showVal(this.value)" onchange="showVal(this.value)">
-        <span id="valBox">5</span>&nbsp; kilometers </p>
-        
-        <p class="formTitle"> POI Preferences:
+        <span id="valBox">5</span>&nbsp; kilometers </div>
+
+        <div class="formTitle">Include:<br/>
         <input type="checkBox" name="POIChoice" value="Museum" checked> Museum
         <input type="checkBox" name="POIChoice" value="Landmark"> Landmark
         <input type="checkBox" name="POIChoice" value="Park"> Park
-        <input type="checkBox" name="POIChoice" value="Mall"> Mall</p>
+        <input type="checkBox" name="POIChoice" value="Mall"> Mall</div>
         <p class=goButton>
         <input type="submit" value="Make my Tour!">
       </p>
