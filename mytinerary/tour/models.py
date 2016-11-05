@@ -13,7 +13,7 @@ class POI(models.Model):
     phone_number = models.CharField(max_length=100, null=True)
     price = models.CharField(max_length=5)
     picture_url = models.CharField(max_length=2083, null=True)
-    summary = models.TextField()
+    summary = models.CharField(max_length=5000)
     
     def __str__(self):
         return self.business_name

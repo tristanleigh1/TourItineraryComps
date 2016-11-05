@@ -33,10 +33,10 @@ for i, coordinates in enumerate(list_of_cities):
     request = urllib.request.Request(query_url, None, {"Authorization": "Bearer %s" %access_token})
     try:
         response = urllib.request.urlopen(request).read().decode('utf-8')
-    except HTTPError as e:
-        response = e.read()
-    data = json.loads(response)
-    result_dict.setdefault(i,[]).append(data['businesses'])
+        data = json.loads(response)
+        result_dict.setdefault(i,[]).append(data['businesses'])
+    except:
+        continue
 
 print("Finding POI's...")
 for i, coordinates in enumerate(list_of_cities):
@@ -44,10 +44,10 @@ for i, coordinates in enumerate(list_of_cities):
     request = urllib.request.Request(query_url, None, {"Authorization": "Bearer %s" %access_token})
     try:
         response = urllib.request.urlopen(request).read().decode('utf-8')
-    except HTTPError as e:
-        response = e.read()
-    data = json.loads(response)
-    result_dict.setdefault(i,[]).append(data['businesses'])
+        data = json.loads(response)
+        result_dict.setdefault(i,[]).append(data['businesses'])
+    except:
+        continue
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mytinerary.settings")
 os.environ["DJANGO_SETTINGS_MODULE"] = "mytinerary.settings"
@@ -84,15 +84,25 @@ for i in range(0,len(list_of_cities)):
                 if not lon:
                     lon = list_of_cities[i][1]
 
-                # not 100% sure this works
-                #wiki_url = 'https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=%s' % (b['name'].replace(" ", "%20"))
-                #wiki_request = urllib.request.Request(wiki_url, None, {})
-                #wiki_response = urllib.request.urlopen(wiki_request).read().decode('utf-8')
-                #wiki_dict = json.loads(wiki_response)
-                #
+                list_of_categories = []
+                wiki_summary = ""
+                for category in b['categories']:
+                    list_of_categories.append(category['alias'])
+                    
+                if 'aquariums' in list_of_categories or 'beaches' in list_of_categories or 'lakes' in list_of_categories or 'parks' in list_of_categories or 'zoos' in list_of_categories or 'museums' in list_of_categories or 'stadiumsarenas' in list_of_categories or 'landmarks' in list_of_categories:
+                    wiki_url = 'https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=%s' % (b['name'].replace(" ", "%20"))
+                    wiki_request = urllib.request.Request(wiki_url, None, {})
+                    try:
+                        wiki_response = urllib.request.urlopen(wiki_request).read().decode('utf-8')
+                        wiki_dict = json.loads(wiki_response)
+                    except:
+                        continue
+                        
+                    page_id = list(wiki_dict['query']['pages'].keys())[0]
+                    if page_id != '-1':
+                        wiki_summary = wiki_dict['query']['pages'][page_id]['extract']
+                
 
-                #import wikipedia
-                #print(wikipedia.summary(b['name']))
                 p = POI.objects.filter(business_name = b.get('name', 'N/A'), city = b['location']['city'])
                 if p:
                     p.update(business_name = b.get('name','N/A'),
@@ -105,7 +115,7 @@ for i in range(0,len(list_of_cities)):
                                 phone_number = b.get('phone','N/A'),
                                 price = b.get('price','N/A'),
                                 picture_url = b.get('image_url','N/A'),
-                                summary = "")
+                                summary = wiki_summary)
                 else:
                     p = POI(business_name = b.get('name','N/A'),
                             latitude = lat,
@@ -117,8 +127,7 @@ for i in range(0,len(list_of_cities)):
                             phone_number = b.get('phone','N/A'),
                             price = b.get('price','N/A'),
                             picture_url = b.get('image_url','N/A'),
-                            summary = "")
-                            #summary = wiki_dict['extract'])
+                            summary = wiki_summary)
 
                     p.save()
             
