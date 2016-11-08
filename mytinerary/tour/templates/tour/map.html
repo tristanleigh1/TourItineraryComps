@@ -17,22 +17,27 @@
         var map = new google.maps.Map(document.getElementById('map'));
         directionsDisplay.setMap(map);
        var locations = [
-           {title: '{{origin.address}}', position: {lat: {{ origin.latitude|stringformat:"f" }}, lng: {{ origin.longitude|stringformat:"f" }}}},
+           {title: '{{origin.address}}', name: '{{origin.business_name}}', categories: {{category_dict|get_item:origin.id}}, position: {lat: {{ origin.latitude|stringformat:"f" }}, lng: {{ origin.longitude|stringformat:"f" }}}},
            {% for poi in poi_list.all %}
-               {title: '{{poi.address}}', position: {lat: {{ poi.latitude|stringformat:"f" }}, lng: {{ poi.longitude|stringformat:"f" }}}},
+               {title: '{{poi.address}}', name: '{{poi.business_name}}', categories: {{category_dict|get_item:poi.id}}, position: {lat: {{ poi.latitude|stringformat:"f" }}, lng: {{ poi.longitude|stringformat:"f" }}}},
            {% endfor %}
-           {title: '{{destination.address}}', position: {lat: {{ destination.latitude|stringformat:"f" }}, lng: {{ destination.longitude|stringformat:"f" }}}},
+           {title: '{{destination.address}}', name: '{{destination.business_name}}', categories: {{category_dict|get_item:destination.id}}, position: {lat: {{ destination.latitude|stringformat:"f" }}, lng: {{ destination.longitude|stringformat:"f" }}}},
        ];
        var markers = [];
        var infoWindow = new google.maps.InfoWindow({content: 'cool place to visit'});
        for (var i = 0; i < locations.length; i++) {
            var position = locations[i].position;
            var title = locations[i].title;
+           var icon = "";
+           if ($.inArray('Museums', locations[i].categories) > -1):
+              icon = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+           //else if ($.inArray('Parks', locations[i].categories) > -1
            var marker = new google.maps.Marker({
                map: map,
                position: position,
                title: title,
-               id: i
+               id: i,
+               label: (i+1).toString(),
            });
            markers.push(marker);
            marker.addListener('click', function() {
@@ -122,16 +127,14 @@
         <div id="sidebar">
             <h2>My Tour</h2>
             <p>Total Distance: ((something dynamic))</p>
-            <!-- <ul> -->
-                <button class="accordion">{{origin.address}}</button>
-                <div class="panel"><p>I am a professor of computer science at Carleton College, where I teach Introduction to Computer Science, Data Stuctures, Programming Languages, Artificial Intelligence, Database Systems, Data Mining, and other occasional courses. My research interests span across solving machine learning and data mining problems, collaborative human/computing systems, and computer science education. Being able to help solve important real-world problems by applying computing-based data analysis techniques is really rewarding. I have also maintained a long term interest in support vector machines, clustering, and text mining. Most recently, I have been working on an approach for helping students better understand the Git version control system.</p></div>
-                {% for poi in poi_list.all %}
-                  <button class="accordion">{{poi.address}}</button>
-                  <div class="panel"><p>I am a professor of computer science at Carleton College, where I teach Introduction to Computer Science, Data Stuctures, Programming Languages, Artificial Intelligence, Database Systems, Data Mining, and other occasional courses. My research interests span across solving machine learning and data mining problems, collaborative human/computing systems, and computer science education. Being able to help solve important real-world problems by applying computing-based data analysis techniques is really rewarding. I have also maintained a long term interest in support vector machines, clustering, and text mining. Most recently, I have been working on an approach for helping students better understand the Git version control system.</p></div>
-                {% endfor %}
-                <button class="accordion">{{destination.address}}</button>
-                <div class="panel"><p>I am a professor of computer science at Carleton College, where I teach Introduction to Computer Science, Data Stuctures, Programming Languages, Artificial Intelligence, Database Systems, Data Mining, and other occasional courses. My research interests span across solving machine learning and data mining problems, collaborative human/computing systems, and computer science education. Being able to help solve important real-world problems by applying computing-based data analysis techniques is really rewarding. I have also maintained a long term interest in support vector machines, clustering, and text mining. Most recently, I have been working on an approach for helping students better understand the Git version control system.</p></div>
-            <!-- </ul> -->
+            <button class="accordion">1: {{origin.business_name}}</button>
+            <div class="panel"><p>{{poi.summary}}</p></div>
+            {% for poi in poi_list.all %}
+              <button class="accordion">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
+              <div class="panel"><p>{{poi.summary}}</p></div>
+            {% endfor %}
+            <button class="accordion">10: {{destination.business_name}}</button>
+            <div class="panel"><p>{{poi.summary}}</p></div>
         </div>
     </div>
     <script>

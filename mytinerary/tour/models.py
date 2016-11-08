@@ -3,6 +3,9 @@ from __future__ import unicode_literals
 from django.db import models
 
 class POI(models.Model):
+
+    def default_category():
+        return "None"
     business_name = models.CharField(max_length=400)
     latitude = models.DecimalField(max_digits=12, decimal_places=9)
     longitude = models.DecimalField(max_digits=12, decimal_places=9)
@@ -13,18 +16,9 @@ class POI(models.Model):
     phone_number = models.CharField(max_length=100, null=True)
     price = models.CharField(max_length=5)
     picture_url = models.CharField(max_length=2083, null=True)
-    summary = models.TextField()
+    category = models.CharField(max_length=100)
+    popularity = models.DecimalField(max_digits=7, decimal_places=4)
+    summary = models.CharField(max_length=5000)
     
     def __str__(self):
         return self.business_name
-    
-class Category_Type(models.Model):
-    category_name = models.CharField(max_length=200, primary_key=True)
-    
-    def __str__(self):
-        return self.category_name
-    
-class POI_Type(models.Model):
-    category_name = models.ForeignKey('Category_Type',
-                                      on_delete=models.CASCADE)
-    poi_id = models.ForeignKey('POI', on_delete=models.CASCADE)

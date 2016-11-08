@@ -8,22 +8,26 @@ def index(request):
 
 #GET: tour/map/
 def map(request):
-#    poi = get_object_or_404(POI, pk=1)
-    poi_list = get_list_or_404(POI, city="Minneapolis")
-    poi_list = POI.objects.filter(city="Minneapolis")[:8]
-    origin = get_object_or_404(POI, pk=1393)
-    destination = get_object_or_404(POI, pk=1372)
 
+    poi_list = POI.objects.filter(city="Minneapolis")[:8]
+    number = 0
+    category_dict = {}
+    for poi in poi_list:
+        categories = POI_Type.objects.values_list('category_name_id', flat=True).filter(poi_id_id = poi.id)
+        category_dict[poi.id] = categories
+
+    origin = get_object_or_404(POI, pk=1114)
+    destination = get_object_or_404(POI, pk=1129)
 
     # Caleb's tests
     city = request.GET['city']
-#    poi_list = POI.objects.filter(city=city)[:8]
     start_choice = request.GET['startDestination']
     end_choice = request.GET['endDestination']
     slider_val = request.GET['points']
-
     test = "test"#calculate_score(poi_list[0])
-    context = { 'poi_list': poi_list,
+
+    context = { 'category_dict': category_dict,
+                'poi_list': poi_list,
                 'origin': origin,
                 'destination': destination,
                 'start_choice': start_choice,
