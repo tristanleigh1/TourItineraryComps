@@ -17,17 +17,21 @@
         var map = new google.maps.Map(document.getElementById('map'));
         directionsDisplay.setMap(map);
        var locations = [
-           {title: '{{origin.address}}', name: '{{origin.business_name}}', position: {lat: {{ origin.latitude|stringformat:"f" }}, lng: {{ origin.longitude|stringformat:"f" }}}},
+           {title: '{{origin.address}}', name: '{{origin.business_name}}', categories: {{category_dict|get_item:origin.id}}, position: {lat: {{ origin.latitude|stringformat:"f" }}, lng: {{ origin.longitude|stringformat:"f" }}}},
            {% for poi in poi_list.all %}
-               {title: '{{poi.address}}', name: '{{poi.business_name}}', position: {lat: {{ poi.latitude|stringformat:"f" }}, lng: {{ poi.longitude|stringformat:"f" }}}},
+               {title: '{{poi.address}}', name: '{{poi.business_name}}', categories: {{category_dict|get_item:poi.id}}, position: {lat: {{ poi.latitude|stringformat:"f" }}, lng: {{ poi.longitude|stringformat:"f" }}}},
            {% endfor %}
-           {title: '{{destination.address}}', name: '{{destination.business_name}}', position: {lat: {{ destination.latitude|stringformat:"f" }}, lng: {{ destination.longitude|stringformat:"f" }}}},
+           {title: '{{destination.address}}', name: '{{destination.business_name}}', categories: {{category_dict|get_item:destination.id}}, position: {lat: {{ destination.latitude|stringformat:"f" }}, lng: {{ destination.longitude|stringformat:"f" }}}},
        ];
        var markers = [];
        var infoWindow = new google.maps.InfoWindow({content: 'cool place to visit'});
        for (var i = 0; i < locations.length; i++) {
            var position = locations[i].position;
            var title = locations[i].title;
+           var icon = "";
+           if ($.inArray('Museums', locations[i].categories) > -1):
+              icon = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+           //else if ($.inArray('Parks', locations[i].categories) > -1
            var marker = new google.maps.Marker({
                map: map,
                position: position,
