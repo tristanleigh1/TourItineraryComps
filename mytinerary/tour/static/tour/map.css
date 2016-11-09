@@ -55,12 +55,31 @@ div.panel.show {
     display: block;
 }
 
-.menu-buttons {
-  top: -50px;
-  position:relative;
-  float: right;
+.header ul {
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+    overflow: hidden;
+    background-color: rgba(50, 50, 50, 0.85);
+    font-size: 20px;
 }
 
-a {
-  padding: 10px;
+.header li {
+    float: right;
+}
+
+.header li:last-child {
+    float: left;
+}
+
+.header li a {
+    display: block;
+    color: white;
+    padding: 14px 16px;
+    text-align: center;
+    text-decoration: none;
+}
+
+.header li a:hover {
+    background-color: #111;
 }
