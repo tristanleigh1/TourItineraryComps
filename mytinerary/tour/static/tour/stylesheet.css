@@ -33,7 +33,6 @@ a {
 }
 
 .userInput {
-  height: 230px;
   display: -webkit-flex;
   display:         flex;
   -webkit-align-items: center;

@@ -9,15 +9,15 @@ def index(request):
 #GET: tour/map/
 def map(request):
 
-    poi_list = POI.objects.filter(city="Minneapolis")[:8]
+    poi_list = POI.objects.filter(city="San Francisco")[:8]
     number = 0
     category_dict = {}
-    for poi in poi_list:
-        categories = POI_Type.objects.values_list('category_name_id', flat=True).filter(poi_id_id = poi.id)
-        category_dict[poi.id] = categories
+#    for poi in poi_list:
+#        categories = POI.objects.values_list('category', flat=True).filter(id = poi.id)
+#        category_dict[poi.id] = categories
 
-    origin = get_object_or_404(POI, pk=1114)
-    destination = get_object_or_404(POI, pk=1129)
+    origin = get_object_or_404(POI, pk=1231)
+    destination = get_object_or_404(POI, pk=1275)
 
     # Caleb's tests
     city = request.GET['city']

@@ -4,11 +4,29 @@
   <head>
     <title>Prototype</title>
     {% load static %}
-    <!--link rel="stylesheet" type="text/css" href="{% static 'tour/stylesheet.css' %}" /-->
     <link rel="stylesheet" type="text/css" href='{% static "tour/stylesheet.css" %}' />
     <script>
         function showVal(newVal){
             document.getElementById("valBox").innerHTML=newVal;
+        }
+        function setQuantifier(newVal, idName) {
+            switch(newVal) {
+                case "0":
+                    document.getElementById(idName).innerHTML="None";
+                    break;
+                case "1":
+                    document.getElementById(idName).innerHTML="Few";
+                    break;
+                case "2":
+                    document.getElementById(idName).innerHTML="Some";
+                    break;
+                case "3":
+                    document.getElementById(idName).innerHTML="Many";
+                    break;
+                case "4":
+                    document.getElementById(idName).innerHTML="Lots!";
+                    break;
+            }
         }
     </script>
   </head>
@@ -30,16 +48,16 @@
           <input type="radio" name=mode value="exploratory" id="exploratory">
           <label for="exploratory">Exploratory Mode</label>
         </nav>
-        <div class="formTitle"> Choose city to explore: <select name="city">
+        <div class="formTitle"> Choose city to explore <select name="city">
             <option value="London">London</option>
             <option value="Madrid">Madrid</option>
             <option value="Minneapolis">Minneapolis</option>
             <option value="New York">New York</option>
             <option value="San Francisco">San Francisco</option>
         </select></div>
-        <div class="formTitle"> Start Destination: <input type="text" name="startDestination"> </div>
-        <div class="formTitle"> End Destination: <input type="text" name="endDestination"> </div>
-        <div class="formTitle"> Walking Preference:
+        <div class="formTitle"> Start Destination <input type="text" name="startDestination"> </div>
+        <div class="formTitle"> End Destination <input type="text" name="endDestination"> </div>
+        <div class="formTitle"> Distance
         <!-- <p class="formTitle"> Couple Blocks <input type="range" name="points" min="0" max="10"> No Limit
         <input type="radio" name="walkPreference" value="Short" checked> Short
         <input type="radio" name="walkPreference" value="Medium"> Medium
@@ -47,13 +65,30 @@
 
         <input type="range" name="points" min="0" max="10" step="1"
             oninput="showVal(this.value)" onchange="showVal(this.value)">
-        <span id="valBox">5</span>&nbsp; kilometers </div>
-
-        <div class="formTitle">Include:<br/>
+        <span id="valBox">5</span>&nbsp; Miles </div>
+        <div class="formTitle"> Museum Preference <input type="range" name="museum" min="0" max="4" step="1"
+        oninput="setQuantifier(this.value,'museumValBox')"
+        onchange="setQuantifier(this.value,'museumValBox')">
+        <span id="museumValBox">Some</span>&nbsp; </div>
+        <div class="formTitle"> Landmark Preference <input type="range" name="landmark" min="0" max="4" step="1"
+        oninput="setQuantifier(this.value,'landmarkValBox')"
+        onchange="setQuantifier(this.value,'landmarkValBox')">
+        <span id="landmarkValBox">Some</span>&nbsp; </div>
+        <div class="formTitle"> Activities Preference <input type="range" name="activity" min="0" max="4" step="1"
+        oninput="setQuantifier(this.value,'activityValBox')"
+        onchange="setQuantifier(this.value,'activityValBox')">
+        <span id="activityValBox">Some</span>&nbsp; </div>
+        <div class="formTitle"> Nature Preference <input type="range" name="nature" min="0" max="4" step="1"
+        oninput="setQuantifier(this.value,'natureValBox')"
+        onchange="setQuantifier(this.value,'natureValBox')">
+        <span id="natureValBox">Some</span>&nbsp; </div>
+        
+<!--
         <input type="checkBox" name="POIChoice" value="Museum" checked> Museum
         <input type="checkBox" name="POIChoice" value="Landmark"> Landmark
         <input type="checkBox" name="POIChoice" value="Park"> Park
-        <input type="checkBox" name="POIChoice" value="Mall"> Mall</div>
+        <input type="checkBox" name="POIChoice" value="Mall"> Mall
+-->
         <p class=goButton>
         <input type="submit" value="Make my Tour!">
       </p>
