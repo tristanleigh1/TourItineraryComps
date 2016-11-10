@@ -8,7 +8,7 @@ def index(request):
     return render(request, 'tour/index.html')
 
 def calculate_score(current_poi, path_segments, walk_factor, preferred_pois):
-    empirical_coefficient = 0.0002
+    empirical_coefficient = 0.000002
     category = current_poi.category
     popularity = current_poi.popularity
     distance_to_path = float("inf")
@@ -84,7 +84,7 @@ def find_next_poi(poi_list, path_segments, slider_val, preference):
     return poi_to_add
 
 def create_path(total_pois, start, end, slider_val, preference):
-    MAX_POIS = 8
+    MAX_POIS = 5
     # path_segments is a list of pairs of points
     path_segments = [(start, end)]
     path_pois = []
@@ -101,15 +101,14 @@ def create_path(total_pois, start, end, slider_val, preference):
 #GET: tour/map/
 def map(request):
 
-    poi_list = POI.objects.filter(city='Minneapolis')
     number = 0
     # category_dict = {}
     # for poi in poi_list:
     #     categories = POI.objects.values_list('category', flat=True).filter(id = poi.id)
     #     category_dict[poi.id] = categories
 
-    origin = get_object_or_404(POI, pk=1393)
-    destination = get_object_or_404(POI, pk=1392)
+    origin = get_object_or_404(POI, pk=1820)
+    destination = get_object_or_404(POI, pk=1830)
 
     # Caleb's tests
     city = request.GET['city']
@@ -118,6 +117,7 @@ def map(request):
     slider_val = request.GET['points']
     preference = request.GET['POIChoice']
     
+    poi_list = POI.objects.filter(city=city)
     final_path = create_path(poi_list, origin, destination, slider_val, preference)
 
     poi_test_list = POI.objects.filter(city='Minneapolis')[:8]
