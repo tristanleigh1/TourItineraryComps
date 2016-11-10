@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404, get_list_or_404, render
+from django.http import HttpResponse
 from .models import *
 import math
 
@@ -6,6 +7,18 @@ import math
 #GET: tour/
 def index(request):
     return render(request, 'tour/index.html')
+
+def about(request):
+    html = "<html><body>A Carleton College comps project created by "
+    html += "Caleb Braun, Hailey Jones, Tristan Leigh, and Jonah Tuchow."
+    html += "<br><a href='/tour/'>Back</a></html></body>"
+    return HttpResponse(html)
+
+def contact(request):
+    html = "<html><body><h2>Contact</h2>Please only contact us by snail mail.<br><br>"
+    html += "Caleb Braun<br>300 North College St.<br>Northfield, MN 55057</html></body>"
+    html += "<br><br><a href='/tour/'>Back</a></html></body>"
+    return HttpResponse(html)
 
 def calculate_score(current_poi, path_segments, walk_factor, preferences):
     empirical_coefficient = 0.0002
