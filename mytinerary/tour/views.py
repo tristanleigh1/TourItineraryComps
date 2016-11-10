@@ -17,7 +17,7 @@ def map(request):
 #        category_dict[poi.id] = categories
 
     origin = get_object_or_404(POI, pk=1231)
-    destination = get_object_or_404(POI, pk=1275)
+    destination = get_object_or_404(POI, pk=1295)
 
     # Caleb's tests
     city = request.GET['city']

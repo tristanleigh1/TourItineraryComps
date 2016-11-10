@@ -75,28 +75,10 @@
          }
        });
      }
-
-      // function calculateAndDisplayRoute(directionsService, directionsDisplay) {
-      //   directionsService.route({
-      //     origin: '100 Portland Ave, Minneapolis, MN 55401',
-      //     destination: 'Dakota Jazz Club & Restaurant, 1010 Nicollet Mall, Minneapolis, MN 55403',
-		  // waypoints: [
-      //         {location: 'Target Center, 600 First Avenue North, Minneapolis, MN 55403'},
-      //         {location: '401 Chicago Ave, Minneapolis, MN 55415'},
-      //     ],
-      //     travelMode: 'WALKING',
-      //     optimizeWaypoints: true
-      //   }, function(response, status) {
-      //     if (status === 'OK') {
-      //       directionsDisplay.setDirections(response);
-      //     } else {
-      //       window.alert('Directions request failed due to ' + status);
-      //     }
-      //   });
-      // }
     </script>
     {% load static %}
     <link rel="stylesheet" type="text/css" href='{% static "tour/map.css" %}' />
+    <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
 </head>
 <body>
     <div class="header">
@@ -131,18 +113,18 @@
             <div class="panel"><p>{{poi.summary}}</p></div>
             {% for poi in poi_list.all %}
               <button class="accordion">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
-              <div class="panel"><p>{{poi.summary}}</p></div>
+              <div class="panel"><p>{{poi.picture_url}}</p></div>
             {% endfor %}
             <button class="accordion">10: {{destination.business_name}}</button>
             <div class="panel"><p>{{poi.summary}}</p></div>
         </div>
     </div>
+    
     <script>
-    var acc = document.getElementsByClassName("accordion");
+    var accordion = document.getElementsByClassName("accordion");
     var i;
-
-    for (i = 0; i < acc.length; i++) {
-        acc[i].onclick = function(){
+    for (i = 0; i < accordion.length; i++) {
+        accordion[i].onclick = function(){
             this.classList.toggle("active");
             this.nextElementSibling.classList.toggle("show");
       }

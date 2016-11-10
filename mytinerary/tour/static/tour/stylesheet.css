@@ -1,3 +1,7 @@
+body {
+    background-image: url("images/londonBlur.jpg");
+}
+
 .segmented-control {
   padding: 12px;
   margin-left: 20px;
@@ -40,35 +44,5 @@
   padding: 25px;
   color: rgb(42, 164, 178);
   background-color: rgba(50, 50, 50, 0.85);
-
   font-size: 30px
-}
-
-.header ul {
-    list-style-type: none;
-    margin: 0px;
-    padding: 0px;
-    overflow: hidden;
-    background-color: rgba(50, 50, 50, 0.85);
-    font-size: 20px;
-}
-
-.header li {
-    float: right;
-}
-
-.header li:last-child {
-    float: left;
-}
-
-.header li a {
-    display: block;
-    color: white;
-    padding: 14px 16px;
-    text-align: center;
-    text-decoration: none;
-}
-
-.header li a:hover {
-    background-color: #111;
 }
