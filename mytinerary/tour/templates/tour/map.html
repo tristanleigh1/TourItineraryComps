@@ -12,7 +12,7 @@
 
         var directionsService = new google.maps.DirectionsService;
         var directionsDisplay = new google.maps.DirectionsRenderer;
-        directionsDisplay.setOptions( { suppressMarkers: true } );
+        directionsDisplay.setOptions( { suppressMarkers: false } );
 
         var map = new google.maps.Map(document.getElementById('map'));
         directionsDisplay.setMap(map);
@@ -66,7 +66,7 @@
              {% endfor %}
          ],
          travelMode: 'WALKING',
-         optimizeWaypoints: false
+         optimizeWaypoints: true
        }, function(response, status) {
          if (status === 'OK') {
            directionsDisplay.setDirections(response);
