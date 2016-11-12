@@ -23,6 +23,6 @@
     text-decoration: none;
 }
 
-.header li a:hover {
+.header li:not(:last-child) a:hover {
     background-color: #111;
 }

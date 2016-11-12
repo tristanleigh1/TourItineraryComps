@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Google Maps API</title>
+  <title>Map - Mytinerary</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -9,28 +9,46 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script>
       function initialize() {
-
         var directionsService = new google.maps.DirectionsService;
         var directionsDisplay = new google.maps.DirectionsRenderer;
-        directionsDisplay.setOptions( { suppressMarkers: false } );
+        directionsDisplay.setOptions( { suppressMarkers: true } );
 
         var map = new google.maps.Map(document.getElementById('map'));
         directionsDisplay.setMap(map);
        var locations = [
-           {title: '{{origin.address}}', name: '{{origin.business_name}}', categories: 'Museums', position: {lat: {{ origin.latitude|stringformat:"f" }}, lng: {{ origin.longitude|stringformat:"f" }}}},
+           {title: '{{origin.address}}', name: '{{origin.business_name}}', category: '{{origin.category}}', position: {lat: {{ origin.latitude|stringformat:"f" }}, lng: {{ origin.longitude|stringformat:"f" }}}},
           {% for poi in poi_list %}
-               {title: '{{poi.address}}', name: '{{poi.business_name}}', categories: 'Museums', position: {lat: {{ poi.latitude|stringformat:"f" }}, lng: {{ poi.longitude|stringformat:"f" }}}},
+               {title: '{{poi.address}}', name: '{{poi.business_name}}', category: '{{poi.category}}', position: {lat: {{ poi.latitude|stringformat:"f" }}, lng: {{ poi.longitude|stringformat:"f" }}}},
            {% endfor %}
-           {title: '{{destination.address}}', name: '{{destination.business_name}}', categories: 'Museums', position: {lat: {{ destination.latitude|stringformat:"f" }}, lng: {{ destination.longitude|stringformat:"f" }}}},
+           {title: '{{destination.address}}', name: '{{destination.business_name}}', category: '{{destination.category}}', position: {lat: {{ destination.latitude|stringformat:"f" }}, lng: {{ destination.longitude|stringformat:"f" }}}},
        ];
        var markers = [];
        var infoWindow = new google.maps.InfoWindow({content: 'cool place to visit'});
        for (var i = 0; i < locations.length; i++) {
            var position = locations[i].position;
            var title = locations[i].title;
-           /*var icon = "";
-           if ($.inArray('Museums', locations[i].categories) > -1):
-              icon = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";*/
+           var categories = locations[i].category;
+           var icon = "";
+           switch (categories) {
+                case "Museums":
+                   icon = "https://maps.gstatic.com/mapfiles/ms2/micons/blue.png";
+                   break;
+                case "Landmarks":
+                   icon = "https://maps.gstatic.com/mapfiles/ms2/micons/pink.png";
+                   break;
+                case "Activities":
+                   icon = "https://maps.gstatic.com/mapfiles/ms2/micons/yellow.png";
+                   break;
+                case "Nature":
+                   icon = "https://maps.gstatic.com/mapfiles/ms2/micons/green.png";
+                   break;
+                case "Restaurants":
+                   icon = "https://maps.gstatic.com/mapfiles/ms2/micons/red.png";
+                   break;
+                default:
+                   icon = "https://maps.gstatic.com/mapfiles/ms2/micons/purple.png";
+                   break;
+           }
            //else if ($.inArray('Parks', locations[i].categories) > -1
            var marker = new google.maps.Marker({
                map: map,
@@ -38,14 +56,22 @@
                title: title,
                id: i,
                label: (i+1).toString(),
+               icon: icon,
            });
            markers.push(marker);
            marker.addListener('click', function() {
                createInfoWindow(this, infoWindow);
            });
        }
-
         calculateAndDisplayRoute(directionsService, directionsDisplay);
+        var directions = directionsDisplay.getDirections()
+        var total = 0;
+        var myroute = directions.routes[0];
+        for (var i = 0; i < myroute.legs.length; i++) {
+          total += myroute.legs[i].distance.value;
+        }
+        total = total / 1000;
+        document.getElementById('distance').innerHTML = total + ' km';
       }
 
       function createInfoWindow(marker, window) {
@@ -81,7 +107,7 @@
     <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
 </head>
 <body>
-    <p>This is temporary testing information: {{poi_list}}</p>
+<!--    <p>This is temporary testing information: {{poi_list}}</p>-->
     <div class="header">
         <ul>
           <li><a href="/tour/contact/" >Contact</a></li>
@@ -95,11 +121,10 @@
             <div id="filter-bar">
                 <ul>
                     <li><input type="checkbox" name="Museums" value="Museums">Museums<br></li>
-                    <li><input type="checkbox" name="Parks" value="Parks">Parks<br></li>
                     <li><input type="checkbox" name="Landmarks" value="Landmarks">Landmarks<br></li>
                     <li><input type="checkbox" name="Activities" value="Activities">Activities<br></li>
+                    <li><input type="checkbox" name="Parks" value="Parks">Parks<br></li>
                     <li><input type="checkbox" name="Restaurants" value="Restaurants">Restaurants<br></li>
-                    <li><input type="checkbox" name="Bars" value="Bars">Bars<br></li>
                 </ul>
             </div>
             <div class="row">
@@ -109,15 +134,58 @@
         </div>
         <div id="sidebar">
             <h2>My Tour</h2>
-            <p>Total Distance: ((something dynamic))</p>
-            <button class="accordion">1: {{origin.business_name}}</button>
-            <div class="panel"><p>{{poi.summary}}</p></div>
+            <p>Total Distance: <span id="distance"></span></p>
+            {% if origin.category == "Museums" %}
+                <button class="accordion museum">1: {{origin.business_name}}</button>
+            {% endif %}
+            {% if origin.category == "Landmarks" %}
+                <button class="accordion landmark">1: {{origin.business_name}}</button>
+            {% endif %}
+            {% if origin.category == "Activities" %}
+                <button class="accordion activity">1: {{origin.business_name}}</button>
+            {% endif %}
+            {% if origin.category == "Nature" %}
+                <button class="accordion nature">1: {{origin.business_name}}</button>
+            {% endif %}
+            {% if origin.category == "Restaurants" %}
+                <button class="accordion restaurant">1: {{origin.business_name}}</button>
+            {% endif %}
+            <div class="panel"><p>{{origin.summary}}</p></div>
+            
             {% for poi in poi_list %}
-              <button class="accordion">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
-              <div class="panel"><p>{{poi.picture_url}}</p></div>
+                {% if poi.category == "Museums" %}
+                    <button class="accordion museum">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
+                {% endif %}
+                {% if poi.category == "Landmarks" %}
+                    <button class="accordion landmark">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
+                {% endif %}
+                {% if poi.category == "Activities" %}
+                    <button class="accordion activity">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
+                {% endif %}
+                {% if poi.category == "Nature" %}
+                    <button class="accordion nature">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
+                {% endif %}
+                {% if poi.category == "Restaurants" %}
+                    <button class="accordion restaurant">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
+                {% endif %}
+                <div class="panel"><p>{{poi.summary}}</p></div>
             {% endfor %}
-            <button class="accordion">10: {{destination.business_name}}</button>
-            <div class="panel"><p>{{poi.summary}}</p></div>
+            {% if destination.category == "Museums" %}
+                <button class="accordion museum">10: {{destination.business_name}}</button>
+            {% endif %}
+            {% if destination.category == "Landmarks" %}
+                <button class="accordion landmark">10: {{destination.business_name}}</button>
+            {% endif %}
+            {% if destination.category == "Activities" %}
+                <button class="accordion activity">10: {{destination.business_name}}</button>
+            {% endif %}
+            {% if destination.category == "Nature" %}
+                <button class="accordion nature">10: {{destination.business_name}}</button>
+            {% endif %}
+            {% if destination.category == "Restaurants" %}
+                <button class="accordion restaurant">10: {{destination.business_name}}</button>
+            {% endif %}
+            <div class="panel"><p>{{destination.summary}}</p></div>
         </div>
     </div>
     

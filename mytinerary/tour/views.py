@@ -127,8 +127,8 @@ def map(request):
     #     categories = POI.objects.values_list('category', flat=True).filter(id = poi.id)
     #     category_dict[poi.id] = categories
 
-    origin = get_object_or_404(POI, pk=1820)
-    destination = get_object_or_404(POI, pk=1830)
+    origin = get_object_or_404(POI, pk=2569)
+    destination = get_object_or_404(POI, pk=2610)
 
     # Caleb's tests
     city = request.GET['city']
@@ -152,8 +152,6 @@ def map(request):
                 'poi_list': final_path,
                 'origin': origin,
                 'destination': destination,
-                'start_choice': start_choice,
-                'end_choice': end_choice,
                 'city': city}
     return render(request, 'tour/map.html', context)
 

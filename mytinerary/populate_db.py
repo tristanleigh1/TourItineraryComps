@@ -107,66 +107,50 @@ from tour.models import POI
 
 print("Storing data...")
 for b in result_dict['businesses']:
-    if b['rating'] >= 3:
-        address_string = ""
-        if b['location']['address1']:
-            address_string += b['location']['address1'] + " "
-        if b['location']['address2']:
-            address_string += b['location']['address2'] + " "
-        if b['location']['address3']:
-            address_string += b['location']['address3'] + " "
-        if b['location']:
-            address_string += b['location']['city'] + ", "
-        if b['location']['state']:
-            address_string += b['location']['state'] + " "
-        if b['location']['zip_code']:
-            address_string += b['location']['zip_code'] + " "
-        if b['location']['country']:
-            address_string += b['location']['country']
+    address_string = ""
+    if b['location']['address1']:
+        address_string += b['location']['address1'] + " "
+    if b['location']['address2']:
+        address_string += b['location']['address2'] + " "
+    if b['location']['address3']:
+        address_string += b['location']['address3'] + " "
+    if b['location']:
+        address_string += b['location']['city'] + ", "
+    if b['location']['state']:
+        address_string += b['location']['state'] + " "
+    if b['location']['zip_code']:
+        address_string += b['location']['zip_code'] + " "
+    if b['location']['country']:
+        address_string += b['location']['country']
 
-        lat = b['coordinates']['latitude']
-        lon = b['coordinates']['longitude']
-        if not lat:
-            lat = list_of_cities[i][0]
+    lat = b['coordinates']['latitude']
+    lon = b['coordinates']['longitude']
+    if not lat:
+        continue
 
-        if not lon:
-            lon = list_of_cities[i][1]
+    if not lon:
+        continue
 
-        b['popularity'] = calculate_popularity(b, result_dict)
+    b['popularity'] = calculate_popularity(b, result_dict)
 
-        wiki_summary = ""
+    wiki_summary = ""
 
-        if b['categories'] == "Nature" or b['categories'] == "Museums" or b['categories'] == "Landmarks" or b['categories'] == "Activities":
-            wiki_url = 'https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=%s' % (b['name'].replace(" ", "%20"))
-            wiki_request = urllib.request.Request(wiki_url, None, {})
-            try:
-                wiki_response = urllib.request.urlopen(wiki_request).read().decode('utf-8')
-                wiki_dict = json.loads(wiki_response)
-            except:
-                continue
+    if b['categories'] == "Nature" or b['categories'] == "Museums" or b['categories'] == "Landmarks" or b['categories'] == "Activities":
+        wiki_url = 'https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=%s' % (b['name'].replace(" ", "%20"))
+        wiki_request = urllib.request.Request(wiki_url, None, {})
+        try:
+            wiki_response = urllib.request.urlopen(wiki_request).read().decode('utf-8')
+            wiki_dict = json.loads(wiki_response)
+        except:
+            continue
 
-            page_id = list(wiki_dict['query']['pages'].keys())[0]
-            if page_id != '-1':
-                wiki_summary = wiki_dict['query']['pages'][page_id]['extract']
+        page_id = list(wiki_dict['query']['pages'].keys())[0]
+        if page_id != '-1':
+            wiki_summary = wiki_dict['query']['pages'][page_id]['extract']
 
-
-        p = POI.objects.filter(business_name = b.get('name', 'N/A'), city = b['location']['city'])
-        if p:
-            p.update(business_name = b.get('name','N/A'),
-                        latitude = lat,
-                        longitude = lon,
-                        address = address_string,
-                        city = b['location']['city'],
-                        num_stars = b.get('rating',0),
-                        num_reviews = b.get('review_count',0),
-                        phone_number = b.get('phone','N/A'),
-                        price = b.get('price','N/A'),
-                        picture_url = b.get('image_url','N/A'),
-                        category = b.get('categories', 'None'),
-                        popularity = b.get('popularity', 0.0),
-                        summary = wiki_summary)
-        else:
-            p = POI(business_name = b.get('name','N/A'),
+    p = POI.objects.filter(business_name = b.get('name', 'N/A'), city = b['location']['city'])
+    if p:
+        p.update(business_name = b.get('name','N/A'),
                     latitude = lat,
                     longitude = lon,
                     address = address_string,
@@ -178,8 +162,22 @@ for b in result_dict['businesses']:
                     picture_url = b.get('image_url','N/A'),
                     category = b.get('categories', 'None'),
                     popularity = b.get('popularity', 0.0),
-                    summary = wiki_summary)
+                    summary = wiki_summary[:3000])
+    else:
+        p = POI(business_name = b.get('name','N/A'),
+                latitude = lat,
+                longitude = lon,
+                address = address_string,
+                city = b['location']['city'],
+                num_stars = b.get('rating',0),
+                num_reviews = b.get('review_count',0),
+                phone_number = b.get('phone','N/A'),
+                price = b.get('price','N/A'),
+                picture_url = b.get('image_url','N/A'),
+                category = b.get('categories', 'None'),
+                popularity = b.get('popularity', 0.0),
+                summary = wiki_summary[:3000])
 
-            p.save()
+        p.save()
 
 print("Complete!")
