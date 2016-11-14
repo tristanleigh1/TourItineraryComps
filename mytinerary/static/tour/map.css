@@ -1,0 +1,56 @@
+#map-container {
+  position: absolute;
+  width: 80%;
+}
+
+#filter-bar {
+  border: solid 2px black;
+  height: 40px;
+}
+
+#filter-bar li {
+  float: left;
+  padding: 9px;
+  list-style-type: none;
+}
+
+#map {
+  height:800px;
+  margin-right: 15px;
+}
+
+#sidebar {
+  position: absolute;
+  height: 840px;
+  width: 20%;
+  margin-left: 80%;
+  border: solid 2px black;
+  overflow: auto;
+  background-color: #eee;
+}
+
+button.accordion {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 9px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    outline: none;
+    transition: 0.4s;
+}
+
+button.accordion.active, button.accordion:hover {
+    background-color: #ddd;
+}
+
+div.panel {
+    padding: 0 18px;
+    background-color: white;
+    display: none;
+}
+
+div.panel.show {
+    display: block;
+}

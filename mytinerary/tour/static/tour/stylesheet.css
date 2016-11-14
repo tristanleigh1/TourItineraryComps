@@ -1,19 +1,48 @@
+body {
+    background-image: url("images/londonBlur.jpg");
+}
+
+.segmented-control {
+  padding: 12px;
+  margin-left: 20px;
+}
+.segmented-control input[type=radio] {
+   display: none;
+}
+.segmented-control label {
+  border: outset 1px silver;
+  padding: 2px 24px;
+  margin-right: -5px;
+  background: #ddd;
+    cursor: pointer;
+}
+
+.segmented-control input:checked + label {
+  border: inset 1px silver;
+  background: #aaa;
+}
+
+.formTitle {
+  padding:4px;
+}
+
 .userInput {
-  height: 230px;
   display: -webkit-flex;
   display:         flex;
   -webkit-align-items: center;
           align-items: center;
-  -webkit-justify-content: left;
-          justify-content: left;
-  margin-top: 30px;
+  -webkit-justify-content: center;
+          justify-content: center;
+  margin-top: 100px;
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 150px;
-  min-width: 300px;
-  max-width: 400px;
+  min-width: 400px;
+  max-width: 750px;
+  min-height: 400px;
+  max-height: 700px;
   padding: 25px;
-  border-radius: 2em;
   color: rgb(42, 164, 178);
   background-color: rgba(50, 50, 50, 0.85);
+  font-size: 30px
 }

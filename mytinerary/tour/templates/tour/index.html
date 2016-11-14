@@ -2,127 +2,114 @@
 
 <html>
   <head>
-    <title>Prototype</title>
+    <title>Home - Mytinerary</title>
     {% load static %}
-    <!--link rel="stylesheet" type="text/css" href="{% static 'tour/stylesheet.css' %}" /-->
     <link rel="stylesheet" type="text/css" href='{% static "tour/stylesheet.css" %}' />
+    <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src='{% static "tour/js/autocomplete.js" %}'></script>
+    <script>
+        $(document).ready(function() {
+            setVal($("#points").val(), "valBox");
+            setQuantifier($("#museums").val(), "museumValBox");
+            setQuantifier($("#landmarks").val(), "landmarkValBox");
+            setQuantifier($("#activities").val(), "activityValBox");
+            setQuantifier($("#parks").val(), "parkValBox");
+        });
+        function setVal(newVal){
+            document.getElementById("valBox").innerHTML=newVal;
+        }
+        function setQuantifier(newVal, idName) {
+            switch(newVal) {
+                case "0":
+                    document.getElementById(idName).innerHTML="None";
+                    break;
+                case "1":
+                    document.getElementById(idName).innerHTML="Few";
+                    break;
+                case "2":
+                    document.getElementById(idName).innerHTML="Some";
+                    break;
+                case "3":
+                    document.getElementById(idName).innerHTML="Many";
+                    break;
+                case "4":
+                    document.getElementById(idName).innerHTML="Lots!";
+                    break;
+            }
+        }
+        
+    </script>
   </head>
   <body>
     <div class="header">
-      <h1>Choose your Itinerary</h1>
+        <ul>
+          <li><a href="/tour/contact/" >Contact</a></li>
+          <li><a href="/tour/about/">About Us</a></li>
+          <li><a href="/tour/">Home</a></li>
+          <li><a href="/tour/">Mytinerary</a></li>
+        </ul>
     </div>
+
     <div class="userInput">
       <form action="/tour/map/" method="GET">
-        <p class="formTitle"> Select City: <select name="city" id="citySelect">
+        <nav class="segmented-control">
+          <input type="radio" name=mode value="start-to-end" id="start-to-end">
+          <label for="start-to-end">Start to End Mode</label>
+          <input type="radio" name=mode value="exploratory" id="exploratory">
+          <label for="exploratory">Exploratory Mode</label>
+        </nav>
+        <div class="formTitle">Choose city to explore<select name="city" id="citySelect">
             <option value="London">London</option>
             <option value="Madrid">Madrid</option>
             <option value="Minneapolis">Minneapolis</option>
             <option value="New York">New York</option>
             <option value="San Francisco">San Francisco</option>
-        </select></p>
+        </select></div>
         <p class="formTitle"> Start Destination: 
             <input  type="text"
-                    id="autocomplete"
-                    placeholder="Enter an Address"
-                    onFocus="geolocate()"
-                    name="startDestination"> </p>
-        <p class="formTitle"> End Destination: <input type="text" id="end" name="endDestination"> </p>
-        <p class="formTitle"> Walking Preference:
+                    style="width:61%"
+                    id="autocomplete1"
+                    name="startDestination"
+                    placeholder="Enter a starting location"
+                    onFocus="geolocate()"> </p>
+        <p class="formTitle"> End Destination: 
+            <input  type="text" 
+                    style="width:62%"
+                    id="autocomplete2"
+                    name="endDestination"
+                    placeholder="Enter your final destination"> </p>
+        <div class="formTitle"> Distance
         <!-- <p class="formTitle"> Couple Blocks <input type="range" name="points" min="0" max="10"> No Limit
         <input type="radio" name="walkPreference" value="Short" checked> Short
         <input type="radio" name="walkPreference" value="Medium"> Medium
         <input type="radio" name="walkPreference" value="Long"> Long </p> -->
-    
-        <input type="range" name="points" min="0" max="10" step="1" 
-            oninput="showVal(this.value)" onchange="showVal(this.value)">
-        <span id="valBox">5</span>&nbsp; kilometers </p>
+        <input type="range" id="points" name="points" min="0" max="10" step="1"
+            oninput="setVal(this.value)" onchange="setVal(this.value)">
+        <span id="valBox"></span>&nbsp; Miles </div>
+        <div class="formTitle"> Museums<input type="range" id="museums" name="museums" min="0" max="4" step="1"
+        oninput="setQuantifier(this.value,'museumValBox')"
+        onchange="setQuantifier(this.value,'museumValBox')">
+        <span id="museumValBox"></span>&nbsp; </div>
+        <div class="formTitle"> Landmarks<input type="range" id="landmarks" name="landmarks" min="0" max="4" step="1"
+        oninput="setQuantifier(this.value,'landmarkValBox')"
+        onchange="setQuantifier(this.value,'landmarkValBox')">
+        <span id="landmarkValBox"></span>&nbsp; </div>
+        <div class="formTitle"> Activities<input type="range" id="activities" name="activities" min="0" max="4" step="1"
+        oninput="setQuantifier(this.value,'activityValBox')"
+        onchange="setQuantifier(this.value,'activityValBox')">
+        <span id="activityValBox"></span>&nbsp; </div>
+        <div class="formTitle"> Parks<input type="range" id="parks" name="parks" min="0" max="4" step="1"
+        oninput="setQuantifier(this.value,'parkValBox')"
+        onchange="setQuantifier(this.value,'parkValBox')">
+        <span id="parkValBox"></span>&nbsp; </div>
         
-        <p class="formTitle"> POI Preferences:
-        <input type="checkBox" name="POIChoice" value="Museum" checked> Museum
-        <input type="checkBox" name="POIChoice" value="Landmark"> Landmark
-        <input type="checkBox" name="POIChoice" value="Park"> Park
-        <input type="checkBox" name="POIChoice" value="Mall"> Mall</p>
         <p class=goButton>
         <input type="submit" value="Make my Tour!">
       </p>
       </form>
     </div>
-    
-    
-    <script>
-    
-    function showVal(newVal){
-        document.getElementById("valBox").innerHTML=newVal;
-    }
-        
-      // This example displays an address form, using the autocomplete feature
-      // of the Google Places API to help users fill in the information.
-
-      // This example requires the Places library. Include the libraries=places
-      // parameter when you first load the API. For example:
-      // <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM&libraries=places">
-
-      function initAutocomplete() {
-        // Create the autocomplete object, restricting the search to geographical
-        // location types.
-        autocomplete = new google.maps.places.Autocomplete(
-            /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
-            {types: ['address']});
-
-        // When the user selects an address from the dropdown, populate the address
-        // fields in the form.
-        autocomplete.addListener('place_changed', selectEndDest);
-      }
-      
-      function selectEndDest() {
-        document.getElementById("end").focus(); // ID set by OnFocusIn 
-      }
-
-      // Bias the autocomplete object to the user's geographical location,
-      // as supplied by the browser's 'navigator.geolocation' object.
-      function geolocate() {
-        /*if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(function(position) {
-            var geolocation = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            };
-            var circle = new google.maps.Circle({
-              center: geolocation,
-              radius: position.coords.accuracy
-            });
-            autocomplete.setBounds(circle.getBounds());
-          });*/
-        
-        var geolocations = {
-            'London': {
-                lat: 51.507,
-                lng: -0.127
-            },
-            'Madrid': {
-                lat: 40.416, 
-                lng: -3.704
-            },
-            'New York': {
-                lat: 40.748,
-                lng: -73.986
-            },
-            
-        }
-        
-        var city = document.getElementById('citySelect').value;
-        console.log(city);
-        
-        var circle = new google.maps.Circle({
-              center: geolocations[city],
-              radius: 100000 // 100 km
-            });
-        autocomplete.setBounds(circle.getBounds()); 
-      }
-    </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM&libraries=places&callback=initAutocomplete"
-        async defer></script>
-        
-        
+    async defer></script>
   </body>
 </html>
