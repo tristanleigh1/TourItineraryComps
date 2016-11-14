@@ -13,11 +13,31 @@ function initAutocomplete() {
     autocompleteEnd = new google.maps.places.Autocomplete(
         /** @type {!HTMLInputElement} */(document.getElementById('autocomplete2')));
 
-    autocompleteStart.addListener('place_changed', selectEndDest);
+    autocompleteStart.addListener('place_changed', handleStartAddress);
+    autocompleteEnd.addListener('place_changed', handleEndAddress);
 }
 
-function selectEndDest() {
+function handleStartAddress() {
     document.getElementById("autocomplete2").focus(); // ID set by OnFocusIn 
+    findLngLat('autocomplete1');
+}
+
+function handleEndAddress() {
+    findLngLat('autocomplete2');
+}
+
+function findLngLat(addressID) {
+    geocoder = new google.maps.Geocoder();
+    var address = document.getElementById(addressID).value;
+    console.log(address);
+    geocoder.geocode( { 'address': address}, function(results, status) {
+      if (status == 'OK') {
+        coordID = (addressID == 'autocomplete1') ? 'startLngLat' :'endLngLat';
+        document.getElementById(coordID).value = results[0].geometry.location;
+      } else {
+        alert('Geocode was not successful for the following reason: ' + status);
+      }
+    });
 }
 
 // Bias the autocomplete object to the user's geographical location,

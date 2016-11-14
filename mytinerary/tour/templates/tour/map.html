@@ -107,7 +107,8 @@
     <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
 </head>
 <body>
-<!--    <p>This is temporary testing information: {{poi_list}}</p>-->
+    <p>Origin coordinates: {{start_coords}}</p>
+    <p>Destination coordinates: {{end_coords}}</p>
     <div class="header">
         <ul>
           <li><a href="/tour/contact/" >Contact</a></li>
@@ -116,6 +117,7 @@
           <li><a href="/tour/">Mytinerary</a></li>
         </ul>
     </div>
+    <h3>{{city}}</h3>
     <div id="body">
         <div id="map-container">
             <div id="filter-bar">

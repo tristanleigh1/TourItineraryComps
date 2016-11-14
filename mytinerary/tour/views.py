@@ -132,14 +132,13 @@ def map(request):
 
     # Caleb's tests
     city = request.GET['city']
-    start_choice = request.GET['startDestination']
-    end_choice = request.GET['endDestination']
+    start_coords = request.GET['startCoords']
+    end_coords = request.GET['endCoords']
     slider_val = request.GET['points']
     museum_preference = request.GET['museums']
     landmark_preference = request.GET['landmarks']
     activity_preference = request.GET['activities']
     nature_preference = request.GET['parks']
-    
     
     preferences = [museum_preference, landmark_preference, activity_preference, nature_preference]
     
@@ -152,7 +151,9 @@ def map(request):
                 'poi_list': final_path,
                 'origin': origin,
                 'destination': destination,
-                'city': city}
+                'city': city,
+                'start_coords': start_coords,
+                'end_coords': end_coords}
     return render(request, 'tour/map.html', context)
 
 
