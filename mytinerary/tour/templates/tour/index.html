@@ -6,7 +6,9 @@
     {% load static %}
     <link rel="stylesheet" type="text/css" href='{% static "tour/stylesheet.css" %}' />
     <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function() {
             setVal($("#points").val(), "valBox");
@@ -41,6 +43,7 @@
     </script>
   </head>
   <body>
+<!--
     <div class="header">
         <ul>
           <li><a href="/tour/contact/" >Contact</a></li>
@@ -49,53 +52,137 @@
           <li><a href="/tour/">Mytinerary</a></li>
         </ul>
     </div>
+-->
 
-    <div class="userInput">
-      <form action="/tour/map/" method="GET">
-        <nav class="segmented-control">
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/tour/">Mytinerary</a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/tour/">Home</a></li>
+            <li><a href="/tour/about/">About</a></li>
+            <li><a href="/tour/contact/">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <form action="/tour/map/" method="GET">
+        <div class="col-sm-5"></div>
+        <nav class="segmented-control col-sm-3">
           <input type="radio" name=mode value="start-to-end" id="start-to-end">
           <label for="start-to-end">Start to End Mode</label>
           <input type="radio" name=mode value="exploratory" id="exploratory">
           <label for="exploratory">Exploratory Mode</label>
         </nav>
-        <div class="formTitle"> Choose city to explore <select name="city">
-            <option value="London">London</option>
-            <option value="Madrid">Madrid</option>
-            <option value="Minneapolis">Minneapolis</option>
-            <option value="New York">New York</option>
-            <option value="San Francisco">San Francisco</option>
-        </select></div>
-        <div class="formTitle"> Start Destination <input type="text" name="startDestination"> </div>
-        <div class="formTitle"> End Destination <input type="text" name="endDestination"> </div>
-        <div class="formTitle"> Distance
-        <!-- <p class="formTitle"> Couple Blocks <input type="range" name="points" min="0" max="10"> No Limit
-        <input type="radio" name="walkPreference" value="Short" checked> Short
-        <input type="radio" name="walkPreference" value="Medium"> Medium
-        <input type="radio" name="walkPreference" value="Long"> Long </p> -->
-        <input type="range" id="points" name="points" min="0" max="10" step="1"
-            oninput="setVal(this.value)" onchange="setVal(this.value)">
-        <span id="valBox"></span>&nbsp; Miles </div>
-        <div class="formTitle"> Museums<input type="range" id="museums" name="museums" min="0" max="4" step="1"
-        oninput="setQuantifier(this.value,'museumValBox')"
-        onchange="setQuantifier(this.value,'museumValBox')">
-        <span id="museumValBox"></span>&nbsp; </div>
-        <div class="formTitle"> Landmarks<input type="range" id="landmarks" name="landmarks" min="0" max="4" step="1"
-        oninput="setQuantifier(this.value,'landmarkValBox')"
-        onchange="setQuantifier(this.value,'landmarkValBox')">
-        <span id="landmarkValBox"></span>&nbsp; </div>
-        <div class="formTitle"> Activities<input type="range" id="activities" name="activities" min="0" max="4" step="1"
-        oninput="setQuantifier(this.value,'activityValBox')"
-        onchange="setQuantifier(this.value,'activityValBox')">
-        <span id="activityValBox"></span>&nbsp; </div>
-        <div class="formTitle"> Parks<input type="range" id="parks" name="parks" min="0" max="4" step="1"
-        oninput="setQuantifier(this.value,'parkValBox')"
-        onchange="setQuantifier(this.value,'parkValBox')">
-        <span id="parkValBox"></span>&nbsp; </div>
-        
-        <p class=goButton>
-        <input type="submit" value="Make my Tour!">
-      </p>
-      </form>
-    </div>
+        <div class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-4"></div>
+                <label class="col-sm-1 control-label">City</label>
+                <div class="col-sm-2">
+                    <select class="form-control" name="city">
+                        <option value="London">London</option>
+                        <option value="Madrid">Madrid</option>
+                        <option value="Minneapolis">Minneapolis</option>
+                        <option value="New York">New York</option>
+                        <option value="San Francisco">San Francisco</option>
+                    </select>
+                </div>
+                <div class="col-sm-5"></div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-4"></div>
+                <label class="col-sm-1 control-label">Start Destination</label>
+                <div class="col-sm-3">
+                    <input type="text" name="startDestination">
+                </div>
+                <div class="col-sm-4"></div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-4"></div>
+                <label class="col-sm-1 control-label">End Destination</label>
+                <div class="col-sm-3">
+                    <input type="text" name="endDestination">
+                </div>
+                <div class="col-sm-4"></div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-4"></div>
+                <label class="col-sm-1 control-label">Distance</label>
+                <div class="col-sm-2">
+                    <input type="range" class="form-control slide-input" id="points" name="points" min="0" max="10" step="1"
+                oninput="setVal(this.value)" onchange="setVal(this.value)">
+                </div>
+                <div class="col-sm-1">
+                    <span id="valBox"></span>&nbsp; Miles
+                </div>
+                <div class="col-sm-4"></div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-4"></div>
+                <label class="col-sm-1 control-label">Museums</label>
+                <div class="col-sm-2">
+                    <input type="range" id="museums" name="museums" min="0" max="4" step="1"
+            oninput="setQuantifier(this.value,'museumValBox')"
+            onchange="setQuantifier(this.value,'museumValBox')" class="form-control slide-input">
+                </div>
+                <div class="col-sm-1">
+                    <span id="museumValBox"></span>&nbsp;
+                </div>
+                <div class="col-sm-4"></div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-4"></div>
+                <label class="col-sm-1 control-label">Landmarks</label>
+                <div class="col-sm-2">
+                    <input type="range" id="landmarks" name="landmarks" min="0" max="4" step="1"
+            oninput="setQuantifier(this.value,'landmarkValBox')"
+            onchange="setQuantifier(this.value,'landmarkValBox')" class="form-control slide-input">
+                </div>
+                <div class="col-sm-1">
+                    <span id="landmarkValBox"></span>&nbsp;
+                </div>
+                <div class="col-sm-4"></div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-4"></div>
+                <label class="col-sm-1 control-label">Activities</label>
+                <div class="col-sm-2">
+                    <input type="range" id="activities" name="activities" min="0" max="4" step="1"
+            oninput="setQuantifier(this.value,'activityValBox')"
+            onchange="setQuantifier(this.value,'activityValBox')" class="form-control slide-input">
+                </div>
+                <div class="col-sm-1">
+                    <span id="activityValBox"></span>&nbsp;
+                </div>
+                <div class="col-sm-4"></div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-4"></div>
+                <label class="col-sm-1 control-label">Parks</label>
+                <div class="col-sm-2">
+                    <input type="range" id="parks" name="parks" min="0" max="4" step="1"
+            oninput="setQuantifier(this.value,'parkValBox')"
+            onchange="setQuantifier(this.value,'parkValBox')" class="form-control slide-input">
+                </div>
+                <div class="col-sm-1">
+                    <span id="parkValBox"></span>&nbsp;
+                </div>
+                <div class="col-sm-4"></div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-5"></div>
+                <input type="submit" class="col-sm-2" value="Make my Tour!">
+                <div class="col-sm-5"></div>
+            </div>
+        </div>
+    </form>
   </body>
 </html>

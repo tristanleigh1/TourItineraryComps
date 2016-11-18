@@ -26,3 +26,8 @@
 .header li:not(:last-child) a:hover {
     background-color: #111;
 }
+
+.navbar {
+  margin-bottom: 0;
+  border-radius: 0;
+}

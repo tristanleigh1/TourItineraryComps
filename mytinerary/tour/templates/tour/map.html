@@ -108,6 +108,7 @@
 </head>
 <body>
 <!--    <p>This is temporary testing information: {{poi_list}}</p>-->
+<!--
     <div class="header">
         <ul>
           <li><a href="/tour/contact/" >Contact</a></li>
@@ -116,76 +117,102 @@
           <li><a href="/tour/">Mytinerary</a></li>
         </ul>
     </div>
-    <div id="body">
-        <div id="map-container">
-            <div id="filter-bar">
-                <ul>
-                    <li><input type="checkbox" name="Museums" value="Museums">Museums<br></li>
-                    <li><input type="checkbox" name="Landmarks" value="Landmarks">Landmarks<br></li>
-                    <li><input type="checkbox" name="Activities" value="Activities">Activities<br></li>
-                    <li><input type="checkbox" name="Parks" value="Parks">Parks<br></li>
-                    <li><input type="checkbox" name="Restaurants" value="Restaurants">Restaurants<br></li>
-                </ul>
-            </div>
-            <div class="row">
-                <div id="map"></div>
-            </div>
-            <div id="buttons"></div>
+-->
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/tour/">Mytinerary</a>
         </div>
-        <div id="sidebar">
-            <h2>My Tour</h2>
-            <p>Total Distance: <span id="distance"></span></p>
-            {% if origin.category == "Museums" %}
-                <button class="accordion museum">1: {{origin.business_name}}</button>
-            {% endif %}
-            {% if origin.category == "Landmarks" %}
-                <button class="accordion landmark">1: {{origin.business_name}}</button>
-            {% endif %}
-            {% if origin.category == "Activities" %}
-                <button class="accordion activity">1: {{origin.business_name}}</button>
-            {% endif %}
-            {% if origin.category == "Nature" %}
-                <button class="accordion nature">1: {{origin.business_name}}</button>
-            {% endif %}
-            {% if origin.category == "Restaurants" %}
-                <button class="accordion restaurant">1: {{origin.business_name}}</button>
-            {% endif %}
-            <div class="panel"><p>{{origin.summary}}</p></div>
-            
-            {% for poi in poi_list %}
-                {% if poi.category == "Museums" %}
-                    <button class="accordion museum">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
+        <div class="collapse navbar-collapse" id="myNavbar">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/tour/">Home</a></li>
+            <li><a href="/tour/about/">About</a></li>
+            <li><a href="/tour/contact/">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-9">
+                <div class="row">
+                    <div class="col-md-12" id="filter-bar">
+                        <ul>
+                            <li><input type="checkbox" name="Museums" value="Museums">Museums<br></li>
+                            <li><input type="checkbox" name="Landmarks" value="Landmarks">Landmarks<br></li>
+                            <li><input type="checkbox" name="Activities" value="Activities">Activities<br></li>
+                            <li><input type="checkbox" name="Parks" value="Parks">Parks<br></li>
+                            <li><input type="checkbox" name="Restaurants" value="Restaurants">Restaurants<br></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="map"></div>
+                    </div>
+                </div>
+                <div id="buttons"></div>
+            </div>
+            <div class="col-md-3" id="sidebar">
+                <h2>My Tour</h2>
+                <p>Total Distance: <span id="distance"></span></p>
+                {% if origin.category == "Museums" %}
+                    <button class="accordion museum">1: {{origin.business_name}}</button>
                 {% endif %}
-                {% if poi.category == "Landmarks" %}
-                    <button class="accordion landmark">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
+                {% if origin.category == "Landmarks" %}
+                    <button class="accordion landmark">1: {{origin.business_name}}</button>
                 {% endif %}
-                {% if poi.category == "Activities" %}
-                    <button class="accordion activity">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
+                {% if origin.category == "Activities" %}
+                    <button class="accordion activity">1: {{origin.business_name}}</button>
                 {% endif %}
-                {% if poi.category == "Nature" %}
-                    <button class="accordion nature">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
+                {% if origin.category == "Nature" %}
+                    <button class="accordion nature">1: {{origin.business_name}}</button>
                 {% endif %}
-                {% if poi.category == "Restaurants" %}
-                    <button class="accordion restaurant">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
+                {% if origin.category == "Restaurants" %}
+                    <button class="accordion restaurant">1: {{origin.business_name}}</button>
                 {% endif %}
-                <div class="panel"><p>{{poi.summary}}</p></div>
-            {% endfor %}
-            {% if destination.category == "Museums" %}
-                <button class="accordion museum">10: {{destination.business_name}}</button>
-            {% endif %}
-            {% if destination.category == "Landmarks" %}
-                <button class="accordion landmark">10: {{destination.business_name}}</button>
-            {% endif %}
-            {% if destination.category == "Activities" %}
-                <button class="accordion activity">10: {{destination.business_name}}</button>
-            {% endif %}
-            {% if destination.category == "Nature" %}
-                <button class="accordion nature">10: {{destination.business_name}}</button>
-            {% endif %}
-            {% if destination.category == "Restaurants" %}
-                <button class="accordion restaurant">10: {{destination.business_name}}</button>
-            {% endif %}
-            <div class="panel"><p>{{destination.summary}}</p></div>
+                <div class="panel"><p>{{origin.summary}}</p></div>
+
+                {% for poi in poi_list %}
+                    {% if poi.category == "Museums" %}
+                        <button class="accordion museum">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
+                    {% endif %}
+                    {% if poi.category == "Landmarks" %}
+                        <button class="accordion landmark">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
+                    {% endif %}
+                    {% if poi.category == "Activities" %}
+                        <button class="accordion activity">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
+                    {% endif %}
+                    {% if poi.category == "Nature" %}
+                        <button class="accordion nature">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
+                    {% endif %}
+                    {% if poi.category == "Restaurants" %}
+                        <button class="accordion restaurant">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
+                    {% endif %}
+                    <div class="panel"><p>{{poi.summary}}</p></div>
+                {% endfor %}
+                {% if destination.category == "Museums" %}
+                    <button class="accordion museum">10: {{destination.business_name}}</button>
+                {% endif %}
+                {% if destination.category == "Landmarks" %}
+                    <button class="accordion landmark">10: {{destination.business_name}}</button>
+                {% endif %}
+                {% if destination.category == "Activities" %}
+                    <button class="accordion activity">10: {{destination.business_name}}</button>
+                {% endif %}
+                {% if destination.category == "Nature" %}
+                    <button class="accordion nature">10: {{destination.business_name}}</button>
+                {% endif %}
+                {% if destination.category == "Restaurants" %}
+                    <button class="accordion restaurant">10: {{destination.business_name}}</button>
+                {% endif %}
+                <div class="panel"><p>{{destination.summary}}</p></div>
+            </div>
         </div>
     </div>
     
