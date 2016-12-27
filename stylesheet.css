@@ -1,0 +1,35 @@
+body {
+    background-image: url("images/londonBlur.jpg");
+}
+
+.formTitle {
+  padding:4px;
+}
+
+
+.slide-input {
+	background-color:black;
+}
+
+input[type="range"],
+input[type="range"]:focus
+{   
+  border-color: none;
+  box-shadow: none;
+  outline: 0 none;
+}
+
+.range-val {
+	position: relative;
+	top:7px;
+}
+
+.navbar {
+	margin-bottom: 0;
+	border-radius: 0;
+}
+
+.preference-form {
+	position: relative;
+	padding:5px;
+}
