@@ -1,14 +1,16 @@
 body {
-/*    background-color: #e5e3df;/*color of google maps loading*/ */
-    background-color: white;
+    background-color: #e5e3df;
 }
 
 .container-fluid {
-    padding-right:0;
-    padding-left:0;
-    margin-right:auto;
-    margin-left:auto
- }
+    padding-left:0px;
+    padding-right:0px;
+}
+
+.navbar-header {
+    padding-left: 15px;
+    padding-right: 15px;
+}
 
 #map-container {
     top: 46px;
@@ -30,7 +32,7 @@ body {
 }
 
 #sidebar {
-    height: 840px;
+    height: 706px;
     overflow: auto;
     
 }
@@ -67,7 +69,7 @@ button.accordion {
 }
 
 button.accordion:hover {
-    background-color: white;
+    color: grey;
 }
 
 div.panel {
