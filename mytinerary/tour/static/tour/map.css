@@ -1,17 +1,21 @@
 body {
-    background-color: #e5e3df;
+/*    background-color: #e5e3df;/*color of google maps loading*/ */
+    background-color: white;
 }
+
+.container-fluid {
+    padding-right:0;
+    padding-left:0;
+    margin-right:auto;
+    margin-left:auto
+ }
 
 #map-container {
     top: 46px;
-/*    position: absolute;*/
-/*    width: 80%;*/
 }
 
 #filter-bar {
     position: relative;
-/*    color: white;*/
-/*    background: #eee;*/
     height: 40px;
 }
 
@@ -23,18 +27,11 @@ body {
 
 #map {
     height:800px;
-/*    margin-right: 15px;*/
 }
 
 #sidebar {
-/*    position: absolute;*/
     height: 840px;
-/*    width: 20%;*/
-/*    margin-left: 80%;*/
-    /*  border: solid 2px black;*/
     overflow: auto;
-/*    background-color: #eee;*/
-/*    padding-top: 17px;*/
     
 }
 
@@ -70,7 +67,7 @@ button.accordion {
 }
 
 button.accordion:hover {
-    background-color: #ddd;
+    background-color: white;
 }
 
 div.panel {
