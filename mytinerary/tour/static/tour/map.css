@@ -66,6 +66,7 @@ button.accordion {
     border: none;
     outline: none;
     transition: 0.4s;
+    margin-left: 10px;
 }
 
 button.accordion:hover {
