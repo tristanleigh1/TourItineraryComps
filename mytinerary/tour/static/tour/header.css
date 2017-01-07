@@ -1,3 +1,4 @@
+/*
 .header ul {
     list-style-type: none;
     margin: 0px;
@@ -13,6 +14,7 @@
 
 .header li:last-child {
     float: left;
+    padding: 15px;
 }
 
 .header li a {
@@ -25,4 +27,10 @@
 
 .header li:not(:last-child) a:hover {
     background-color: #111;
+}
+*/
+
+.navbar {
+  margin-bottom: 0;
+  border-radius: 0;
 }

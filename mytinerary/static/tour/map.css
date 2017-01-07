@@ -1,37 +1,64 @@
+body {
+    background-color: #e5e3df;
+}
+
+.container-fluid {
+    padding-left:0px;
+    padding-right:0px;
+}
+
+.navbar-header {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
 #map-container {
-  position: absolute;
-  width: 80%;
+    top: 46px;
 }
 
 #filter-bar {
-  border: solid 2px black;
-  height: 40px;
+    position: relative;
+    height: 40px;
 }
 
 #filter-bar li {
-  float: left;
-  padding: 9px;
-  list-style-type: none;
+    float: left;
+    padding: 9px;
+    list-style-type: none;
 }
 
 #map {
-  height:800px;
-  margin-right: 15px;
+    height:800px;
 }
 
 #sidebar {
-  position: absolute;
-  height: 840px;
-  width: 20%;
-  margin-left: 80%;
-  border: solid 2px black;
-  overflow: auto;
-  background-color: #eee;
+    height: 706px;
+    overflow: auto;
+    
+}
+
+#sidebar h2{
+/*    color: white;*/
+}
+
+.museum {
+    background-color: #6890fb;
+}
+.landmark {
+    background-color: #e661ac;
+}
+.activity {
+    background-color: #fdf569;
+}
+.nature {
+    background-color: #00e64d;
+}
+.restaurant {
+    background-color: #fd7567;
 }
 
 button.accordion {
-    background-color: #eee;
-    color: #444;
+    color: black;
     cursor: pointer;
     padding: 9px;
     width: 100%;
@@ -39,10 +66,11 @@ button.accordion {
     border: none;
     outline: none;
     transition: 0.4s;
+    margin-left: 10px;
 }
 
-button.accordion.active, button.accordion:hover {
-    background-color: #ddd;
+button.accordion:hover {
+    color: grey;
 }
 
 div.panel {

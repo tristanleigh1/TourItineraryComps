@@ -3,6 +3,10 @@
 <html>
   <head>
     <title>Home - Mytinerary</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	
     {% load static %}
     <link rel="stylesheet" type="text/css" href='{% static "tour/stylesheet.css" %}' />
     <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
@@ -42,80 +46,147 @@
     </script>
   </head>
   <body>
-    <div class="header">
-        <ul>
-          <li><a href="/tour/contact/" >Contact</a></li>
-          <li><a href="/tour/about/">About Us</a></li>
-          <li><a href="/tour/">Home</a></li>
-          <li><a href="/tour/">Mytinerary</a></li>
-        </ul>
-    </div>
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/tour/">Mytinerary</a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/tour/">Home</a></li>
+            <li><a href="/tour/about/">About</a></li>
+            <li><a href="/tour/contact/">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+	<div class="col-sm-4"></div>
+	<div class="col-sm-4">
+		<form action="/tour/map/" method="GET" class="preference-form">
+			<div class="form-horizontal">
+				<fieldset>
+					<div class="form-group row">
+						<div class="col-sm-3"></div>
+						<div class="btn-group col-sm-9" data-toggle="buttons">
+							<label class="btn btn-primary active">
+								<input type="radio" name="mode" id="start-to-end" value="start-to-end" autocomplete="off" checked> Start-to-End Mode
+							</label>
+							<label class="btn btn-primary">
+								<input type="radio" name="mode" id="exploratory" value="exploratory" autocomplete="off"> Exploratory Mode
+							</label>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-3 control-label">City</label>
+						<div class="col-sm-6">
+							<select class="form-control" name="city" id="citySelect">
+								<option value="London">London</option>
+								<option value="Madrid">Madrid</option>
+								<option value="Minneapolis">Minneapolis</option>
+								<option value="New York">New York</option>
+								<option value="San Francisco">San Francisco</option>
+							</select>
+						</div>
+					</div>
+				</fieldset>
+				<fieldset>
+					<div class="form-group row">
+						<label class="col-sm-3 control-label">Start Destination</label>
+						<div class="col-sm-6">
+                            <input  type="text"
+                                style="width:61%"
+                                class="form-control"
+                                id="autocomplete1"
+                                name="startDestination"
+                                placeholder="Enter a starting location"
+                                onFocus="geolocate()">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-3 control-label">End Destination</label>
+						<div class="col-sm-6">
+                            <input  type="text" 
+                                style="width:62%"
+                                class="form-control"
+                                id="autocomplete2"
+                                name="endDestination"
+                                placeholder="Enter your final destination">
+						</div>
+					</div>
+                <input type="hidden" id="startLngLat" name="startCoords">
+                <input type="hidden" id="endLngLat" name="endCoords">
+					<div class="form-group row ">
+						<label class="col-sm-3 control-label">Distance</label>
+						<div class="col-sm-6">
+							<input type="range" class="form-control slide-input" id="points" name="points" min="0" max="10" step="1"
+						oninput="setVal(this.value)" onchange="setVal(this.value)">
+						</div>
+						<div class="col-sm-2 range-val">
+							<span id="valBox"></span>&nbsp; Miles
+						</div>
+					</div>
+				</fieldset>
+				<fieldset>
+					<div class="form-group row">
+						
+						<label class="col-sm-3 control-label">Museums</label>
+						<div class="col-sm-6">
+							<input type="range" id="museums" name="museums" min="0" max="4" step="1"
+					oninput="setQuantifier(this.value,'museumValBox')"
+					onchange="setQuantifier(this.value,'museumValBox')" class="form-control slide-input">
+						</div>
+						<div class="col-sm-2 range-val">
+							<span id="museumValBox"></span>&nbsp;
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-3 control-label">Landmarks</label>
+						<div class="col-sm-6">
+							<input type="range" id="landmarks" name="landmarks" min="0" max="4" step="1"
+					oninput="setQuantifier(this.value,'landmarkValBox')"
+					onchange="setQuantifier(this.value,'landmarkValBox')" class="form-control slide-input">
+						</div>
+						<div class="col-sm-2 range-val">
+							<span id="landmarkValBox"></span>&nbsp;
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-3 control-label">Activities</label>
+						<div class="col-sm-6">
+							<input type="range" id="activities" name="activities" min="0" max="4" step="1"
+					oninput="setQuantifier(this.value,'activityValBox')"
+					onchange="setQuantifier(this.value,'activityValBox')" class="form-control slide-input">
+						</div>
+						<div class="col-sm-2 range-val">
+							<span id="activityValBox"></span>&nbsp;
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-3 control-label">Parks</label>
+						<div class="col-sm-6">
+							<input type="range" id="parks" name="parks" min="0" max="4" step="1"
+					oninput="setQuantifier(this.value,'parkValBox')"
+					onchange="setQuantifier(this.value,'parkValBox')" class="form-control slide-input">
+						</div>
+						<div class="col-sm-2 range-val">
+							<div id="parkValBox"></div>&nbsp;
+						</div>
+					</div>
 
-    <div class="userInput">
-      <form action="/tour/map/" method="GET">
-      
-        <nav class="segmented-control">
-          <input type="radio" name=mode value="start-to-end" id="start-to-end">
-          <label for="start-to-end">Start to End Mode</label>
-          <input type="radio" name=mode value="exploratory" id="exploratory">
-          <label for="exploratory">Exploratory Mode</label>
-        </nav>
-        
-        <div class="formTitle">Choose city to explore<select name="city" id="citySelect">
-            <option value="London">London</option>
-            <option value="Madrid">Madrid</option>
-            <option value="Minneapolis">Minneapolis</option>
-            <option value="New York">New York</option>
-            <option value="San Francisco">San Francisco</option>
-        </select></div>
-        
-        <p class="formTitle"> Start Destination: 
-            <input  type="text"
-                    style="width:61%"
-                    id="autocomplete1"
-                    name="startDestination"
-                    placeholder="Enter a starting location"
-                    onFocus="geolocate()"> </p>
-        <p class="formTitle"> End Destination: 
-            <input  type="text" 
-                    style="width:62%"
-                    id="autocomplete2"
-                    name="endDestination"
-                    placeholder="Enter your final destination"> </p>
-        <input type="hidden" id="startLngLat" name="startCoords">
-        <input type="hidden" id="endLngLat" name="endCoords">
-                    
-        <div class="formTitle"> Distance
-        <!-- <p class="formTitle"> Couple Blocks <input type="range" name="points" min="0" max="10"> No Limit
-        <input type="radio" name="walkPreference" value="Short" checked> Short
-        <input type="radio" name="walkPreference" value="Medium"> Medium
-        <input type="radio" name="walkPreference" value="Long"> Long </p> -->
-        <input type="range" id="points" name="points" min="0" max="10" step="1"
-            oninput="setVal(this.value)" onchange="setVal(this.value)">
-        <span id="valBox"></span>&nbsp; Miles </div>
-        <div class="formTitle"> Museums<input type="range" id="museums" name="museums" min="0" max="4" step="1"
-        oninput="setQuantifier(this.value,'museumValBox')"
-        onchange="setQuantifier(this.value,'museumValBox')">
-        <span id="museumValBox"></span>&nbsp; </div>
-        <div class="formTitle"> Landmarks<input type="range" id="landmarks" name="landmarks" min="0" max="4" step="1"
-        oninput="setQuantifier(this.value,'landmarkValBox')"
-        onchange="setQuantifier(this.value,'landmarkValBox')">
-        <span id="landmarkValBox"></span>&nbsp; </div>
-        <div class="formTitle"> Activities<input type="range" id="activities" name="activities" min="0" max="4" step="1"
-        oninput="setQuantifier(this.value,'activityValBox')"
-        onchange="setQuantifier(this.value,'activityValBox')">
-        <span id="activityValBox"></span>&nbsp; </div>
-        <div class="formTitle"> Parks<input type="range" id="parks" name="parks" min="0" max="4" step="1"
-        oninput="setQuantifier(this.value,'parkValBox')"
-        onchange="setQuantifier(this.value,'parkValBox')">
-        <span id="parkValBox"></span>&nbsp; </div>
-        
-        <p class=goButton>
-        <input type="submit" value="Make my Tour!">
-      </p>
-      </form>
-    </div>
+					<div class="form-group row">
+						<div class="col-sm-3"></div>
+						<input type="submit" class="col-sm-6 btn btn-primary" value="Make my Tour!">
+					</div>
+				</fieldset>
+			</div>
+		</form>
+	</div>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM&libraries=places&callback=initAutocomplete"
-    async defer></script>
+     async defer></script>
   </body>
 </html>

@@ -45,7 +45,7 @@ for i, coordinates in enumerate(list_of_cities):
         response1 = urllib.request.urlopen(request1).read().decode('utf-8')
         data1 = json.loads(response1)
         for j in range(0,len(data1['businesses'])):
-            data1['businesses'][j]['categories'] = "Restaurants"
+            data1['businesses'][j]['category'] = "Restaurants"
             data1['businesses'][j]['location']['city'] = list_of_city_names[i]
             result_dict.setdefault('businesses',[]).append(data1['businesses'][j])
     except:
@@ -57,7 +57,7 @@ for i, coordinates in enumerate(list_of_cities):
         response2 = urllib.request.urlopen(request2).read().decode('utf-8')
         data2 = json.loads(response2)
         for j in range(0,len(data2['businesses'])):
-            data2['businesses'][j]['categories'] = "Nature"
+            data2['businesses'][j]['category'] = "Nature"
             data2['businesses'][j]['location']['city'] = list_of_city_names[i]
             result_dict.setdefault('businesses',[]).append(data2['businesses'][j])
     except:
@@ -69,7 +69,7 @@ for i, coordinates in enumerate(list_of_cities):
         response3 = urllib.request.urlopen(request3).read().decode('utf-8')
         data3 = json.loads(response3)
         for j in range(0,len(data3['businesses'])):
-            data3['businesses'][j]['categories'] = "Activities"
+            data3['businesses'][j]['category'] = "Activities"
             data3['businesses'][j]['location']['city'] = list_of_city_names[i]
             result_dict.setdefault('businesses',[]).append(data3['businesses'][j])
     except:
@@ -81,7 +81,7 @@ for i, coordinates in enumerate(list_of_cities):
         response4 = urllib.request.urlopen(request4).read().decode('utf-8')
         data4 = json.loads(response4)
         for j in range(0,len(data4['businesses'])):
-            data4['businesses'][j]['categories'] = "Museums"
+            data4['businesses'][j]['category'] = "Museums"
             data4['businesses'][j]['location']['city'] = list_of_city_names[i]
             result_dict.setdefault('businesses',[]).append(data4['businesses'][j])
     except:
@@ -93,7 +93,7 @@ for i, coordinates in enumerate(list_of_cities):
         response5 = urllib.request.urlopen(request5).read().decode('utf-8')
         data5 = json.loads(response5)
         for j in range(0,len(data5['businesses'])):
-            data5['businesses'][j]['categories'] = "Landmarks"
+            data5['businesses'][j]['category'] = "Landmarks"
             data5['businesses'][j]['location']['city'] = list_of_city_names[i]
             result_dict.setdefault('businesses',[]).append(data5['businesses'][j])
     except:
@@ -132,25 +132,40 @@ for b in result_dict['businesses']:
         continue
 
     b['popularity'] = calculate_popularity(b, result_dict)
-
+    
     wiki_summary = ""
-
-    if b['categories'] == "Nature" or b['categories'] == "Museums" or b['categories'] == "Landmarks" or b['categories'] == "Activities":
-        wiki_url = 'https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=%s' % (b['name'].replace(" ", "%20"))
-        wiki_request = urllib.request.Request(wiki_url, None, {})
+    if b['category'] != "Restaurants":
+        wiki_coordinates ='https://en.wikipedia.org/w/api.php?format=json&action=query&list=geosearch&gsradius=10000&gscoord=%s|%s&gslimit=250' % (lat, lon)
+        wiki_coord_request = urllib.request.Request(wiki_coordinates, None, {})
         try:
-            wiki_response = urllib.request.urlopen(wiki_request).read().decode('utf-8')
-            wiki_dict = json.loads(wiki_response)
+            wiki_coord_response = urllib.request.urlopen(wiki_coord_request).read().decode('utf-8')
+            wiki_coord_dict = json.loads(wiki_coord_response)
         except:
             continue
+            
+        for item in wiki_coord_dict['query']['geosearch']:
+            if b['name'] == item['title']:
+                wiki_url = 'https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=%s' % (b['name'].replace(" ", "%20"))
+                wiki_request = urllib.request.Request(wiki_url, None, {})
+                try:
+                    wiki_response = urllib.request.urlopen(wiki_request).read().decode('utf-8')
+                    wiki_dict = json.loads(wiki_response)
+                except:
+                    continue
 
-        page_id = list(wiki_dict['query']['pages'].keys())[0]
-        if page_id != '-1':
-            wiki_summary = wiki_dict['query']['pages'][page_id]['extract']
+                page_id = list(wiki_dict['query']['pages'].keys())[0]
+                if page_id != '-1':
+                    wiki_summary = wiki_dict['query']['pages'][page_id]['extract']
+    if wiki_summary == "":
+        list_of_cats = []
+        for category in b['categories']:
+            list_of_cats.append(category['title'])
+        wiki_summary = ', '.join(list_of_cats)
+
 
     p = POI.objects.filter(business_name = b.get('name', 'N/A'), city = b['location']['city'])
     if p:
-        p.update(business_name = b.get('name','N/A'),
+        p.update(business_name = b['name'],
                     latitude = lat,
                     longitude = lon,
                     address = address_string,
@@ -160,7 +175,7 @@ for b in result_dict['businesses']:
                     phone_number = b.get('phone','N/A'),
                     price = b.get('price','N/A'),
                     picture_url = b.get('image_url','N/A'),
-                    category = b.get('categories', 'None'),
+                    category = b.get('category', 'None'),
                     popularity = b.get('popularity', 0.0),
                     summary = wiki_summary[:3000])
     else:
@@ -174,7 +189,7 @@ for b in result_dict['businesses']:
                 phone_number = b.get('phone','N/A'),
                 price = b.get('price','N/A'),
                 picture_url = b.get('image_url','N/A'),
-                category = b.get('categories', 'None'),
+                category = b.get('category', 'None'),
                 popularity = b.get('popularity', 0.0),
                 summary = wiki_summary[:3000])
 
