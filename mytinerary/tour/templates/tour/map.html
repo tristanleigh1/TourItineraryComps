@@ -88,7 +88,7 @@
       }
 
      function calculateAndDisplayRoute(geocoder, directionsService, directionsDisplay) {
-         waypoints = [] 
+         /* waypoints = [] 
          {% for poi in poi_list %}
                 var latlng = {lat: {{ poi.latitude|stringformat:"f" }}, lng: {{ poi.longitude|stringformat:"f" }}};
                 geocoder.geocode({'location':latlng}, function(results, status) {
@@ -107,11 +107,15 @@
                 });
          {% endfor %}
          console.log(waypoints);
-
+            */
          directionsService.route({
             origin: '{{origin.address}}',
             destination: '{{destination.address}}',
-		    waypoints: waypoints,
+            waypoints: [
+                {% for poi in poi_list %}
+                {location: '{{poi.address}}'},
+                {% endfor %}
+            ],
             travelMode: 'WALKING',
             optimizeWaypoints: true
          }, function(response, status) {

@@ -13,8 +13,15 @@ function initAutocomplete() {
     autocompleteEnd = new google.maps.places.Autocomplete(
         /** @type {!HTMLInputElement} */(document.getElementById('autocomplete2')));
 
-    autocompleteStart.addListener('place_changed', handleStartAddress);
-    autocompleteEnd.addListener('place_changed', handleEndAddress);
+    //autocompleteEnd.addListener('place_changed', handleEndAddress);
+    //autocompleteStart.addListener('place_changed', handleStartAddress);
+
+    autocompleteStart.addListener('place_changed', function() {
+        document.getElementById('startLngLat').value = autocompleteStart.getPlace().geometry.location;
+    });
+    autocompleteEnd.addListener('place_changed', function() {
+        document.getElementById('endLngLat').value = autocompleteEnd.getPlace().geometry.location;
+    });
 }
 
 function handleStartAddress() {
@@ -33,6 +40,7 @@ function findLngLat(addressID) {
     geocoder.geocode( { 'address': address}, function(results, status) {
       if (status == 'OK') {
         coordID = (addressID == 'autocomplete1') ? 'startLngLat' :'endLngLat';
+        console.log(coordID);
         document.getElementById(coordID).value = results[0].geometry.location;
       } else {
         alert('Geocode was not successful for the following reason: ' + status);

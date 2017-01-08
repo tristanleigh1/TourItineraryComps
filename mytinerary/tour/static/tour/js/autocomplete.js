@@ -1,42 +1,27 @@
-
-// This example displays an address form, using the autocomplete feature
-// of the Google Places API to help users fill in the information.
+/* 
+ * Javascript for the start and end address autocompletion. Also fills in the hidden
+ * form fields for start and end long/lat. Written with help from the autocomplete
+ * documentation found here:
+ * https://developers.google.com/maps/documentation/javascript/examples/places-autocomplete
+ * 
+ * @author Caleb Braun
+ * 1/8/17
+*/
 
 // This requires the Places library. Include the libraries=places
 // parameter when you first load the API.
 
 function initAutocomplete() {
-    // Create the autocomplete object, restricting the search to geographical
-    // location types.
     autocompleteStart = new google.maps.places.Autocomplete(
         /** @type {!HTMLInputElement} */(document.getElementById('autocomplete1')));    
     autocompleteEnd = new google.maps.places.Autocomplete(
         /** @type {!HTMLInputElement} */(document.getElementById('autocomplete2')));
 
-    autocompleteStart.addListener('place_changed', handleStartAddress);
-    autocompleteEnd.addListener('place_changed', handleEndAddress);
-}
-
-function handleStartAddress() {
-    document.getElementById("autocomplete2").focus(); // ID set by OnFocusIn 
-    findLngLat('autocomplete1');
-}
-
-function handleEndAddress() {
-    findLngLat('autocomplete2');
-}
-
-function findLngLat(addressID) {
-    geocoder = new google.maps.Geocoder();
-    var address = document.getElementById(addressID).value;
-    console.log(address);
-    geocoder.geocode( { 'address': address}, function(results, status) {
-      if (status == 'OK') {
-        coordID = (addressID == 'autocomplete1') ? 'startLngLat' :'endLngLat';
-        document.getElementById(coordID).value = results[0].geometry.location;
-      } else {
-        alert('Geocode was not successful for the following reason: ' + status);
-      }
+    autocompleteStart.addListener('place_changed', function() {
+        document.getElementById('startLngLat').value = autocompleteStart.getPlace().geometry.location;
+    });
+    autocompleteEnd.addListener('place_changed', function() {
+        document.getElementById('endLngLat').value = autocompleteEnd.getPlace().geometry.location;
     });
 }
 

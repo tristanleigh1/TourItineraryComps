@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, get_list_or_404, render
 from django.http import HttpResponse
+from django.db.models import Func, F
 from .models import *
 import math
 
@@ -110,6 +111,11 @@ def create_path(total_pois, start, end, slider_val, preferences):
     path_pois = []
     total_pois = list(total_pois)
 
+    # given a start and end address (which we take as lat lng):
+    # 1. Check if it's a POI
+    # 2. If so, remove POI from list and make start point it's POI object
+    # 3. If not, deal with starting with an address, not a POI
+
     while len(path_pois) < MAX_POIS:
         poi = find_next_poi(total_pois, path_segments, slider_val, preferences)
         path_pois.append(poi)
@@ -121,16 +127,10 @@ def create_path(total_pois, start, end, slider_val, preferences):
 #GET: tour/map/
 def map(request):
 
-    number = 0
-    # category_dict = {}
-    # for poi in poi_list:
-    #     categories = POI.objects.values_list('category', flat=True).filter(id = poi.id)
-    #     category_dict[poi.id] = categories
-
     origin = get_object_or_404(POI, pk=2569)
     destination = get_object_or_404(POI, pk=2610)
 
-    # Caleb's tests
+    # Form values
     city = request.GET['city']
     start_coords = request.GET['startCoords']
     end_coords = request.GET['endCoords']
@@ -144,8 +144,6 @@ def map(request):
     
     poi_list = POI.objects.filter(city=city)
     final_path = create_path(poi_list, origin, destination, slider_val, preferences)
-
-    poi_test_list = POI.objects.filter(city='Minneapolis')[:8]
 
     context = { #'category_dict': category_dict,
                 'poi_list': final_path,
