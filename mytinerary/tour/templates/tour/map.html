@@ -10,7 +10,6 @@
   <script>
       var markers = [];
       function initialize() {
-          console.log('here');
         var directionsService = new google.maps.DirectionsService;
         var directionsDisplay = new google.maps.DirectionsRenderer;
         var geocoder = new google.maps.Geocoder;
@@ -95,29 +94,34 @@
                 geocoder.geocode({'location':latlng}, function(results, status) {
                     if (status === 'OK') {
                         if (results[0]) {
-                            waypoints.push({location: results[0]});
+                            waypoints.push({location: results[0].formatted_address});
+                            console.log('pushed {{poi.business_name}}' + results[0].formatted_address);
                         } else {
+                        console.log('no address found for latlng');
                         waypoints.push({location: '{{poi.address}}'});
-                }}
+                    }}
                     else {
+                        console.log('geocoder error: ' + status);
                         waypoints.push({location: '{{poi.address}}'});
                     }
                 });
-             {% endfor %}
+         {% endfor %}
+         console.log(waypoints);
+
          directionsService.route({
-         origin: '{{origin.address}}',
-         destination: '{{destination.address}}',
-		waypoints: waypoints,
-         travelMode: 'WALKING',
-         optimizeWaypoints: true
-       }, function(response, status) {
-         if (status === 'OK') {
-           directionsDisplay.setDirections(response);
-         } else {
-           window.alert('Directions request failed due to ' + status);
-         }
-       });
-     }
+            origin: '{{origin.address}}',
+            destination: '{{destination.address}}',
+		    waypoints: waypoints,
+            travelMode: 'WALKING',
+            optimizeWaypoints: true
+         }, function(response, status) {
+            if (status === 'OK') {
+                directionsDisplay.setDirections(response);
+            } else {
+                window.alert('Directions request failed due to ' + status);
+            }
+        });
+    }
     </script>
     {% load static %}
     <link rel="stylesheet" type="text/css" href='{% static "tour/map.css" %}' />
