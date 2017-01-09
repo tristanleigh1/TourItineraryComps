@@ -74,6 +74,7 @@ button.accordion:hover {
 }
 
 div.panel {
+    padding: 0 18px;
     background-color: white;
     display: none;
 }
