@@ -18,12 +18,26 @@
         var map = new google.maps.Map(document.getElementById('map'));
         directionsDisplay.setMap(map);
        var locations = [
-           {title: '{{origin.address}}', name: '{{origin.business_name}}', category: '{{origin.category}}', position: {lat: {{ origin.latitude|stringformat:"f" }}, lng: {{ origin.longitude|stringformat:"f" }}}, rating: '{{origin.num_stars}}'},
+           {title: '{{origin.address}}',
+            name: '{{origin.business_name}}',
+            category: '{{origin.category}}',
+            position: {lat: {{ origin.latitude|stringformat:"f" }},
+                       lng: {{ origin.longitude|stringformat:"f" }}},
+            rating: '{{origin.num_stars}}'},
            {% for poi in poi_list %}
-                
-               {title: '{{poi.address}}', name: '{{poi.business_name}}', category: '{{poi.category}}', position: {lat: {{ poi.latitude|stringformat:"f" }}, lng: {{ poi.longitude|stringformat:"f" }}}, rating: '{{poi.num_stars}}'},
+               {title: '{{poi.address}}',
+                name: '{{poi.business_name}}',
+                category: '{{poi.category}}',
+                position: {lat: {{ poi.latitude|stringformat:"f" }},
+                           lng: {{ poi.longitude|stringformat:"f" }}},
+                rating: '{{poi.num_stars}}'},
            {% endfor %}
-           {title: '{{destination.address}}', name: '{{destination.business_name}}', category: '{{destination.category}}', position: {lat: {{ destination.latitude|stringformat:"f" }}, lng: {{ destination.longitude|stringformat:"f" }}}, rating: '{{destination.num_stars}}'},
+           {title: '{{destination.address}}',
+            name: '{{destination.business_name}}',
+            category: '{{destination.category}}',
+            position: {lat: {{ destination.latitude|stringformat:"f" }},
+                       lng: {{ destination.longitude|stringformat:"f" }}},
+            rating: '{{destination.num_stars}}'},
        ];
        var infoWindow = new google.maps.InfoWindow();
        for (var i = 0; i < locations.length; i++) {
@@ -34,22 +48,28 @@
            var icon = ""
            switch (category) {
                 case "Museums":
-                   icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/blue.png", scaledSize: new google.maps.Size(45, 45)};
+                   icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/blue.png",
+                           scaledSize: new google.maps.Size(45, 45)};
                    break;
                 case "Landmarks":
-                   icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/pink.png", scaledSize: new google.maps.Size(45, 45)};
+                   icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/pink.png",
+                           scaledSize: new google.maps.Size(45, 45)};
                    break;
                 case "Activities":
-                   icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/yellow.png", scaledSize: new google.maps.Size(45, 45)};
+                   icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/yellow.png",
+                           scaledSize: new google.maps.Size(45, 45)};
                    break;
                 case "Nature":
-                   icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/green.png", scaledSize: new google.maps.Size(45, 45)};
+                   icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/green.png",
+                           scaledSize: new google.maps.Size(45, 45)};
                    break;
                 case "Restaurants":
-                   icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/red.png", scaledSize: new google.maps.Size(45, 45)};
+                   icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/red.png",
+                           scaledSize: new google.maps.Size(45, 45)};
                    break;
                 default:
-                   icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/purple.png", scaledSize: new google.maps.Size(45, 45)};
+                   icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/purple.png",
+                           scaledSize: new google.maps.Size(45, 45)};
                    break;
            }
            //else if ($.inArray('Parks', locations[i].category) > -1
@@ -79,7 +99,9 @@
       }
 
       function createInfoWindow(marker, window) {
-          var content = '<p>' + marker.name +'</p><p>' + marker.rating + '</p><div class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-trash" onclick="markers['+ marker.id +'].setMap(null);"></span></div>'
+          var content = '<p>' + marker.name + '</p><p>' + marker.rating +
+                '</p><div class="btn btn-primary btn-sm"  onclick="markers[' + marker.id +
+                '].setMap(null);"><span class="glyphicon glyphicon-trash"></span></div>';
           if (window.marker != marker) {
               window.marker = marker;
               window.setContent(content);
@@ -117,7 +139,7 @@
                 {% endfor %}
             ],
             travelMode: 'WALKING',
-            optimizeWaypoints: true
+            optimizeWaypoints: false //we may want to enable this
          }, function(response, status) {
             if (status === 'OK') {
                 directionsDisplay.setDirections(response);
@@ -132,10 +154,8 @@
     <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
 </head>
 <body>
-    <h3>{{city}}</h3>
+<!--    <h3>{{city}}</h3>-->
     <div id="body">
-        <div id="map-container">
-            <div id="filter-bar">
     <nav class="navbar navbar-inverse">
       <div class="container-fluid">
         <div class="navbar-header">
