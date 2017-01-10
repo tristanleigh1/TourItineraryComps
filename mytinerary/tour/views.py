@@ -45,7 +45,7 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
         y1, y2 = seg[0].longitude, seg[1].longitude
         rise = y2 - y1
         run = x2 - x1
-        
+
         if rise == 0:
             # Horizontal line
             distance_to_segment = abs(y1 - current_poi.longitude)
@@ -55,14 +55,14 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
         else:
             # Calculate slopes and y-intercepts
             slope = rise / run
-            orthogonal_slope = slope * -1      
+            orthogonal_slope = slope * -1
             y_int = y1 - (slope * x1)
             orthogonal_y_int = current_poi.longitude - (orthogonal_slope * current_poi.latitude)
 
             # Find where lines intersect
             intersect_x = (orthogonal_y_int - y_int) / (2 * slope)
             intersect_y = (slope * intersect_x) + y_int
-           
+
             # Check if intersection is part of segment
             if x1 <= intersect_x and intersect_x <= x2 and y1 <= intersect_y and intersect_y <= y2:
                 # Distance formula
@@ -128,7 +128,7 @@ def create_path(total_pois, start, end, slider_val, preferences):
 def map(request):
 
     origin = get_object_or_404(POI, pk=2569)
-    destination = get_object_or_404(POI, pk=2610)
+    destination = get_object_or_404(POI, pk=2611)
 
     # Form values
     city = request.GET['city']
@@ -139,9 +139,9 @@ def map(request):
     landmark_preference = request.GET['landmarks']
     activity_preference = request.GET['activities']
     nature_preference = request.GET['parks']
-    
+
     preferences = [museum_preference, landmark_preference, activity_preference, nature_preference]
-    
+
     poi_list = POI.objects.filter(city=city)
     final_path = create_path(poi_list, origin, destination, slider_val, preferences)
 
@@ -153,5 +153,3 @@ def map(request):
                 'start_coords': start_coords,
                 'end_coords': end_coords}
     return render(request, 'tour/map.html', context)
-
-

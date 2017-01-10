@@ -110,32 +110,35 @@
       }
 
      function calculateAndDisplayRoute(geocoder, directionsService, directionsDisplay) {
-         /* waypoints = [] 
-         {% for poi in poi_list %}
-                var latlng = {lat: {{ poi.latitude|stringformat:"f" }}, lng: {{ poi.longitude|stringformat:"f" }}};
-                geocoder.geocode({'location':latlng}, function(results, status) {
-                    if (status === 'OK') {
-                        if (results[0]) {
-                            waypoints.push({location: results[0].formatted_address});
-                            console.log('pushed {{poi.business_name}}' + results[0].formatted_address);
-                        } else {
-                        console.log('no address found for latlng');
-                        waypoints.push({location: '{{poi.address}}'});
-                    }}
-                    else {
-                        console.log('geocoder error: ' + status);
-                        waypoints.push({location: '{{poi.address}}'});
-                    }
-                });
-         {% endfor %}
-         console.log(waypoints);
-            */
+      //  waypoints = [];
+      //  count = 0;
+      //    {% for poi in poi_list %}
+      //           var latlng = {lat: {{ poi.latitude|stringformat:"f" }}, lng: {{ poi.longitude|stringformat:"f" }}};
+      //           geocoder.geocode({'location':latlng}, function(results, status) {
+      //               if (status === 'OK') {
+      //                   if (results[0]) {
+      //                       waypoints.push({location: results[0].formatted_address});
+      //                       console.log('pushed {{poi.business_name}}' + results[0].formatted_address);
+      //                   } else {
+      //                   console.log('no address found for latlng');
+      //                   waypoints.push({location: '{{poi.address}}'});
+      //               }}
+      //               else {
+      //                   console.log('geocoder error: ' + status);
+      //                   waypoints.push({location: '{{poi.address}}'});
+      //               }
+      //           });
+      //     count = count + 1;
+      //     console.log(count);
+      //    {% endfor %}
+      //    console.log(waypoints);
+
          directionsService.route({
-            origin: '{{origin.address}}',
-            destination: '{{destination.address}}',
+            origin: new google.maps.LatLng({lat:{{origin.latitude|stringformat:"f"}}, lng:{{origin.longitude|stringformat:"f"}}}),
+            destination: new google.maps.LatLng({lat:{{destination.latitude|stringformat:"f"}}, lng:{{destination.longitude|stringformat:"f"}}}),
             waypoints: [
                 {% for poi in poi_list %}
-                {location: '{{poi.address}}'},
+                {location: new google.maps.LatLng({lat:{{poi.latitude|stringformat:"f"}}, lng:{{poi.longitude|stringformat:"f"}}})},
                 {% endfor %}
             ],
             travelMode: 'WALKING',
@@ -250,7 +253,7 @@
             </div>
         </div>
     </div>
-    
+
     <script>
     var accordion = document.getElementsByClassName("accordion");
     var i;
