@@ -87,8 +87,8 @@
            marker.addListener('click', function() {
                createInfoWindow(this, infoWindow);
            });
-           
-       }  
+
+       }
         calculateAndDisplayRoute(geocoder, directionsService, directionsDisplay);
 //        var directions = directionsDisplay.getDirections()
 //        var total = 0;
@@ -112,12 +112,12 @@
               windows[window.marker.id] = window;
           }
       }
-      
+
       function setInfoWindowContent(markerId) {
           var marker = markers[markerId];
           var content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
-                '</p><img src="https://maps.googleapis.com/maps/api/streetview?size=600x300&location=' + 
-              marker.position['lat'] + ',' + marker.position['lng'] + 
+                '</p><img src="https://maps.googleapis.com/maps/api/streetview?size=600x300&location=' +
+              marker.position['lat'] + ',' + marker.position['lng'] +
               '&key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM" >' +
                 '<br/><div class="btn btn-primary btn-sm"  onclick="markers[' + marker.id +
                 '].setMap(null);"><span class="glyphicon glyphicon-trash"></span></div>' +
@@ -125,7 +125,7 @@
                 ');">Less Info</div>';
           windows[markerId].setContent(content);
       }
-      
+
       function resetInfoWindow(markerId) {
           var marker = markers[markerId];
           var content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
@@ -185,25 +185,7 @@
 <body>
 <!--    <h3>{{city}}</h3>-->
     <div id="body">
-    <nav class="navbar navbar-inverse">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="/tour/">Mytinerary</a>
-        </div>
-        <div class="collapse navbar-collapse" id="myNavbar">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="/tour/">Home</a></li>
-            <li><a href="/tour/about/">About</a></li>
-            <li><a href="/tour/contact/">Contact Us</a></li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+    {% include "tour/navbar.html" %}
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12" id="filter-bar">

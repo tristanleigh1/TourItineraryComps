@@ -1,8 +1,10 @@
 from django.shortcuts import get_object_or_404, get_list_or_404, render
 from django.http import HttpResponse
 from django.db.models import Func, F
+import logging
 from .models import *
 import math
+from decimal import *
 
 # Create your views here.
 #GET: tour/
@@ -10,16 +12,10 @@ def index(request):
     return render(request, 'tour/index.html')
 
 def about(request):
-    html = "<html><body>A Carleton College comps project created by "
-    html += "Caleb Braun, Hailey Jones, Tristan Leigh, and Jonah Tuchow."
-    html += "<br><a href='/tour/'>Back</a></html></body>"
-    return HttpResponse(html)
+	return render(request, 'tour/about.html')
 
 def contact(request):
-    html = "<html><body><h2>Contact</h2>Please only contact us by snail mail.<br><br>"
-    html += "Caleb Braun<br>300 North College St.<br>Northfield, MN 55057</html></body>"
-    html += "<br><br><a href='/tour/'>Back</a></html></body>"
-    return HttpResponse(html)
+    return render(request, 'tour/contact.html')
 
 def calculate_score(current_poi, path_segments, walk_factor, preferences):
     empirical_coefficient = 0.0002
@@ -36,9 +32,10 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
         taste = float(preferences[2])
     else:
         taste = float(preferences[3])
-    print(walk_factor)
+
     walk_factor = float(walk_factor) * (3.0/10.0)
 
+    # Loop through every existing segment to find the closest one to add the new POI to
     for seg in path_segments:
         # Calculate closest line (Remember: latitude is x direction, longitude is y)
         x1, x2 = seg[0].latitude, seg[1].latitude
@@ -76,6 +73,9 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
         if distance_to_segment < distance_to_path:
             distance_to_path = distance_to_segment
             closest_segment = seg
+        if distance_to_segment == distance_to_path:
+            #logging.info("TWO SEGMENTS ARE SAME DISTANCE")
+            pass
 
     # Calculate the score
     score = float(distance_to_path) - empirical_coefficient * float(popularity) * taste * walk_factor
@@ -84,13 +84,14 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
 
 def update_segments(current_segments, new_poi, segment_to_add_to):
     seg_index = current_segments.index(segment_to_add_to)
+    logging.info("Updating segments. Adding %s between segment %i and segment %i." %(str(new_poi), seg_index, seg_index + 1))
     new_segment = (current_segments[seg_index][0], new_poi)
     current_segments[seg_index] = (new_poi, current_segments[seg_index][1])
     current_segments.insert(seg_index, new_segment)
 
 def find_next_poi(poi_list, path_segments, slider_val, preferences):
     poi_to_add = None
-    segment = None
+    seg_to_add_to = None
     min_score = float("inf")
     for poi in poi_list:
         if poi.category == 'Restaurants':
@@ -99,8 +100,9 @@ def find_next_poi(poi_list, path_segments, slider_val, preferences):
         if score < min_score:
             poi_to_add = poi
             min_score = score
+            seg_to_add_to = segment
 
-    update_segments(path_segments, poi_to_add, segment)
+    update_segments(path_segments, poi_to_add, seg_to_add_to)
 
     return poi_to_add
 
@@ -118,17 +120,21 @@ def create_path(total_pois, start, end, slider_val, preferences):
 
     while len(path_pois) < MAX_POIS:
         poi = find_next_poi(total_pois, path_segments, slider_val, preferences)
+        #logging.info("adding poi " + str(poi))
         path_pois.append(poi)
         # Not sure if remove is correct
         total_pois.remove(poi)
 
-    return path_pois
+    final_path_pois = []
+    for i in range(len(path_segments)-1):
+        final_path_pois.append(path_segments[i][1])
+    return final_path_pois
 
 #GET: tour/map/
 def map(request):
 
-    origin = get_object_or_404(POI, pk=2569)
-    destination = get_object_or_404(POI, pk=2611)
+    # origin = get_object_or_404(POI, pk=2569)
+    # destination = get_object_or_404(POI, pk=2611)
 
     # Form values
     city = request.GET['city']
@@ -139,6 +145,18 @@ def map(request):
     landmark_preference = request.GET['landmarks']
     activity_preference = request.GET['activities']
     nature_preference = request.GET['parks']
+
+    origin = POI()
+    destination = POI()
+    origin.latitude = Decimal(start_coords[1:-1].split(", ")[0])
+    origin.longitude = Decimal(start_coords[1:-1].split(", ")[1])
+    origin.business_name = "Origin"
+    origin.category = "Museums"
+
+    destination.latitude = Decimal(end_coords[1:-1].split(", ")[0])
+    destination.longitude = Decimal(end_coords[1:-1].split(", ")[1])
+    destination.business_name = "Destination"
+    destination.category = "Museums"
 
     preferences = [museum_preference, landmark_preference, activity_preference, nature_preference]
 
