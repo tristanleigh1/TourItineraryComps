@@ -24,11 +24,6 @@ input[type="range"]:focus
 	top:7px;
 }
 
-.navbar {
-	margin-bottom: 0;
-	border-radius: 0;
-}
-
 .preference-form {
 	position: relative;
     top: 20px;
