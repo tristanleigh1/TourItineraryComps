@@ -41,6 +41,14 @@
             rating: '{{destination.num_stars}}'},
        ];
        var infoWindow = new google.maps.InfoWindow();
+       var popRadius = new google.maps.Circle({
+            strokeWeight: 0,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35,
+            map: map,
+            radius: 500,
+            visible: false,
+       });
        for (var i = 0; i < locations.length; i++) {
            var position = locations[i].position;
            var name = locations[i].name;
@@ -85,19 +93,27 @@
            });
            markers.push(marker);
            marker.addListener('click', function() {
+               createPopRadius(this, popRadius);
                createInfoWindow(this, infoWindow);
            });
 
        }
         calculateAndDisplayRoute(geocoder, directionsService, directionsDisplay);
-//        var directions = directionsDisplay.getDirections()
-//        var total = 0;
-//        var myroute = directions.routes[0];
-//        for (var i = 0; i < myroute.legs.length; i++) {
-//          total += myroute.legs[i].distance.value;
-//        }
-//        total = total / 1000;
-//        document.getElementById('distance').innerHTML = total + ' km';
+      }
+      
+      function createPopRadius(marker, popRadius) {
+//          if (popRadius.center != marker.position) {
+//              popRadius.strokeColor = '#FF0000';
+//              popRadius.strokeOpacity = 0.8;
+//              popRadius.strokeWeight = 2;
+//              popRadius.fillColor = '#FF0000';
+//              popRadius.fillOpacity = 0.35;
+//              popRadius.map = map;
+//              popRadius.center = marker.position;
+//              popRadius.radius = 500;
+//          }
+            popRadius.setCenter(marker.position);
+            popRadius.setVisible(true);
       }
 
       function createInfoWindow(marker, window) {
