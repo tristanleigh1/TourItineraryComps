@@ -95,10 +95,32 @@
            marker.addListener('click', function() {
                createPopRadius(this, popRadius);
                createInfoWindow(this, infoWindow);
+               findNearbyPOIs(this);
            });
 
        }
         calculateAndDisplayRoute(geocoder, directionsService, directionsDisplay);
+      }
+
+      function findNearbyPOIs(marker) {
+            console.log(marker); 
+            console.log("hey."); 
+            $.ajax({
+                url : "/tour/pop_radius/",
+                type : "GET",
+                data : { name :  "hey"// marker.name
+                         // lat : marker -- figure out
+                        // position : marker.position
+                     },
+                success : function(json) {
+                    console.log(json);
+                    console.log("jason");
+                },
+                error : function(xhr, errmsg, err) {
+                    console.log(errmsg);
+                    console.log(xhr.status + " " + xhr.responseText);
+                }
+            });
       }
       
       function createPopRadius(marker, popRadius) {

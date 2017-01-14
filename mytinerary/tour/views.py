@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, get_list_or_404, render
 from django.http import HttpResponse
 from django.db.models import Func, F
 import logging
+import json
 from .models import *
 import math
 from decimal import *
@@ -16,6 +17,26 @@ def about(request):
 
 def contact(request):
     return render(request, 'tour/contact.html')
+
+def pop_radius(request):
+    # Do some stuff
+    if request.method == 'GET':
+        raise Exception(request.GET)
+        name = request.GET["name"]
+        response_data = {}
+        
+        response_data["name"] = name
+        response_data["name2"] = "yyp"
+        
+        return HttpResponse(
+                json.dumps(response_data),
+                content_type="application/json"
+        )
+    else:
+        return HttpResponse(
+                json.dumps({"error":"an error occured."}),
+                content_type="application/json"
+        )
 
 def calculate_score(current_poi, path_segments, walk_factor, preferences):
     empirical_coefficient = 0.0002
