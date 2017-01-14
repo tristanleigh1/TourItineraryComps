@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, get_list_or_404, render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.db.models import Func, F
 import logging
 import json
@@ -19,19 +19,14 @@ def contact(request):
     return render(request, 'tour/contact.html')
 
 def pop_radius(request):
-    # Do some stuff
     if request.method == 'GET':
-        raise Exception(request.GET)
-        name = request.GET["name"]
-        response_data = {}
+        name = request.GET.get('name', None)
+        poi_id = request.GET.get('id', None)
+        response_data = {"name": name, "id": poi_id}
         
-        response_data["name"] = name
-        response_data["name2"] = "yyp"
-        
-        return HttpResponse(
-                json.dumps(response_data),
-                content_type="application/json"
-        )
+        poi = POI.objects.get(id = str(int(poi_id) + 1))
+        response_data['poi'] = poi.business_name
+        return JsonResponse(response_data)
     else:
         return HttpResponse(
                 json.dumps({"error":"an error occured."}),

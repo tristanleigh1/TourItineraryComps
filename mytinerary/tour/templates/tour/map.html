@@ -4,7 +4,9 @@
   <title>Map - Mytinerary</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+   {% load static %}
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="icon" href='{% static "tour/images/icon.png" %}' />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script>
@@ -21,6 +23,7 @@
        var locations = [
            {title: '{{origin.address}}',
             name: '{{origin.business_name}}',
+            id: '{{origin.id}}',
             category: '{{origin.category}}',
             position: {lat: {{ origin.latitude|stringformat:"f" }},
                        lng: {{ origin.longitude|stringformat:"f" }}},
@@ -28,6 +31,7 @@
            {% for poi in poi_list %}
                {title: '{{poi.address}}',
                 name: '{{poi.business_name}}',
+                id: '{{poi.id}}',
                 category: '{{poi.category}}',
                 position: {lat: {{ poi.latitude|stringformat:"f" }},
                            lng: {{ poi.longitude|stringformat:"f" }}},
@@ -35,6 +39,7 @@
            {% endfor %}
            {title: '{{destination.address}}',
             name: '{{destination.business_name}}',
+            id: '{{destination.id}}',
             category: '{{destination.category}}',
             position: {lat: {{ destination.latitude|stringformat:"f" }},
                        lng: {{ destination.longitude|stringformat:"f" }}},
@@ -88,6 +93,7 @@
                name: name,
                rating: rating,
                id: i,
+               poi_id: locations[i].id,
                label: (i+1).toString(),
                icon: icon,
            });
@@ -103,19 +109,17 @@
       }
 
       function findNearbyPOIs(marker) {
-            console.log(marker); 
-            console.log("hey."); 
             $.ajax({
                 url : "/tour/pop_radius/",
-                type : "GET",
-                data : { name :  "hey"// marker.name
-                         // lat : marker -- figure out
-                        // position : marker.position
-                     },
+                contentType: "application/json; charset=utf-8",
+                type : 'GET',
+                data : {'name' : marker.name,
+                        'id' : marker.poi_id},
+                dataType : 'json',
                 success : function(json) {
                     console.log(json);
-                    console.log("jason");
                 },
+                cache : false,
                 error : function(xhr, errmsg, err) {
                     console.log(errmsg);
                     console.log(xhr.status + " " + xhr.responseText);
@@ -206,7 +210,7 @@
                 {% endfor %}
             ],
             travelMode: 'WALKING',
-            optimizeWaypoints: false //we may want to enable this
+            optimizeWaypoints: true //we may want to enable this
          }, function(response, status) {
             if (status === 'OK') {
                 directionsDisplay.setDirections(response);
@@ -216,7 +220,6 @@
         });
     }
     </script>
-    {% load static %}
     <link rel="stylesheet" type="text/css" href='{% static "tour/map.css" %}' />
     <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
 </head>
