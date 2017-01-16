@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
    {% load static %}
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://bootswatch.com/united/bootstrap.min.css">
   <link rel="icon" href='{% static "tour/images/icon.png" %}' />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -128,16 +128,6 @@
       }
       
       function createPopRadius(marker, popRadius) {
-//          if (popRadius.center != marker.position) {
-//              popRadius.strokeColor = '#FF0000';
-//              popRadius.strokeOpacity = 0.8;
-//              popRadius.strokeWeight = 2;
-//              popRadius.fillColor = '#FF0000';
-//              popRadius.fillOpacity = 0.35;
-//              popRadius.map = map;
-//              popRadius.center = marker.position;
-//              popRadius.radius = 500;
-//          }
             popRadius.setCenter(marker.position);
             popRadius.setVisible(true);
       }
@@ -247,35 +237,56 @@
                 <h2>My Tour</h2>
                 <p>Total Distance: <span id="distance"></span></p>
                 <div id="sidebar">
-                    <button class="accordion {{origin.category}}">1: {{origin.business_name}}</button>
-                    <div class="panel">
-                        <p>{{origin.summary}}</p>
-                    </div>
-                    {% for poi in poi_list %}
-                        <button class="accordion {{poi.category}}">{{ forloop.counter|add:"1" }}: {{poi.business_name}}</button>
-                        <div class="panel">
-                            <p>{{poi.summary}}</p>
+                    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                      <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingOrig">
+                          <h4 class="panel-title {{poi.category}}">
+                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOrig" aria-expanded="false" aria-controls="collapseOrig">
+                              Origin
+                            </a>
+                          </h4>
                         </div>
-                    {% endfor %}
-                    <button class="accordion {{destination.category}}">10: {{destination.business_name}}</button>
-                    <div class="panel">
-                        <p>{{destination.summary}}</p>
+                        <div id="collapseOrig" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOrig">
+                          <div class="panel-body">
+                            ...
+                          </div>
+                        </div>
+                      </div>
+                      {% for poi in poi_list %}
+                          <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="heading{{forloop.counter|add:'1'}}">
+                              <h4 class="panel-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{forloop.counter|add:'1'}}" aria-expanded="false" aria-controls="collapse{{forloop.counter|add:'1'}}">
+                                  {{ forloop.counter|add:"1" }}: {{poi.business_name}}
+                                </a>
+                              </h4>
+                            </div>
+                            <div id="collapse{{forloop.counter|add:'1'}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{forloop.counter|add:'1'}}">
+                              <div class="panel-body">
+                                {{poi.summary}}
+                              </div>
+                            </div>
+                          </div>
+                      {% endfor %}
+                      <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingDest">
+                          <h4 class="panel-title">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseDest" aria-expanded="false" aria-controls="collapseDest">
+                              Destination
+                            </a>
+                          </h4>
+                        </div>
+                        <div id="collapseDest" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingDest">
+                          <div class="panel-body">
+                            ...
+                          </div>
+                        </div>
+                      </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-    var accordion = document.getElementsByClassName("accordion");
-    var i;
-    for (i = 0; i < accordion.length; i++) {
-        accordion[i].onclick = function(){
-            this.classList.toggle("active");
-            this.nextElementSibling.classList.toggle("show");
-      }
-    }
-    </script>
     <script async defer
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM&callback=initialize">
     </script>
