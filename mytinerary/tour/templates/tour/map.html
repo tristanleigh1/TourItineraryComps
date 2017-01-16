@@ -210,7 +210,7 @@
                 {% endfor %}
             ],
             travelMode: 'WALKING',
-            optimizeWaypoints: true //we may want to enable this
+            optimizeWaypoints: false //we may want to enable this
          }, function(response, status) {
             if (status === 'OK') {
                 directionsDisplay.setDirections(response);

@@ -12,10 +12,12 @@
 // parameter when you first load the API.
 
 function initAutocomplete() {
+    var ac1 = document.getElementById('autocomplete1')
+    var ac2 = document.getElementById('autocomplete2')
     autocompleteStart = new google.maps.places.Autocomplete(
-        /** @type {!HTMLInputElement} */(document.getElementById('autocomplete1')));    
+        /** @type {!HTMLInputElement} */(ac1));    
     autocompleteEnd = new google.maps.places.Autocomplete(
-        /** @type {!HTMLInputElement} */(document.getElementById('autocomplete2')));
+        /** @type {!HTMLInputElement} */(ac2));
 
     autocompleteStart.addListener('place_changed', function() {
         document.getElementById('startLngLat').value = autocompleteStart.getPlace().geometry.location;
@@ -23,6 +25,19 @@ function initAutocomplete() {
     autocompleteEnd.addListener('place_changed', function() {
         document.getElementById('endLngLat').value = autocompleteEnd.getPlace().geometry.location;
     });
+
+    google.maps.event.addDomListener(ac1, 'keydown', function(e) { 
+        if (e.keyCode == 13) { 
+            e.preventDefault(); 
+            ac2.select();
+        }
+    }); 
+
+    google.maps.event.addDomListener(ac1, 'keydown', function(e) { 
+        if (e.keyCode == 13) { 
+            e.preventDefault(); 
+        }
+    }); 
 }
 
 // Bias the autocomplete object to the user's geographical location,

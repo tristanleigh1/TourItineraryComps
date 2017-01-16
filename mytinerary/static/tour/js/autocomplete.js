@@ -1,20 +1,23 @@
-
-// This example displays an address form, using the autocomplete feature
-// of the Google Places API to help users fill in the information.
+/* 
+ * Javascript for the start and end address autocompletion. Also fills in the hidden
+ * form fields for start and end long/lat. Written with help from the autocomplete
+ * documentation found here:
+ * https://developers.google.com/maps/documentation/javascript/examples/places-autocomplete
+ * 
+ * @author Caleb Braun
+ * 1/8/17
+*/
 
 // This requires the Places library. Include the libraries=places
 // parameter when you first load the API.
 
 function initAutocomplete() {
-    // Create the autocomplete object, restricting the search to geographical
-    // location types.
+    var ac1 = document.getElementById('autocomplete1')
+    var ac2 = document.getElementById('autocomplete2')
     autocompleteStart = new google.maps.places.Autocomplete(
-        /** @type {!HTMLInputElement} */(document.getElementById('autocomplete1')));    
+        /** @type {!HTMLInputElement} */(ac1));    
     autocompleteEnd = new google.maps.places.Autocomplete(
-        /** @type {!HTMLInputElement} */(document.getElementById('autocomplete2')));
-
-    //autocompleteEnd.addListener('place_changed', handleEndAddress);
-    //autocompleteStart.addListener('place_changed', handleStartAddress);
+        /** @type {!HTMLInputElement} */(ac2));
 
     autocompleteStart.addListener('place_changed', function() {
         document.getElementById('startLngLat').value = autocompleteStart.getPlace().geometry.location;
@@ -22,30 +25,13 @@ function initAutocomplete() {
     autocompleteEnd.addListener('place_changed', function() {
         document.getElementById('endLngLat').value = autocompleteEnd.getPlace().geometry.location;
     });
-}
 
-function handleStartAddress() {
-    document.getElementById("autocomplete2").focus(); // ID set by OnFocusIn 
-    findLngLat('autocomplete1');
-}
-
-function handleEndAddress() {
-    findLngLat('autocomplete2');
-}
-
-function findLngLat(addressID) {
-    geocoder = new google.maps.Geocoder();
-    var address = document.getElementById(addressID).value;
-    console.log(address);
-    geocoder.geocode( { 'address': address}, function(results, status) {
-      if (status == 'OK') {
-        coordID = (addressID == 'autocomplete1') ? 'startLngLat' :'endLngLat';
-        console.log(coordID);
-        document.getElementById(coordID).value = results[0].geometry.location;
-      } else {
-        alert('Geocode was not successful for the following reason: ' + status);
-      }
-    });
+    google.maps.event.addDomListener(ac1, 'keydown', function(e) { 
+        if (e.keyCode == 13) { 
+            e.preventDefault(); 
+            ac2.select();
+        }
+    }); 
 }
 
 // Bias the autocomplete object to the user's geographical location,
