@@ -13,7 +13,7 @@ def index(request):
     return render(request, 'tour/index.html')
 
 def about(request):
-	return render(request, 'tour/about.html')
+    return render(request, 'tour/about.html')
 
 def contact(request):
     return render(request, 'tour/contact.html')
@@ -23,9 +23,21 @@ def pop_radius(request):
         name = request.GET.get('name', None)
         poi_id = request.GET.get('id', None)
         response_data = {"name": name, "id": poi_id}
-        
-        poi = POI.objects.get(id = str(int(poi_id) + 1))
+
+        poi = POI.objects.get(id = poi_id)
+        latitude = float(poi.latitude)
+        longitude = float(poi.longitude)
+        city = poi.city
+        radius = 0.004 ##nead to consider curve of earth
+        nearby_pois = POI.objects.filter(city = city).filter(latitude__lte=latitude+radius, latitude__gte=latitude-radius, longitude__lte=longitude+radius, longitude__gte=longitude-radius) ##(new_latitude-origin_latitude)^2 + (new_longitude - origin_longitude^2 <= radius^2
         response_data['poi'] = poi.business_name
+        response_data['nearby_pois'] = list()
+        for poi in nearby_pois:
+            response_data['nearby_pois'].append({'name' : poi.business_name,
+                                                 'latitude' : poi.latitude,
+                                                 'longitude' : poi.longitude,
+                                                 'poi_id' : poi.id
+                                                 })
         return JsonResponse(response_data)
     else:
         return HttpResponse(

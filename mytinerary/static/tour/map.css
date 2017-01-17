@@ -73,6 +73,7 @@ button.accordion:hover {
     color: grey;
 }
 
+/*
 div.panel {
     padding: 0 18px;
     background-color: white;
@@ -81,4 +82,4 @@ div.panel {
 
 div.panel.show {
     display: block;
-}
+}*/

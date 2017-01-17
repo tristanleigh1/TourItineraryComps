@@ -11,14 +11,16 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script>
       var markers = [];
+			var radiusMarkers = [];
       var windows = {};
+			var map;
       function initialize() {
         var directionsService = new google.maps.DirectionsService;
         var directionsDisplay = new google.maps.DirectionsRenderer;
         var geocoder = new google.maps.Geocoder;
         directionsDisplay.setOptions( { suppressMarkers: true } );
 
-        var map = new google.maps.Map(document.getElementById('map'));
+        map = new google.maps.Map(document.getElementById('map'));
         directionsDisplay.setMap(map);
        var locations = [
            {title: '{{origin.address}}',
@@ -117,6 +119,7 @@
                         'id' : marker.poi_id},
                 dataType : 'json',
                 success : function(json) {
+										plotNearbyPois(json["nearby_pois"]);
                     console.log(json);
                 },
                 cache : false,
@@ -126,7 +129,23 @@
                 }
             });
       }
-      
+
+			function plotNearbyPois(nearby_pois) {
+				for (var i=0; i<radiusMarkers.length; i++) {
+					marker = radiusMarkers[i];
+					marker.setMap(null);
+				}
+				for (var i=0; i<nearby_pois.length; i++) {
+					var marker = new google.maps.Marker({
+							map: map,
+							position: {lat: parseFloat(nearby_pois[i].latitude), lng: parseFloat(nearby_pois[i].longitude)},
+							name: nearby_pois[i].business_name,
+							poi_id: nearby_pois[i].poi_id,
+					});
+					radiusMarkers.push(marker);
+				}
+			}
+
       function createPopRadius(marker, popRadius) {
             popRadius.setCenter(marker.position);
             popRadius.setVisible(true);
