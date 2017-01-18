@@ -96,7 +96,7 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
             if x1 <= intersect_x and intersect_x <= x2 and y1 <= intersect_y and intersect_y <= y2:
                 # Distance formula
                 distance_to_segment = math.sqrt((intersect_x - current_poi.latitude)**2 + (intersect_y - current_poi.longitude)**2)
-            whereInSegment = "middle"
+                whereInSegment = "middle"
             else:
                 distance_to_start = math.sqrt((x1 - current_poi.latitude)**2 + (y1 - current_poi.longitude)**2)
                 distance_to_end = math.sqrt((x2 - current_poi.latitude)**2 + (y2 - current_poi.longitude)**2)
@@ -147,6 +147,7 @@ def find_next_poi(poi_list, path_segments, walk_factor, preferences):
     poi_to_add = None
     seg_to_add_to = None
     min_score = float("inf")
+    whereInSegment = ""
     for poi in poi_list:
         if poi.category == 'Restaurants':
             continue
@@ -156,7 +157,7 @@ def find_next_poi(poi_list, path_segments, walk_factor, preferences):
             min_score = score
             seg_to_add_to = segment
 
-    update_segments(path_segments, poi_to_add, seg_to_add_to)
+    update_segments(path_segments, poi_to_add, seg_to_add_to, whereInSegment)
 
     return poi_to_add
 
