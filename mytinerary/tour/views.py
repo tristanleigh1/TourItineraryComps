@@ -56,13 +56,13 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
     whereInSegment = "middle"
     score = float("inf")
     if current_poi.category == 'Museums':
-        taste = float(preferences[0])
+        taste = float(preferences[0]) * (1.0/4.0)
     elif current_poi.category == 'Landmarks':
-        taste = float(preferences[1])
+        taste = float(preferences[1]) * (1.0/4.0)
     elif current_poi.category == 'Activities':
-        taste = float(preferences[2])
+        taste = float(preferences[2]) * (1.0/4.0)
     else:
-        taste = float(preferences[3])
+        taste = float(preferences[3]) * (1.0/4.0)
 
     walk_factor = float(walk_factor) * (3.0/10.0)
 
@@ -143,14 +143,14 @@ def update_segments(current_segments, new_poi, segment_to_add_to, whereInSegment
         new_segment = (current_segments[seg_index][1], new_poi)
         current_segments.insert(seg_index+1, new_segment)
 
-def find_next_poi(poi_list, path_segments, slider_val, preferences):
+def find_next_poi(poi_list, path_segments, walk_factor, preferences):
     poi_to_add = None
     seg_to_add_to = None
     min_score = float("inf")
     for poi in poi_list:
         if poi.category == 'Restaurants':
             continue
-        score, segment, whereInSegment = calculate_score(poi, path_segments, slider_val, preferences)
+        score, segment, whereInSegment = calculate_score(poi, path_segments, walk_factor, preferences)
         if score < min_score:
             poi_to_add = poi
             min_score = score
@@ -160,8 +160,8 @@ def find_next_poi(poi_list, path_segments, slider_val, preferences):
 
     return poi_to_add
 
-def create_path(total_pois, start, end, slider_val, preferences):
-    MAX_POIS = 8
+def create_path(total_pois, start, end, walk_factor, preferences, num_destinations):
+    MAX_POIS = int(num_destinations)
     # path_segments is a list of pairs of points
     path_segments = [(start, end)]
     path_pois = []
@@ -173,7 +173,7 @@ def create_path(total_pois, start, end, slider_val, preferences):
     # 3. If not, deal with starting with an address, not a POI
 
     while len(path_pois) < MAX_POIS:
-        poi = find_next_poi(total_pois, path_segments, slider_val, preferences)
+        poi = find_next_poi(total_pois, path_segments, walk_factor, preferences)
         #logging.info("adding poi " + str(poi))
         path_pois.append(poi)
         # Not sure if remove is correct
@@ -194,7 +194,8 @@ def map(request):
     city = request.GET['city']
     start_coords = request.GET['startCoords']
     end_coords = request.GET['endCoords']
-    slider_val = request.GET['points']
+    num_destinations = request.GET['points']
+    walk_factor = request.GET['miles']
     museum_preference = request.GET['museums']
     landmark_preference = request.GET['landmarks']
     activity_preference = request.GET['activities']
@@ -215,7 +216,7 @@ def map(request):
     preferences = [museum_preference, landmark_preference, activity_preference, nature_preference]
 
     poi_list = POI.objects.filter(city=city)
-    final_path = create_path(poi_list, origin, destination, slider_val, preferences)
+    final_path = create_path(poi_list, origin, destination, walk_factor, preferences, num_destinations)
 
     context = { #'category_dict': category_dict,
                 'poi_list': final_path,
