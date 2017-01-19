@@ -23,8 +23,9 @@ def pop_radius(request):
         name = request.GET.get('name', None)
         poi_id = request.GET.get('id', None)
         response_data = {"name": name, "id": poi_id}
-
+        
         poi = POI.objects.get(id = poi_id)
+        
         latitude = float(poi.latitude)
         longitude = float(poi.longitude)
         city = poi.city
