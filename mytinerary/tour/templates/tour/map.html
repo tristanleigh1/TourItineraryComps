@@ -11,9 +11,9 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script>
       var markers = [];
-			var radiusMarkers = [];
+      var radiusMarkers = [];
       var windows = {};
-			var map;
+      var map;
       function initialize() {
         var directionsService = new google.maps.DirectionsService;
         var directionsDisplay = new google.maps.DirectionsRenderer;
@@ -119,43 +119,77 @@
                         'id' : marker.poi_id},
                 dataType : 'json',
                 success : function(json) {
-										plotNearbyPois(json["nearby_pois"]);
+				    plotNearbyPois(json["nearby_pois"]);
                     console.log(json);
                 },
                 cache : false,
                 error : function(xhr, errmsg, err) {
+                    for (var i=0; i<radiusMarkers.length; i++) {
+                        marker = radiusMarkers[i];
+                        marker.setMap(null);
+                    }
                     console.log(errmsg);
                     console.log(xhr.status + " " + xhr.responseText);
                 }
             });
       }
 
-			function plotNearbyPois(nearby_pois) {
-				for (var i=0; i<radiusMarkers.length; i++) {
-					marker = radiusMarkers[i];
-					marker.setMap(null);
-				}
-				for (var i=0; i<nearby_pois.length; i++) {
-					var marker = new google.maps.Marker({
-							map: map,
-							position: {lat: parseFloat(nearby_pois[i].latitude), lng: parseFloat(nearby_pois[i].longitude)},
-							name: nearby_pois[i].business_name,
-							poi_id: nearby_pois[i].poi_id,
-					});
-					radiusMarkers.push(marker);
-				}
-			}
+        function plotNearbyPois(nearby_pois) {
+            for (var i=0; i<radiusMarkers.length; i++) {
+                marker = radiusMarkers[i];
+                marker.setMap(null);
+            }
+            for (var i=0; i<nearby_pois.length; i++) {
+                var poiOutsideRoute = true;
+                for (var j=0; i<markers.length; i++) {
+                    if (markers[j].poi_id == nearby_pois[i].poi_id) {
+                        poiOutsideRoute = false;
+                    }
+                }
+                if (poiOutsideRoute) {
+                    var marker = new google.maps.Marker({
+                        map: map,
+                        position: {lat: parseFloat(nearby_pois[i].latitude),
+                                   lng: parseFloat(nearby_pois[i].longitude)},
+                        name: nearby_pois[i].business_name,
+                        poi_id: nearby_pois[i].poi_id,
+                        id: radiusMarkers.length - 1,
+                        rating: nearby_pois[i].rating
+                    });
+                    var infoWindow = new google.maps.InfoWindow();
+                    marker.addListener('click', function() {
+                        createNearbyInfoWindow(this, infoWindow);
+                    });
+                    radiusMarkers.push(marker);
+                }
+            }
+        }
 
       function createPopRadius(marker, popRadius) {
             popRadius.setCenter(marker.position);
             popRadius.setVisible(true);
+      }
+      
+      function createNearbyInfoWindow(marker, window) {
+          var content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
+                '</p><div class="btn btn-primary btn-sm"  onclick="radiusMarkers[' + marker.id +
+                '].setMap(null);"><span class="glyphicon glyphicon-trash"></span></div>' +
+                '<div class="btn btn-link btn-sm"  onclick="setInfoWindowContent('+ marker.id +
+                ');">More Info...</div>';
+          if (window.marker != marker) {
+              window.marker = marker;
+              window.setContent(content);
+              window.open(map, marker);
+              windows[window.marker.id] = window;
+          }
       }
 
       function createInfoWindow(marker, window) {
           var content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
                 '</p><div class="btn btn-primary btn-sm"  onclick="markers[' + marker.id +
                 '].setMap(null);"><span class="glyphicon glyphicon-trash"></span></div>' +
-                '<div class="btn btn-link btn-sm"  onclick="setInfoWindowContent('+ marker.id +');">More Info...</div>';
+                '<div class="btn btn-link btn-sm"  onclick="setInfoWindowContent('+ marker.id +
+                ');">More Info...</div>';
           if (window.marker != marker) {
               window.marker = marker;
               window.setContent(content);
