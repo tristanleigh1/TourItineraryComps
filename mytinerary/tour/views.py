@@ -53,7 +53,7 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
     closest_segment = None
     # To determine if the POI should be added in the middle of a segment or to the 
     # beginning or end of a segment, we'll assume middle for now
-    whereInSegment = "middle"
+    finalWhereInSegment = "middle"
     score = float("inf")
     if current_poi.category == 'Museums':
         taste = float(preferences[0]) * (1.0/4.0)
@@ -78,9 +78,11 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
         if rise == 0:
             # Horizontal line
             distance_to_segment = abs(y1 - current_poi.longitude)
+            whereInSegment = "middle"
         elif run == 0:
             # Vertical line
             distance_to_segment = abs(x1 - current_poi.latitude)
+            whereInSegment = "middle"
         else:
             # Calculate slopes and y-intercepts
             slope = rise / run
@@ -102,52 +104,55 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
                 distance_to_end = math.sqrt((x2 - current_poi.latitude)**2 + (y2 - current_poi.longitude)**2)
                 if distance_to_start < distance_to_end:
                     distance_to_segment = distance_to_start
-                    if i > 0:
+                   # if i > 0
+                    if seg[0].business_name != "Origin":
                         whereInSegment = "begin"
                     else:
                         whereInSegment = "middle"
                 else:
                     distance_to_segment = distance_to_end
-                    if i < len(path_segments)-1:
+                    if seg[1].business_name != "Destination":
                         whereInSegment = "end"
                     else:
                         whereInSegment = "middle"
 
 
-        # Update the smallest distance
+       # Update the smallest distance
         if distance_to_segment < distance_to_path:
             distance_to_path = distance_to_segment
             closest_segment = seg
+            finalWhereInSegment = whereInSegment
         if distance_to_segment == distance_to_path:
             #logging.info("TWO SEGMENTS ARE SAME DISTANCE")
             pass
-
+ 
     # Calculate the score
     score = float(distance_to_path) - empirical_coefficient * float(popularity) * taste * walk_factor
 
-    return score, closest_segment, whereInSegment
+    return score, closest_segment, finalWhereInSegment
 
 def update_segments(current_segments, new_poi, segment_to_add_to, whereInSegment):
     seg_index = current_segments.index(segment_to_add_to)
-    if whereInSegment == "middle":
+    if whereInSegment == "end":
     #logging.info("Updating segments. Adding %s between segment %i and segment %i." %(str(new_poi), seg_index, seg_index + 1))
+        new_segment = (current_segments[seg_index][1], new_poi)
+        current_segments[seg_index + 1] = (new_poi, current_segments[seg_index + 1][1])
+        current_segments.insert(seg_index+1, new_segment)
+ 
+    elif whereInSegment == "begin":
+        new_segment = (new_poi, current_segments[seg_index][0])
+        current_segments[seg_index - 1] = (current_segments[seg_index - 1][0], new_poi)
+        current_segments.insert(seg_index, new_segment)
+    else:
         new_segment = (current_segments[seg_index][0], new_poi)
         current_segments[seg_index] = (new_poi, current_segments[seg_index][1])
         current_segments.insert(seg_index, new_segment)
-    elif whereInSegment == "begin":
-        current_segments[seg_index - 1] = (current_segments[seg_index - 1][0], new_poi)
-        new_segment = (new_poi, current_segments[seg_index][0])
-        current_segments.insert(seg_index, new_segment)
-    else:
-        current_segments[seg_index + 1] = (new_poi, current_segments[seg_index + 1][1])
-        new_segment = (current_segments[seg_index][1], new_poi)
-        current_segments.insert(seg_index+1, new_segment)
-
+ 
 def find_next_poi(poi_list, path_segments, walk_factor, preferences):
     poi_to_add = None
     seg_to_add_to = None
     min_score = float("inf")
-    whereInSegment = ""
+    finalWhereInSegment = ""
     for poi in poi_list:
         if poi.category == 'Restaurants':
             continue
@@ -156,8 +161,8 @@ def find_next_poi(poi_list, path_segments, walk_factor, preferences):
             poi_to_add = poi
             min_score = score
             seg_to_add_to = segment
-
-    update_segments(path_segments, poi_to_add, seg_to_add_to, whereInSegment)
+            finalWhereInSegment = whereInSegment
+    update_segments(path_segments, poi_to_add, seg_to_add_to, finalWhereInSegment)
 
     return poi_to_add
 
