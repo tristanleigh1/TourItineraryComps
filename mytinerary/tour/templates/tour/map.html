@@ -14,15 +14,17 @@
       var radiusMarkers = [];
       var windows = {};
       var map;
+      var directionsService;
+      var directionsDisplay;
+      
       function initialize() {
-        var directionsService = new google.maps.DirectionsService;
-        var directionsDisplay = new google.maps.DirectionsRenderer;
-        var geocoder = new google.maps.Geocoder;
+        directionsService = new google.maps.DirectionsService;
+        directionsDisplay = new google.maps.DirectionsRenderer;
         directionsDisplay.setOptions( { suppressMarkers: true } );
 
         map = new google.maps.Map(document.getElementById('map'));
         directionsDisplay.setMap(map);
-       var locations = [
+        var locations = [
            {title: '{{origin.address}}',
             name: '{{origin.business_name}}',
             id: '{{origin.id}}',
@@ -107,7 +109,7 @@
            });
 
        }
-        calculateAndDisplayRoute(geocoder, directionsService, directionsDisplay);
+        calculateAndDisplayRoute(directionsService, directionsDisplay);
       }
 
       function findNearbyPOIs(marker) {
@@ -141,7 +143,7 @@
             }
             for (var i=0; i<nearby_pois.length; i++) {
                 var poiOutsideRoute = true;
-                for (var j=0; i<markers.length; i++) {
+                for (var j=0; j<markers.length; j++) {
                     if (markers[j].poi_id == nearby_pois[i].poi_id) {
                         poiOutsideRoute = false;
                     }
@@ -186,8 +188,8 @@
 
       function createInfoWindow(marker, window) {
           var content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
-                '</p><div class="btn btn-primary btn-sm"  onclick="markers[' + marker.id +
-                '].setMap(null);"><span class="glyphicon glyphicon-trash"></span></div>' +
+                '</p><div class="btn btn-primary btn-sm"  onclick="removePoint(' + marker.id + ');">' +
+                '<span class="glyphicon glyphicon-trash"></span></div>' +
                 '<div class="btn btn-link btn-sm"  onclick="setInfoWindowContent('+ marker.id +
                 ');">More Info...</div>';
           if (window.marker != marker) {
@@ -202,7 +204,7 @@
           var marker = markers[markerId];
           var content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
                 '</p><img src="https://maps.googleapis.com/maps/api/streetview?size=600x300&location=' +
-              marker.position['lat'] + ',' + marker.position['lng'] +
+              marker.getPosition().lat() + ',' + marker.getPosition().lng() +
               '&key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM" >' +
                 '<br/><div class="btn btn-primary btn-sm"  onclick="markers[' + marker.id +
                 '].setMap(null);"><span class="glyphicon glyphicon-trash"></span></div>' +
@@ -220,30 +222,7 @@
           windows[markerId].setContent(content);
       }
 
-      function calculateAndDisplayRoute(geocoder, directionsService, directionsDisplay) {
-      //  waypoints = [];
-      //  count = 0;
-      //    {% for poi in poi_list %}
-      //           var latlng = {lat: {{ poi.latitude|stringformat:"f" }}, lng: {{ poi.longitude|stringformat:"f" }}};
-      //           geocoder.geocode({'location':latlng}, function(results, status) {
-      //               if (status === 'OK') {
-      //                   if (results[0]) {
-      //                       waypoints.push({location: results[0].formatted_address});
-      //                       console.log('pushed {{poi.business_name}}' + results[0].formatted_address);
-      //                   } else {
-      //                   console.log('no address found for latlng');
-      //                   waypoints.push({location: '{{poi.address}}'});
-      //               }}
-      //               else {
-      //                   console.log('geocoder error: ' + status);
-      //                   waypoints.push({location: '{{poi.address}}'});
-      //               }
-      //           });
-      //     count = count + 1;
-      //     console.log(count);
-      //    {% endfor %}
-      //    console.log(waypoints);
-
+      function calculateAndDisplayRoute(directionsService, directionsDisplay) {
          directionsService.route({
             origin: new google.maps.LatLng({lat:{{origin.latitude|stringformat:"f"}}, lng:{{origin.longitude|stringformat:"f"}}}),
             destination: new google.maps.LatLng({lat:{{destination.latitude|stringformat:"f"}}, lng:{{destination.longitude|stringformat:"f"}}}),
@@ -261,6 +240,48 @@
                 window.alert('Directions request failed due to ' + status);
             }
         });
+    }
+      
+    function removePoint(markerId) {
+//        waypoints = [
+//            {% for poi in poi_list %}
+//            {location: new google.maps.LatLng({lat:{{poi.latitude|stringformat:"f"}}, lng:{{poi.longitude|stringformat:"f"}}})},
+//            {% endfor %}
+//        ];
+//        waypoints.splice(markerId -1, 1);
+        markers[markerId].setMap(null);
+        markers.splice(markerId, 1);
+        for (var i = markerId; i < markers.length; i++) {
+            markers[i].id--;
+            markers[i].label -= 1;
+            markers[i].setMap(null)
+            markers[i].setMap(map);
+        }
+        waypoints = [];
+        
+        for (var i = 0; i < markers.length; i++) {
+            waypoints.push({location: markers[i].getPosition()});
+        }
+        console.log(waypoints);
+        
+        directionsService.route({
+            origin: new google.maps.LatLng({lat:{{origin.latitude|stringformat:"f"}}, lng:{{origin.longitude|stringformat:"f"}}}),
+            destination: new google.maps.LatLng({lat:{{destination.latitude|stringformat:"f"}}, lng:{{destination.longitude|stringformat:"f"}}}),
+            waypoints: waypoints,
+            travelMode: 'WALKING',
+            optimizeWaypoints: false //we may want to enable this
+         }, function(response, status) {
+            if (status === 'OK') {
+                directionsDisplay.setDirections(response);
+            } else {
+                window.alert('Directions request failed due to ' + status);
+            }
+        });
+        
+        for (var i=0; i<radiusMarkers.length; i++) {
+            marker = radiusMarkers[i];
+            marker.setMap(null);
+        }
     }
     </script>
     <link rel="stylesheet" type="text/css" href='{% static "tour/map.css" %}' />
