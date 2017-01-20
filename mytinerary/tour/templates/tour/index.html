@@ -19,7 +19,7 @@
 	{% include "tour/navbar.html" %}
 	<div class="col-sm-4"></div>
 	<div class="col-sm-4">
-		<form action="/tour/map/" method="GET" class="preference-form">
+		<form action="/tour/map/" method="GET" class="preference-form" name="indexForm" onsubmit="return validateForm()">
 			<div class="form-horizontal">
 				<fieldset>
 					<div class="form-group row">

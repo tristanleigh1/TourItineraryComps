@@ -1,9 +1,9 @@
-/* 
+/*
  * Javascript for the start and end address autocompletion. Also fills in the hidden
  * form fields for start and end long/lat. Written with help from the autocomplete
  * documentation found here:
  * https://developers.google.com/maps/documentation/javascript/examples/places-autocomplete
- * 
+ *
  * @author Caleb Braun
  * 1/8/17
 */
@@ -12,10 +12,10 @@
 // parameter when you first load the API.
 
 function initAutocomplete() {
-    var ac1 = document.getElementById('autocomplete1')
-    var ac2 = document.getElementById('autocomplete2')
+    var ac1 = document.getElementById('autocomplete1');
+    var ac2 = document.getElementById('autocomplete2');
     autocompleteStart = new google.maps.places.Autocomplete(
-        /** @type {!HTMLInputElement} */(ac1));    
+        /** @type {!HTMLInputElement} */(ac1));
     autocompleteEnd = new google.maps.places.Autocomplete(
         /** @type {!HTMLInputElement} */(ac2));
 
@@ -26,12 +26,18 @@ function initAutocomplete() {
         document.getElementById('endLngLat').value = autocompleteEnd.getPlace().geometry.location;
     });
 
-    google.maps.event.addDomListener(ac1, 'keydown', function(e) { 
-        if (e.keyCode == 13) { 
-            e.preventDefault(); 
+    google.maps.event.addDomListener(ac1, 'keydown', function(e) {
+        if (e.keyCode == 13) {
+            e.preventDefault();
             ac2.select();
         }
-    }); 
+    });
+
+    google.maps.event.addDomListener(ac2, 'keydown', function(e) {
+        if (e.keyCode == 13) {
+            e.preventDefault();
+        }
+    });
 }
 
 // Bias the autocomplete object to the user's geographical location,
@@ -44,7 +50,7 @@ function geolocate() {
             lng: -0.127
         },
         'Madrid': {
-            lat: 40.416, 
+            lat: 40.416,
             lng: -3.704
         },
         'Minneapolis': {
@@ -56,7 +62,7 @@ function geolocate() {
             lng: -73.986
         },
         'San Francisco': {
-            lat: 37.774929, 
+            lat: 37.774929,
             lng: -122.419416
         }
     }
@@ -66,6 +72,24 @@ function geolocate() {
           center: geolocations[city],
           radius: 100000 // 100 km
         });
-    autocompleteStart.setBounds(circle.getBounds()); 
-    autocompleteEnd.setBounds(circle.getBounds()); 
+    autocompleteStart.setBounds(circle.getBounds());
+    autocompleteEnd.setBounds(circle.getBounds());
+}
+
+function validateForm() {
+	var isValid = true;
+	var form = document.forms["indexForm"];
+	if (!form["startDestination"].value || !form["startCoords"].value) {
+		document.getElementById('autocomplete1').style.borderColor = "red";
+		isValid = false;
+	} else {
+		document.getElementById('autocomplete1').removeAttribute("style");
+	}
+	if (!form["endDestination"].value || !document.forms["indexForm"]["endCoords"].value) {
+		document.getElementById('autocomplete2').style.borderColor = "red";
+		isValid = false;
+	} else {
+		document.getElementById('autocomplete2').removeAttribute("style");
+	}
+	return isValid;
 }
