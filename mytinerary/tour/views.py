@@ -7,6 +7,7 @@ from .models import *
 import math
 from decimal import *
 
+
 # Create your views here.
 #GET: tour/
 def index(request):
