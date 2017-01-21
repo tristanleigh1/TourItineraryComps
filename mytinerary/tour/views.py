@@ -38,7 +38,8 @@ def pop_radius(request):
             response_data['nearby_pois'].append({'name' : poi.business_name,
                                                  'latitude' : poi.latitude,
                                                  'longitude' : poi.longitude,
-                                                 'poi_id' : poi.id
+                                                 'poi_id' : poi.id,
+                                                 'rating' : poi.num_stars
                                                  })
         return JsonResponse(response_data)
     else:

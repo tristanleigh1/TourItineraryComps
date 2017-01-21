@@ -110,7 +110,12 @@
            });
 
        }
-        calculateAndDisplayRoute(directionsService, directionsDisplay);
+        var waypoints = [
+                {% for poi in poi_list %}
+                {location: new google.maps.LatLng({lat:{{poi.latitude|stringformat:"f"}}, lng:{{poi.longitude|stringformat:"f"}}})},
+                {% endfor %}
+        ];
+        updateRoute(waypoints);
       }
 
       function findNearbyPOIs(marker) {
@@ -122,8 +127,7 @@
                         'id' : marker.poi_id},
                 dataType : 'json',
                 success : function(json) {
-				    plotNearbyPois(json["nearby_pois"]);
-                    console.log(json);
+				    plotNearbyPois(json["nearby_pois"], marker);
                 },
                 cache : false,
                 error : function(xhr, errmsg, err) {
@@ -137,11 +141,13 @@
             });
       }
 
-        function plotNearbyPois(nearby_pois) {
+        function plotNearbyPois(nearby_pois, centerMarker) {
+            // Get rid of markers from previous radius
             for (var i=0; i<radiusMarkers.length; i++) {
                 marker = radiusMarkers[i];
                 marker.setMap(null);
             }
+            // Only adds nearby POIs that aren't already in route
             for (var i=0; i<nearby_pois.length; i++) {
                 var poiOutsideRoute = true;
                 for (var j=0; j<markers.length; j++) {
@@ -156,12 +162,12 @@
                                    lng: parseFloat(nearby_pois[i].longitude)},
                         name: nearby_pois[i].name,
                         poi_id: nearby_pois[i].poi_id,
-                        id: radiusMarkers.length - 1,
+                        id: radiusMarkers.length,
                         rating: nearby_pois[i].rating
                     });
                     var infoWindow = new google.maps.InfoWindow();
                     marker.addListener('click', function() {
-                        createNearbyInfoWindow(this, infoWindow);
+                        createNearbyInfoWindow(this, infoWindow, centerMarker);
                     });
                     radiusMarkers.push(marker);
                 }
@@ -173,11 +179,9 @@
             popRadius.setVisible(true);
       }
       
-      function createNearbyInfoWindow(marker, window) {
-          console.log(marker);
+      function createNearbyInfoWindow(marker, window, centerMarker) {
           var content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
-                '</p><div class="btn btn-primary btn-sm"  onclick="radiusMarkers[' + marker.id +
-                '].setMap(null);"><span class="glyphicon glyphicon-trash"></span></div>' +
+                '</p><div class="btn btn-primary btn-sm"onclick="addPoint(' + marker.id + ', ' + centerMarker.id + ');">Add</div>' +
                 '<div class="btn btn-link btn-sm"  onclick="setInfoWindowContent('+ marker.id +
                 ');">More Info...</div>';
           if (window.marker != marker) {
@@ -223,33 +227,13 @@
                 '<div class="btn btn-link btn-sm"  onclick="setInfoWindowContent('+ marker.id +');">More Info...</div>';
           windows[markerId].setContent(content);
       }
-
-      function calculateAndDisplayRoute(directionsService, directionsDisplay) {
-         directionsService.route({
-            origin: new google.maps.LatLng({lat:{{origin.latitude|stringformat:"f"}}, lng:{{origin.longitude|stringformat:"f"}}}),
-            destination: new google.maps.LatLng({lat:{{destination.latitude|stringformat:"f"}}, lng:{{destination.longitude|stringformat:"f"}}}),
-            waypoints: [
-                {% for poi in poi_list %}
-                {location: new google.maps.LatLng({lat:{{poi.latitude|stringformat:"f"}}, lng:{{poi.longitude|stringformat:"f"}}})},
-                {% endfor %}
-            ],
-            travelMode: 'WALKING',
-            optimizeWaypoints: false //we may want to enable this
-         }, function(response, status) {
-            if (status === 'OK') {
-                directionsDisplay.setDirections(response);
-            } else {
-                window.alert('Directions request failed due to ' + status);
-            }
-        });
-    }
       
     function removePoint(markerId) {
         markers[markerId].setMap(null);
         markers.splice(markerId, 1);
         for (var i = markerId; i < markers.length; i++) {
             markers[i].id--;
-            markers[i].label -= 1;
+            markers[i].label--;
             markers[i].setMap(null)
             markers[i].setMap(map);
         }
@@ -258,8 +242,60 @@
         for (var i = 0; i < markers.length; i++) {
             waypoints.push({location: markers[i].getPosition()});
         }
-        console.log(waypoints);
         
+        updateRoute(waypoints);
+        
+        for (var i=0; i<radiusMarkers.length; i++) {
+            marker = radiusMarkers[i];
+            marker.setMap(null);
+        }
+        
+        popRadius.setVisible(false);
+        
+    }
+      
+    function addPoint(newMarkerId, markerId) {
+        var newMarker = new google.maps.Marker({
+               map: map,
+               position: radiusMarkers[newMarkerId].position,
+               name: radiusMarkers[newMarkerId].name,
+               rating: radiusMarkers[newMarkerId].rating,
+               id: markerId+1,
+               poi_id: radiusMarkers[newMarkerId].poi_id,
+               label: (markerId+1).toString(),
+//               icon: radiusMarkers[newMarkerId].icon,
+           });
+//           marker.addListener('click', function() {
+//               createPopRadius(this, popRadius);
+//               createInfoWindow(this, infoWindow);
+//               findNearbyPOIs(this);
+//           });
+        markers.splice(markerId+1, 0, newMarker);
+        
+        for (var i = markerId; i < markers.length; i++) {
+            markers[i].id++;
+            markers[i].label = i + 1;
+            markers[i].setMap(null)
+            markers[i].setMap(map);
+        }
+        
+        waypoints = [];
+        for (var i = 0; i < markers.length; i++) {
+            waypoints.push({location: markers[i].getPosition()});
+        }
+        
+        
+        updateRoute(waypoints);
+        
+        for (var i=0; i<radiusMarkers.length; i++) {
+            marker = radiusMarkers[i];
+            marker.setMap(null);
+        }
+        
+        popRadius.setVisible(false);
+        
+    }
+    function updateRoute(waypoints) {
         directionsService.route({
             origin: new google.maps.LatLng({lat:{{origin.latitude|stringformat:"f"}}, lng:{{origin.longitude|stringformat:"f"}}}),
             destination: new google.maps.LatLng({lat:{{destination.latitude|stringformat:"f"}}, lng:{{destination.longitude|stringformat:"f"}}}),
@@ -273,14 +309,6 @@
                 window.alert('Directions request failed due to ' + status);
             }
         });
-        
-        for (var i=0; i<radiusMarkers.length; i++) {
-            marker = radiusMarkers[i];
-            marker.setMap(null);
-        }
-        
-        popRadius.setVisible(false);
-        
     }
     </script>
     <link rel="stylesheet" type="text/css" href='{% static "tour/map.css" %}' />
