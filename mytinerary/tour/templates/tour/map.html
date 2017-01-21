@@ -14,6 +14,7 @@
       var radiusMarkers = [];
       var windows = {};
       var map;
+      var popRadius;
       var directionsService;
       var directionsDisplay;
       
@@ -50,7 +51,7 @@
             rating: '{{destination.num_stars}}'},
        ];
        var infoWindow = new google.maps.InfoWindow();
-       var popRadius = new google.maps.Circle({
+       popRadius = new google.maps.Circle({
             strokeWeight: 0,
             fillColor: '#FF0000',
             fillOpacity: 0.35,
@@ -153,7 +154,7 @@
                         map: map,
                         position: {lat: parseFloat(nearby_pois[i].latitude),
                                    lng: parseFloat(nearby_pois[i].longitude)},
-                        name: nearby_pois[i].business_name,
+                        name: nearby_pois[i].name,
                         poi_id: nearby_pois[i].poi_id,
                         id: radiusMarkers.length - 1,
                         rating: nearby_pois[i].rating
@@ -173,6 +174,7 @@
       }
       
       function createNearbyInfoWindow(marker, window) {
+          console.log(marker);
           var content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
                 '</p><div class="btn btn-primary btn-sm"  onclick="radiusMarkers[' + marker.id +
                 '].setMap(null);"><span class="glyphicon glyphicon-trash"></span></div>' +
@@ -243,12 +245,6 @@
     }
       
     function removePoint(markerId) {
-//        waypoints = [
-//            {% for poi in poi_list %}
-//            {location: new google.maps.LatLng({lat:{{poi.latitude|stringformat:"f"}}, lng:{{poi.longitude|stringformat:"f"}}})},
-//            {% endfor %}
-//        ];
-//        waypoints.splice(markerId -1, 1);
         markers[markerId].setMap(null);
         markers.splice(markerId, 1);
         for (var i = markerId; i < markers.length; i++) {
@@ -282,6 +278,9 @@
             marker = radiusMarkers[i];
             marker.setMap(null);
         }
+        
+        popRadius.setVisible(false);
+        
     }
     </script>
     <link rel="stylesheet" type="text/css" href='{% static "tour/map.css" %}' />
