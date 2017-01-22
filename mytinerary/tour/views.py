@@ -160,6 +160,8 @@ def find_next_poi(poi_list, path_segments, walk_factor, preferences):
     for poi in poi_list:
         if poi.category == 'Restaurants':
             continue
+#        if poi.business_name == path_segments[0][0].business_name:
+ #           continue
         score, segment, whereInSegment = calculate_score(poi, path_segments, walk_factor, preferences)
         if score < min_score:
             poi_to_add = poi
@@ -167,7 +169,8 @@ def find_next_poi(poi_list, path_segments, walk_factor, preferences):
             seg_to_add_to = segment
             finalWhereInSegment = whereInSegment
     update_segments(path_segments, poi_to_add, seg_to_add_to, finalWhereInSegment)
-
+   # if poi_to_add.business_name == 'Museo Nacional del Prado':
+    #    raise Exception('here')
     return poi_to_add
 
 def create_path(total_pois, start, end, walk_factor, preferences, num_destinations):
@@ -215,11 +218,13 @@ def map(request):
     destination = POI()
     origin.latitude = Decimal(start_coords[1:-1].split(", ")[0])
     origin.longitude = Decimal(start_coords[1:-1].split(", ")[1])
+   # origin.business_name = request.GET['startDestination'].split(',')[0]
     origin.business_name = "Origin"
     origin.category = "Museums"
 
     destination.latitude = Decimal(end_coords[1:-1].split(", ")[0])
     destination.longitude = Decimal(end_coords[1:-1].split(", ")[1])
+   # destination.business_name = request.GET['endDestination'].split(',')[0]
     destination.business_name = "Destination"
     destination.category = "Museums"
 
