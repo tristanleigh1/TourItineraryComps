@@ -49,7 +49,7 @@ def pop_radius(request):
         )
 
 def calculate_score(current_poi, path_segments, walk_factor, preferences):
-    empirical_coefficient = 0.0002
+    empirical_coefficient = 0.002
     category = current_poi.category
     popularity = current_poi.popularity
     distance_to_path = float("inf")
@@ -57,15 +57,16 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
     # To determine if the POI should be added in the middle of a segment or to the 
     # beginning or end of a segment, we'll assume middle for now
     finalWhereInSegment = "middle"
+    totalPreferencePoints = float(preferences[0]) + float(preferences[1]) + float(preferences[2]) + float(preferences[3])
     score = float("inf")
     if current_poi.category == 'Museums':
-        taste = float(preferences[0]) * (1.0/4.0)
+        taste = float(preferences[0])/totalPreferencePoints
     elif current_poi.category == 'Landmarks':
-        taste = float(preferences[1]) * (1.0/4.0)
+        taste = float(preferences[1])/totalPreferencePoints
     elif current_poi.category == 'Activities':
-        taste = float(preferences[2]) * (1.0/4.0)
+        taste = float(preferences[2])/totalPreferencePoints
     else:
-        taste = float(preferences[3]) * (1.0/4.0)
+        taste = float(preferences[3])/totalPreferencePoints
 
     walk_factor = float(walk_factor) * (3.0/10.0)
 
