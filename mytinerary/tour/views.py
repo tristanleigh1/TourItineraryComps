@@ -162,6 +162,8 @@ def find_next_poi(poi_list, path_segments, walk_factor, preferences):
             continue
         if poi.business_name == path_segments[0][0].category:
             continue
+        if poi.business_name == path_segments[len(path_segments)-1][1].category:
+            continue
         score, segment, whereInSegment = calculate_score(poi, path_segments, walk_factor, preferences)
         if score < min_score:
             poi_to_add = poi
