@@ -160,8 +160,8 @@ def find_next_poi(poi_list, path_segments, walk_factor, preferences):
     for poi in poi_list:
         if poi.category == 'Restaurants':
             continue
-#        if poi.business_name == path_segments[0][0].business_name:
- #           continue
+        if poi.business_name == path_segments[0][0].category:
+            continue
         score, segment, whereInSegment = calculate_score(poi, path_segments, walk_factor, preferences)
         if score < min_score:
             poi_to_add = poi
@@ -218,15 +218,15 @@ def map(request):
     destination = POI()
     origin.latitude = Decimal(start_coords[1:-1].split(", ")[0])
     origin.longitude = Decimal(start_coords[1:-1].split(", ")[1])
-   # origin.business_name = request.GET['startDestination'].split(',')[0]
+    origin.category = request.GET['startDestination'].split(',')[0]
     origin.business_name = "Origin"
-    origin.category = "Museums"
+   # origin.category = "Museums"
 
     destination.latitude = Decimal(end_coords[1:-1].split(", ")[0])
     destination.longitude = Decimal(end_coords[1:-1].split(", ")[1])
-   # destination.business_name = request.GET['endDestination'].split(',')[0]
+    destination.category = request.GET['endDestination'].split(',')[0]
     destination.business_name = "Destination"
-    destination.category = "Museums"
+#    destination.category = "Other"
 
     preferences = [museum_preference, landmark_preference, activity_preference, nature_preference]
 
