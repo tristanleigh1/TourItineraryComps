@@ -49,7 +49,7 @@ def pop_radius(request):
         )
 
 def calculate_score(current_poi, path_segments, walk_factor, preferences):
-    empirical_coefficient = 0.002
+    empirical_coefficient = 0.0006
     category = current_poi.category
     popularity = current_poi.popularity
     distance_to_path = float("inf")
