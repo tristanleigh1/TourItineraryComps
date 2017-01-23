@@ -19,7 +19,7 @@
 	{% include "tour/navbar.html" %}
 	<div class="col-sm-4"></div>
 	<div class="col-sm-4">
-		<form action="/tour/map/" method="GET" class="preference-form" name="indexForm" onsubmit="return validateForm()">
+        <form action="/tour/map/" method="GET" class="preference-form" name="indexForm" onsubmit="return validateForm()">
 			<div class="form-horizontal">
 				<fieldset>
 					<div class="form-group row">
@@ -55,7 +55,6 @@
                                 class="form-control"
                                 id="autocomplete1"
                                 name="startDestination"
-                                placeholder="Enter your starting location"
                                 onFocus="geolocate()">
 						</div>
 					</div>
@@ -66,8 +65,7 @@
                                 style="width:100%"
                                 class="form-control"
                                 id="autocomplete2"
-                                name="endDestination"
-                                placeholder="Enter your final destination">
+                                name="endDestination">
 						</div>
 					</div>
                 <input type="hidden" id="startLngLat" name="startCoords">
