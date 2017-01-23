@@ -1,6 +1,6 @@
 $(document).ready(function() {
     setVal($("#points").val(), "pointValBox");
-    setVal($("#miles").val(), "mileValBox");
+    setDirectness($("#miles").val(), "distanceValBox");
     setQuantifier($("#museums").val(), "museumValBox");
     setQuantifier($("#landmarks").val(), "landmarkValBox");
     setQuantifier($("#activities").val(), "activityValBox");
@@ -27,6 +27,26 @@ function setQuantifier(newVal, idName) {
             break;
         case "4":
             document.getElementById(idName).innerHTML="Lots!";
+            break;
+    }
+}
+
+function setDirectness(newVal, idName) {
+    switch(newVal) {
+        case "0":
+            document.getElementById(idName).innerHTML="In a Rush";
+            break;
+        case "3":
+            document.getElementById(idName).innerHTML="More Direct";
+            break;
+        case "6":
+            document.getElementById(idName).innerHTML="Default";
+            break;
+        case "9":
+            document.getElementById(idName).innerHTML="Scenic Route";
+            break;
+        case "12":
+            document.getElementById(idName).innerHTML="Only the Best!";
             break;
     }
 }
