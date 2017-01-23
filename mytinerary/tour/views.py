@@ -194,6 +194,8 @@ def create_path(total_pois, start, end, walk_factor, preferences, num_destinatio
     path_pois = []
     total_pois = list(total_pois)
 
+    # Check if start or end are POIs, if so remove from list
+
     # given a start and end address (which we take as lat lng):
     # 1. Check if it's a POI
     # 2. If so, remove POI from list and make start point it's POI object
