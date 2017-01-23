@@ -109,13 +109,13 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
                 if distance_to_start < distance_to_end:
                     distance_to_segment = distance_to_start
                    # if i > 0
-                    if seg[0].business_name != "Origin":
+                    if seg[0].category != "Origin":
                         whereInSegment = "begin"
                     else:
                         whereInSegment = "middle"
                 else:
                     distance_to_segment = distance_to_end
-                    if seg[1].business_name != "Destination":
+                    if seg[1].category != "Destination":
                         whereInSegment = "end"
                     else:
                         whereInSegment = "middle"
@@ -160,9 +160,9 @@ def find_next_poi(poi_list, path_segments, walk_factor, preferences):
     for poi in poi_list:
         if poi.category == 'Restaurants':
             continue
-        if poi.business_name == path_segments[0][0].category:
+        if poi.business_name == path_segments[0][0].business_name:
             continue
-        if poi.business_name == path_segments[len(path_segments)-1][1].category:
+        if poi.business_name == path_segments[len(path_segments)-1][1].business_name:
             continue
         score, segment, whereInSegment = calculate_score(poi, path_segments, walk_factor, preferences)
         if score < min_score:
@@ -220,15 +220,13 @@ def map(request):
     destination = POI()
     origin.latitude = Decimal(start_coords[1:-1].split(", ")[0])
     origin.longitude = Decimal(start_coords[1:-1].split(", ")[1])
-    origin.category = request.GET['startDestination'].split(',')[0]
-    origin.business_name = "Origin"
-   # origin.category = "Museums"
+    origin.business_name = request.GET['startDestination'].split(',')[0]
+    origin.category = "Origin"
 
     destination.latitude = Decimal(end_coords[1:-1].split(", ")[0])
     destination.longitude = Decimal(end_coords[1:-1].split(", ")[1])
-    destination.category = request.GET['endDestination'].split(',')[0]
-    destination.business_name = "Destination"
-#    destination.category = "Other"
+    destination.business_name = request.GET['endDestination'].split(',')[0]
+    destination.category = "Destination"
 
     preferences = [museum_preference, landmark_preference, activity_preference, nature_preference]
 
