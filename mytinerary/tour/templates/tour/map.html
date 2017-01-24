@@ -12,12 +12,12 @@
   <script>
       var markers = [];
       var radiusMarkers = [];
+      var sidebarButtons = [];
       var popWindow;
       var map;
       var popRadius;
       var directionsService;
       var directionsDisplay;
-
 
       function initialize() {
         directionsService = new google.maps.DirectionsService;
@@ -33,7 +33,8 @@
             category: '{{origin.category}}',
             position: {lat: {{ origin.latitude|stringformat:"f" }},
                        lng: {{ origin.longitude|stringformat:"f" }}},
-            rating: '{{origin.num_stars}}'},
+            rating: '{{origin.num_stars}}',
+            summary: `{{origin.summary}}`},
            {% for poi in poi_list %}
                {title: '{{poi.address}}',
                 name: '{{poi.business_name}}',
@@ -41,7 +42,8 @@
                 category: '{{poi.category}}',
                 position: {lat: {{ poi.latitude|stringformat:"f" }},
                            lng: {{ poi.longitude|stringformat:"f" }}},
-                rating: '{{poi.num_stars}}'},
+                rating: '{{poi.num_stars}}',
+                summary: `{{poi.summary}}`},
            {% endfor %}
            {title: '{{destination.address}}',
             name: '{{destination.business_name}}',
@@ -49,7 +51,8 @@
             category: '{{destination.category}}',
             position: {lat: {{ destination.latitude|stringformat:"f" }},
                        lng: {{ destination.longitude|stringformat:"f" }}},
-            rating: '{{destination.num_stars}}'},
+            rating: '{{destination.num_stars}}',
+            summary: `{{destination.summary}}`},
        ];
        popRadius = new google.maps.Circle({
             strokeWeight: 0,
@@ -60,10 +63,12 @@
             visible: false,
        });
        for (var i = 0; i < locations.length; i++) {
+           var poi_id = locations[i].id;
            var position = locations[i].position;
            var name = locations[i].name;
            var category = locations[i].category;
            var rating = locations[i].rating;
+           var summary = locations[i].summary;
            var icon = ""
            switch (category) {
                 case "Museums":
@@ -91,16 +96,17 @@
                            scaledSize: new google.maps.Size(45, 45)};
                    break;
            }
-           //else if ($.inArray('Parks', locations[i].category) > -1
+           //else if ($.inArray('Parks', locations[i].category) > -1  
            var marker = new google.maps.Marker({
                map: map,
                position: position,
                name: name,
                rating: rating,
                id: i,
-               poi_id: locations[i].id,
+               poi_id: poi_id,
                label: (i+1).toString(),
                icon: icon,
+               summary: summary
            });
            markers.push(marker);
            marker.addListener('click', function() {
@@ -108,12 +114,17 @@
                createInfoWindow(this, null);
                findNearbyPOIs(this);
            });
-
+           
+           sidebarButtons.push({
+               name: name,
+               summary: summary,
+           });
        }
+      addSidebarButtons();
         var waypoints = [
-                {% for poi in poi_list %}
-                {location: new google.maps.LatLng({lat:{{poi.latitude|stringformat:"f"}}, lng:{{poi.longitude|stringformat:"f"}}})},
-                {% endfor %}
+            {% for poi in poi_list %}
+            {location: new google.maps.LatLng({lat:{{poi.latitude|stringformat:"f"}}, lng:{{poi.longitude|stringformat:"f"}}})},
+            {% endfor %}
         ];
         updateRoute(waypoints);
       }
@@ -165,7 +176,8 @@
                         name: nearby_pois[i].name,
                         poi_id: nearby_pois[i].poi_id,
                         id: radiusMarkers.length,
-                        rating: nearby_pois[i].rating
+                        rating: nearby_pois[i].rating,
+                        summary: nearby_pois[i].summary
                     });
                     marker.addListener('click', function() {
                         createInfoWindow(this, centerMarker);
@@ -289,19 +301,21 @@
                id: markerId,
                poi_id: radiusMarkers[newMarkerId].poi_id,
                label: (markerId+1).toString(),
+               summary: radiusMarkers[newMarkerId].summary
 //               icon: radiusMarkers[newMarkerId].icon,
            });
-          newMarker.addListener('click', function() {
-              createPopRadius(this);
-              createInfoWindow(this, null);
-              findNearbyPOIs(this);
-          });
+        newMarker.addListener('click', function() {
+          createPopRadius(this);
+          createInfoWindow(this, null);
+          findNearbyPOIs(this);
+        });
         markers.splice(markerId+1, 0, newMarker);
 
+        //refresh markers on map with updated labels
         for (var i = markerId+1; i < markers.length; i++) {
             markers[i].id++;
             markers[i].label = i + 1;
-            markers[i].setMap(null)
+            markers[i].setMap(null); 
             markers[i].setMap(map);
         }
 
@@ -309,7 +323,6 @@
         for (var i = 0; i < markers.length; i++) {
             waypoints.push({location: markers[i].getPosition()});
         }
-
 
         updateRoute(waypoints);
 
@@ -319,8 +332,9 @@
         }
         radiusMarkers.length = 0;
         popRadius.setVisible(false);
-
+        updateSidebar(newMarker, markerId);
     }
+      
     function updateRoute(waypoints) {
         directionsService.route({
             origin: new google.maps.LatLng({lat:{{origin.latitude|stringformat:"f"}}, lng:{{origin.longitude|stringformat:"f"}}}),
@@ -335,6 +349,36 @@
                 window.alert('Directions request failed due to ' + status);
             }
         });
+    }
+      
+    function updateSidebar(newMarker, markerId) {
+        var sidebarButton = {name: newMarker.name, summary: newMarker.summary };
+        sidebarButtons.splice(markerId + 1, 0, sidebarButton);
+        $("#accordion").empty();
+        addSidebarButtons();
+    }
+      
+    function addSidebarButtons() {
+        for (var i = 0; i < markers.length; i++) {
+          $("#accordion").append(
+              `<div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="heading`+ i +`">
+                  <h4 class="panel-title">
+                    <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse` +
+              i + `" aria-expanded="false" aria-controls="collapse` + i + `">
+                      ` + (i + 1) + `: ` + markers[i].name + `
+                    </a>
+                  </h4>
+                </div>
+                <div id="collapse` + i + `" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading` +
+              i + `">
+                  <div class="panel-body">
+                    ` + markers[i].summary + `
+                  </div>
+                </div>
+              </div>`
+          );
+      }
     }
     </script>
     <link rel="stylesheet" type="text/css" href='{% static "tour/map.css" %}' />
@@ -363,6 +407,9 @@
             <div class="col-md-3">
                 <h2>My Tour</h2>
                 <p>Total Distance: <span id="distance"></span></p>
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                </div>
+                <!--
                 <div id="sidebar">
                     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                       <div class="panel panel-default">
@@ -411,6 +458,7 @@
                       </div>
                     </div>
                 </div>
+-->
             </div>
         </div>
     </div>
