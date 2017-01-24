@@ -31,14 +31,10 @@ body {
     height:800px;
 }
 
-#sidebar {
+#accordion {
     height: 706px;
     overflow: auto;
     
-}
-
-#sidebar h2{
-/*    color: white;*/
 }
 
 .Museums {
@@ -57,6 +53,7 @@ body {
     background-color: #fd7567;
 }
 
+/*
 button.accordion {
     color: black;
     cursor: pointer;
@@ -71,15 +68,4 @@ button.accordion {
 
 button.accordion:hover {
     color: grey;
-}
-
-/*
-div.panel {
-    padding: 0 18px;
-    background-color: white;
-    display: none;
-}
-
-div.panel.show {
-    display: block;
 }*/
