@@ -12,17 +12,17 @@
   <script>
       var markers = [];
       var radiusMarkers = [];
-      var windows = {};
+      var popWindow;
       var map;
       var popRadius;
       var directionsService;
       var directionsDisplay;
-      
+
       function initialize() {
         directionsService = new google.maps.DirectionsService;
         directionsDisplay = new google.maps.DirectionsRenderer;
         directionsDisplay.setOptions( { suppressMarkers: true } );
-
+        popWindow  = new google.maps.InfoWindow();
         map = new google.maps.Map(document.getElementById('map'));
         directionsDisplay.setMap(map);
         var locations = [
@@ -50,7 +50,6 @@
                        lng: {{ destination.longitude|stringformat:"f" }}},
             rating: '{{destination.num_stars}}'},
        ];
-       var infoWindow = new google.maps.InfoWindow();
        popRadius = new google.maps.Circle({
             strokeWeight: 0,
             fillColor: '#FF0000',
@@ -104,8 +103,8 @@
            });
            markers.push(marker);
            marker.addListener('click', function() {
-               createPopRadius(this, popRadius);
-               createInfoWindow(this, infoWindow);
+               createPopRadius(this);
+               createInfoWindow(this, null);
                findNearbyPOIs(this);
            });
 
@@ -147,6 +146,8 @@
                 marker = radiusMarkers[i];
                 marker.setMap(null);
             }
+            radiusMarkers.length = 0;
+
             // Only adds nearby POIs that aren't already in route
             for (var i=0; i<nearby_pois.length; i++) {
                 var poiOutsideRoute = true;
@@ -165,69 +166,93 @@
                         id: radiusMarkers.length,
                         rating: nearby_pois[i].rating
                     });
-                    var infoWindow = new google.maps.InfoWindow();
                     marker.addListener('click', function() {
-                        createNearbyInfoWindow(this, infoWindow, centerMarker);
+                        createInfoWindow(this, centerMarker);
                     });
                     radiusMarkers.push(marker);
                 }
             }
         }
 
-      function createPopRadius(marker, popRadius) {
+      function createPopRadius(marker) {
             popRadius.setCenter(marker.position);
             popRadius.setVisible(true);
       }
-      
-      function createNearbyInfoWindow(marker, window, centerMarker) {
-          var content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
-                '</p><div class="btn btn-primary btn-sm"onclick="addPoint(' + marker.id + ', ' + centerMarker.id + ');">Add</div>' +
-                '<div class="btn btn-link btn-sm"  onclick="setInfoWindowContent('+ marker.id +
-                ');">More Info...</div>';
-          if (window.marker != marker) {
-              window.marker = marker;
-              window.setContent(content);
-              window.open(map, marker);
-              windows[window.marker.id] = window;
+
+      // Called when a poi in the pop radius is clicked
+      // function createNearbyInfoWindow(marker, centerMarker) {
+      //     var content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
+      //           '</p><div class="btn btn-primary btn-sm"onclick="addPoint(' + marker.id + ', ' + centerMarker.id + ');">Add</div>' +
+      //           '<div class="btn btn-link btn-sm"  onclick="setInfoWindowContent('+ marker.id +
+      //           ');">More Info...</div>';
+      //     if (popWindow.marker != marker) {
+      //         popWindow.marker = marker;
+      //         popWindow.setContent(content);
+      //         popWindow.open(map, marker);
+      //     }
+      // }
+
+      // Called when path POI marker is clicked
+      function createInfoWindow(marker, centerMarker) {
+          var content;
+
+          // There is no centerMarker if the marker is on our path
+          if (centerMarker == null) {
+            content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
+                  '</p><div class="btn btn-primary btn-sm"  onclick="removePoint(' + marker.id + ');">' +
+                  '<span class="glyphicon glyphicon-trash"></span></div>' +
+                  '<div class="btn btn-link btn-sm"  onclick="setInfoWindowContent('+ marker.id + ', null' +
+                  ');">More Info...</div>';
+          } else {
+            content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
+                  '</p><div class="btn btn-primary btn-sm"onclick="addPoint(' + marker.id + ', ' + centerMarker.id + ');">Add</div>' +
+                  '<div class="btn btn-link btn-sm"  onclick="setInfoWindowContent('+ marker.id + ', ' + centerMarker.id +
+                  ');">More Info...</div>';
+          }
+
+          popWindow.marker = marker;
+          popWindow.setContent(content);
+          popWindow.open(map, marker);
+      }
+
+      //Called when user clicks on "More Info..." button in info window
+      function setInfoWindowContent(markerId, centerMarkerId) {
+          var content;
+          if (!centerMarkerId) {
+            var marker = markers[markerId];
+            content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
+                  '</p><img src="https://maps.googleapis.com/maps/api/streetview?size=600x300&location=' +
+                marker.getPosition().lat() + ',' + marker.getPosition().lng() +
+                '&key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM" >' +
+                  '<br/><div class="btn btn-primary btn-sm"  onclick="removePoint(' + marker.id +
+                  ');"><span class="glyphicon glyphicon-trash"></span></div>' +
+                  '<div class="btn btn-link btn-sm" onclick="resetInfoWindow('+ marker.id + ', null' +
+                  ');">Less Info</div>';
+          } else {
+            var marker = radiusMarkers[markerId];
+            content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
+                  '</p><img src="https://maps.googleapis.com/maps/api/streetview?size=600x300&location=' +
+                marker.getPosition().lat() + ',' + marker.getPosition().lng() +
+                '&key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM" >' +
+                  '<br/></p><div class="btn btn-primary btn-sm"onclick="addPoint(' + marker.id + ', ' + centerMarkerId + ');">Add</div>' +
+                  '<div class="btn btn-link btn-sm" onclick="resetInfoWindow('+ marker.id + ', ' + centerMarkerId +
+                  ');">Less Info</div>';
+          }
+          popWindow.setContent(content);
+      }
+
+      function resetInfoWindow(markerId, centerMarkerId) {
+          console.log(markerId);
+          console.log(centerMarkerId);
+          if (centerMarkerId == null) {
+            var marker = markers[markerId];
+            createInfoWindow(marker, null);
+          } else {
+            var centerMarker = markers[centerMarkerId];
+            createInfoWindow(radiusMarkers[markerId], centerMarker);
           }
       }
 
-      function createInfoWindow(marker, window) {
-          var content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
-                '</p><div class="btn btn-primary btn-sm"  onclick="removePoint(' + marker.id + ');">' +
-                '<span class="glyphicon glyphicon-trash"></span></div>' +
-                '<div class="btn btn-link btn-sm"  onclick="setInfoWindowContent('+ marker.id +
-                ');">More Info...</div>';
-          if (window.marker != marker) {
-              window.marker = marker;
-              window.setContent(content);
-              window.open(map, marker);
-              windows[window.marker.id] = window;
-          }
-      }
-
-      function setInfoWindowContent(markerId) {
-          var marker = markers[markerId];
-          var content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
-                '</p><img src="https://maps.googleapis.com/maps/api/streetview?size=600x300&location=' +
-              marker.getPosition().lat() + ',' + marker.getPosition().lng() +
-              '&key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM" >' +
-                '<br/><div class="btn btn-primary btn-sm"  onclick="markers[' + marker.id +
-                '].setMap(null);"><span class="glyphicon glyphicon-trash"></span></div>' +
-                '<div class="btn btn-link btn-sm" onclick="resetInfoWindow('+ marker.id +
-                ');">Less Info</div>';
-          windows[markerId].setContent(content);
-      }
-
-      function resetInfoWindow(markerId) {
-          var marker = markers[markerId];
-          var content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
-                '</p><div class="btn btn-primary btn-sm"  onclick="markers[' + marker.id +
-                '].setMap(null);"><span class="glyphicon glyphicon-trash"></span></div>' +
-                '<div class="btn btn-link btn-sm"  onclick="setInfoWindowContent('+ marker.id +');">More Info...</div>';
-          windows[markerId].setContent(content);
-      }
-      
     function removePoint(markerId) {
         markers[markerId].setMap(null);
         markers.splice(markerId, 1);
@@ -238,62 +263,62 @@
             markers[i].setMap(map);
         }
         waypoints = [];
-        
+
         for (var i = 0; i < markers.length; i++) {
             waypoints.push({location: markers[i].getPosition()});
         }
-        
+
         updateRoute(waypoints);
-        
+
         for (var i=0; i<radiusMarkers.length; i++) {
             marker = radiusMarkers[i];
             marker.setMap(null);
         }
-        
+
         popRadius.setVisible(false);
-        
+
     }
-      
+
     function addPoint(newMarkerId, markerId) {
         var newMarker = new google.maps.Marker({
                map: map,
                position: radiusMarkers[newMarkerId].position,
                name: radiusMarkers[newMarkerId].name,
                rating: radiusMarkers[newMarkerId].rating,
-               id: markerId+1,
+               id: markerId,
                poi_id: radiusMarkers[newMarkerId].poi_id,
                label: (markerId+1).toString(),
 //               icon: radiusMarkers[newMarkerId].icon,
            });
-//           marker.addListener('click', function() {
-//               createPopRadius(this, popRadius);
-//               createInfoWindow(this, infoWindow);
-//               findNearbyPOIs(this);
-//           });
+          newMarker.addListener('click', function() {
+              createPopRadius(this);
+              createInfoWindow(this, null);
+              findNearbyPOIs(this);
+          });
         markers.splice(markerId+1, 0, newMarker);
-        
-        for (var i = markerId; i < markers.length; i++) {
+
+        for (var i = markerId+1; i < markers.length; i++) {
             markers[i].id++;
             markers[i].label = i + 1;
             markers[i].setMap(null)
             markers[i].setMap(map);
         }
-        
+
         waypoints = [];
         for (var i = 0; i < markers.length; i++) {
             waypoints.push({location: markers[i].getPosition()});
         }
-        
-        
+
+
         updateRoute(waypoints);
-        
+
         for (var i=0; i<radiusMarkers.length; i++) {
             marker = radiusMarkers[i];
             marker.setMap(null);
         }
-        
+        radiusMarkers.length = 0;
         popRadius.setVisible(false);
-        
+
     }
     function updateRoute(waypoints) {
         directionsService.route({
