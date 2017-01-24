@@ -12,7 +12,6 @@
   <script>
       var markers = [];
       var radiusMarkers = [];
-      var sidebarButtons = [];
       var popWindow;
       var map;
       var popRadius;
@@ -113,11 +112,6 @@
                createPopRadius(this);
                createInfoWindow(this, null);
                findNearbyPOIs(this);
-           });
-           
-           sidebarButtons.push({
-               name: name,
-               summary: summary,
            });
        }
       addSidebarButtons();
@@ -332,7 +326,9 @@
         }
         radiusMarkers.length = 0;
         popRadius.setVisible(false);
-        updateSidebar(newMarker, markerId);
+        
+        $("#accordion").empty();
+        addSidebarButtons();
     }
       
     function updateRoute(waypoints) {
@@ -349,13 +345,6 @@
                 window.alert('Directions request failed due to ' + status);
             }
         });
-    }
-      
-    function updateSidebar(newMarker, markerId) {
-        var sidebarButton = {name: newMarker.name, summary: newMarker.summary };
-        sidebarButtons.splice(markerId + 1, 0, sidebarButton);
-        $("#accordion").empty();
-        addSidebarButtons();
     }
       
     function addSidebarButtons() {
@@ -409,56 +398,6 @@
                 <p>Total Distance: <span id="distance"></span></p>
                 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                 </div>
-                <!--
-                <div id="sidebar">
-                    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                      <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingOrig">
-                          <h4 class="panel-title {{poi.category}}">
-                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOrig" aria-expanded="false" aria-controls="collapseOrig">
-                              Origin
-                            </a>
-                          </h4>
-                        </div>
-                        <div id="collapseOrig" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOrig">
-                          <div class="panel-body">
-                            ...
-                          </div>
-                        </div>
-                      </div>
-                      {% for poi in poi_list %}
-                          <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="heading{{forloop.counter|add:'1'}}">
-                              <h4 class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{forloop.counter|add:'1'}}" aria-expanded="false" aria-controls="collapse{{forloop.counter|add:'1'}}">
-                                  {{ forloop.counter|add:"1" }}: {{poi.business_name}}
-                                </a>
-                              </h4>
-                            </div>
-                            <div id="collapse{{forloop.counter|add:'1'}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{forloop.counter|add:'1'}}">
-                              <div class="panel-body">
-                                {{poi.summary}}
-                              </div>
-                            </div>
-                          </div>
-                      {% endfor %}
-                      <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingDest">
-                          <h4 class="panel-title">
-                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseDest" aria-expanded="false" aria-controls="collapseDest">
-                              Destination
-                            </a>
-                          </h4>
-                        </div>
-                        <div id="collapseDest" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingDest">
-                          <div class="panel-body">
-                            ...
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                </div>
--->
             </div>
         </div>
     </div>

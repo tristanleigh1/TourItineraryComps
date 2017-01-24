@@ -34,13 +34,13 @@ def pop_radius(request):
         nearby_pois = POI.objects.filter(city = city).filter(latitude__lte=latitude+radius, latitude__gte=latitude-radius, longitude__lte=longitude+radius, longitude__gte=longitude-radius) ##(new_latitude-origin_latitude)^2 + (new_longitude - origin_longitude^2 <= radius^2
         response_data['poi'] = poi.business_name
         response_data['nearby_pois'] = list()
-        for poi in nearby_pois:
-            response_data['nearby_pois'].append({'name' : poi.business_name,
-                                                 'latitude' : poi.latitude,
-                                                 'longitude' : poi.longitude,
-                                                 'poi_id' : poi.id,
-                                                 'rating' : poi.num_stars,
-                                                 'summary': poi.summary
+        for nearby_poi in nearby_pois:
+            response_data['nearby_pois'].append({'name' : nearby_poi.business_name,
+                                                 'latitude' : nearby_poi.latitude,
+                                                 'longitude' : nearby_poi.longitude,
+                                                 'poi_id' : nearby_poi.id,
+                                                 'rating' : nearby_poi.num_stars,
+                                                 'summary': nearby_poi.summary
                                                  })
         return JsonResponse(response_data)
     else:
