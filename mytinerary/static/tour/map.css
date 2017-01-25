@@ -23,7 +23,7 @@ body {
 
 #filter-bar li {
     float: left;
-    padding: 9px;
+    padding: 7px;
     list-style-type: none;
 }
 
@@ -38,19 +38,24 @@ body {
 }
 
 .Museums {
-    background-color: #6890fb;
+/*    background-color: #514c42;*/
+    border: 2px solid #6890fb;
 }
 .Landmarks {
-    background-color: #e661ac;
+/*    background-color: #514c42;*/
+    border: 2px solid #e661ac;
 }
 .Activities {
-    background-color: #fdf569;
+/*    background-color: #514c42;*/
+    border: 2px solid #fdf569;
 }
 .Nature {
-    background-color: #00e64d;
+/*    background-color: #514c42;*/
+    border: 2px solid #00e64d;
 }
 .Restaurants {
-    background-color: #fd7567;
+/*    background-color: #514c42;*/
+    border: 2px solid #fd7567;
 }
 
 /*

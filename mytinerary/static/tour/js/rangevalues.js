@@ -8,25 +8,25 @@ $(document).ready(function() {
 });
 
 function setVal(newVal, idName){
-    document.getElementById(idName).innerHTML=newVal;
+    $("#" + idName).html(newVal);
 }
 
 function setQuantifier(newVal, idName) {
     switch(newVal) {
         case "0":
-            document.getElementById(idName).innerHTML="None";
+            $("#" + idName).html("None");
             break;
         case "1":
-            document.getElementById(idName).innerHTML="Few";
+            $("#" + idName).html("Few");
             break;
         case "2":
-            document.getElementById(idName).innerHTML="Some";
+            $("#" + idName).html("Some");
             break;
         case "3":
-            document.getElementById(idName).innerHTML="Many";
+            $("#" + idName).html("Many");
             break;
         case "4":
-            document.getElementById(idName).innerHTML="Lots!";
+            $("#" + idName).html("Lots!");
             break;
     }
 }
@@ -34,19 +34,19 @@ function setQuantifier(newVal, idName) {
 function setDirectness(newVal, idName) {
     switch(newVal) {
         case "0":
-            document.getElementById(idName).innerHTML="In a Rush";
+            $("#" + idName).html("In a Rush");
             break;
         case "3":
-            document.getElementById(idName).innerHTML="More Direct";
+            $("#" + idName).html("More Direct");
             break;
         case "6":
-            document.getElementById(idName).innerHTML="Default";
+            $("#" + idName).html("Default");
             break;
         case "9":
-            document.getElementById(idName).innerHTML="Scenic Route";
+            $("#" + idName).html("Scenic Route");
             break;
         case "12":
-            document.getElementById(idName).innerHTML="Only the Best!";
+            $("#" + idName).html("Only the Best!");
             break;
     }
 }
