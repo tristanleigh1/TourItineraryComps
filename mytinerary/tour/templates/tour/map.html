@@ -162,6 +162,7 @@
                         poiOutsideRoute = false;
                     }
                 }
+
                 if (poiOutsideRoute) {
                     var marker = new google.maps.Marker({
                         map: map,
@@ -201,21 +202,22 @@
 
       // Called when path POI marker is clicked
       function createInfoWindow(marker, centerMarker) {
-          var content;
+          var onclick;
+          var centerMarkerId;
 
           // There is no centerMarker if the marker is on our path
           if (centerMarker == null) {
-            content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
-                  '</p><div class="btn btn-primary btn-sm"  onclick="removePoint(' + marker.id + ');">' +
-                  '<span class="glyphicon glyphicon-trash"></span></div>' +
-                  '<div class="btn btn-link btn-sm"  onclick="setInfoWindowContent('+ marker.id + ', null' +
-                  ');">More Info...</div>';
+              onclick = ' onclick="removePoint(' + marker.id + ');">' + 
+              '<span class="glyphicon glyphicon-trash"></span>';
           } else {
-            content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
-                  '</p><div class="btn btn-primary btn-sm"onclick="addPoint(' + marker.id + ', ' + centerMarker.id + ');">Add</div>' +
-                  '<div class="btn btn-link btn-sm"  onclick="setInfoWindowContent('+ marker.id + ', ' + centerMarker.id +
-                  ');">More Info...</div>';
+            centerMarkerId = centerMarker.id;
+            onclick = ' onclick="addPoint(' + marker.id + ', ' + centerMarker.id + ');">Add';
           }
+
+          var content = '<p>' + marker.name + '</p><p>Yelp rating: ' + marker.rating +
+          '</p><div class="btn btn-primary btn-sm"' + onclick + '</div><div class="btn btn-link btn-sm"' +
+                          'onclick="setInfoWindowContent('+ marker.id + ', ' + centerMarkerId +
+                          ');">More Info...</div>';
 
           popWindow.marker = marker;
           popWindow.setContent(content);
