@@ -40,7 +40,8 @@ def pop_radius(request):
                                                  'longitude' : nearby_poi.longitude,
                                                  'poi_id' : nearby_poi.id,
                                                  'rating' : nearby_poi.num_stars,
-                                                 'summary': nearby_poi.summary
+                                                 'summary': nearby_poi.summary,
+                                                 'category': nearby_poi.category
                                                  })
         return JsonResponse(response_data)
     else:

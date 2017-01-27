@@ -12,6 +12,10 @@ body {
     padding-right: 15px;
 }
 
+.panel-heading {
+    background: inherit;
+}
+
 #map-container {
     top: 46px;
 }
@@ -23,7 +27,7 @@ body {
 
 #filter-bar li {
     float: left;
-    padding: 7px;
+    padding: 9px;
     list-style-type: none;
 }
 
@@ -32,45 +36,76 @@ body {
 }
 
 #accordion {
-    height: 706px;
+    height: 663px;
     overflow: auto;
     
 }
 
 .Museums {
-/*    background-color: #514c42;*/
-    border: 2px solid #6890fb;
+    background: #6890fb;
 }
 .Landmarks {
-/*    background-color: #514c42;*/
-    border: 2px solid #e661ac;
+    background: #e661ac;
 }
 .Activities {
-/*    background-color: #514c42;*/
-    border: 2px solid #fdf569;
+    background: #fdf569;
 }
 .Nature {
-/*    background-color: #514c42;*/
-    border: 2px solid #00e64d;
+    background: #00e64d;
 }
 .Restaurants {
-/*    background-color: #514c42;*/
-    border: 2px solid #fd7567;
+    background: #fd7567;
 }
 
-/*
-button.accordion {
-    color: black;
+checkbox-label {
+    padding-right: 5px;
+    border: 1px solid black;
+}
+
+.checkbox-slider > input[type="checkbox"] {
+    display: none;   
+}
+
+.checkbox-slider > label {
     cursor: pointer;
-    padding: 9px;
-    width: 100%;
-    text-align: left;
-    border: none;
-    outline: none;
-    transition: 0.4s;
-    margin-left: 10px;
+    height: 0px;
+    position: relative; 
+    width: 40px;  
 }
 
-button.accordion:hover {
-    color: grey;
-}*/
+.checkbox-slider > label::before {
+    background: black;
+    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    content: '';
+    height: 16px;
+    margin-top: -8px;
+    position:absolute;
+    opacity: 0.3;
+    transition: all 0.4s ease-in-out;
+    width: 40px;
+}
+
+.checkbox-slider > label::after {
+    background: #e5e3df;
+    border-radius: 16px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+    content: '';
+    height: 24px;
+    left: -4px;
+    margin-top: -8px;
+    position: absolute;
+    top: -4px;
+    transition: all 0.2s ease-in-out;
+    width: 24px;
+}
+
+.checkbox-slider > input[type="checkbox"]:checked + label::before {
+    background: inherit;
+    opacity: 0.5;
+}
+
+.checkbox-slider > input[type="checkbox"]:checked + label::after {
+    background: inherit;
+    left: 20px;
+}

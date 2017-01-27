@@ -107,7 +107,8 @@
                poi_id: poi_id,
                label: (i+1).toString(),
                icon: icon,
-               summary: summary
+               summary: summary,
+               category: category
            });
            markers.push(marker);
            marker.addListener('click', function() {
@@ -174,7 +175,8 @@
                       poi_id: nearby_pois[i].poi_id,
                       id: radiusMarkers.length,
                       rating: nearby_pois[i].rating,
-                      summary: nearby_pois[i].summary
+                      summary: nearby_pois[i].summary,
+                      category: nearby_pois[i].category
                   });
                   marker.addListener('click', function() {
                       createInfoWindow(this, centerMarker);
@@ -291,7 +293,8 @@
                id: markerId,
                poi_id: radiusMarkers[newMarkerId].poi_id,
                label: (markerId+1).toString(),
-               summary: radiusMarkers[newMarkerId].summary
+               summary: radiusMarkers[newMarkerId].summary,
+               category: radiusMarkers[newMarkerId].category
 //               icon: radiusMarkers[newMarkerId].icon,
            });
         newMarker.addListener('click', function() {
@@ -356,7 +359,8 @@
     function addSidebarButtons() {
         for (var i = 0; i < markers.length; i++) {
           $("#accordion").append(
-              `<div class="panel panel-default">
+              `<div class="panel panel-info">
+                <div class="`+ markers[i].category +`">
                 <div class="panel-heading" role="tab" id="heading`+ i +`">
                   <h4 class="panel-title">
                     <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse` +
@@ -364,6 +368,7 @@
                       ` + (i + 1) + `: ` + markers[i].name + `
                     </a>
                   </h4>
+                </div>
                 </div>
                 <div id="collapse` + i + `" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading` +
               i + `">
@@ -403,12 +408,50 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12" id="filter-bar">
-                <ul>
-                    <li class="Museums"><input type="checkbox" name="Museums" value="Museums">Museums<br></li>
-                    <li class="Landmarks"><input type="checkbox" name="Landmarks" value="Landmarks">Landmarks<br></li>
-                    <li class="Activities"><input type="checkbox" name="Activities" value="Activities">Activities<br></li>
-                    <li class="Nature"><input type="checkbox" name="Parks" value="Parks">Parks<br></li>
-                    <li class="Restaurants"><input type="checkbox" name="Restaurants" value="Restaurants">Restaurants<br></li>
+                <ul class="list-group">
+                    <li>
+                        <label>Museums&nbsp</label>
+                        <div class="checkbox-slider pull-right">
+                            <input id="Museums" name="Museums" type="checkbox"/>
+                            <label for="Museums" class="Museums label-default"></label>
+                        </div>
+                        <br>
+                    </li>
+                    <li>
+                        <label>Landmarks&nbsp</label>
+                        <div class="checkbox-slider pull-right">
+                            <input id="Landmarks" name="Landmarks" type="checkbox"/>
+                            <label for="Landmarks" class="Landmarks label-default"></label>
+                        </div>
+                        <br>
+                    </li>
+                    <li>
+                        <label>Activities&nbsp</label>
+                        <div class="checkbox-slider pull-right">
+                            <input id="Activities" name="Activities" type="checkbox"/>
+                            <label for="Activities" class="label-default Activities"></label>
+                        </div>
+                        <br>
+                    </li>
+                    <li>
+                        <label>Parks&nbsp</label>
+                        <div class="checkbox-slider pull-right">
+                            <input id="Nature" name="Nature" type="checkbox"/>
+                            <label for="Nature" class="label-default Nature"></label>
+                        </div>
+                        <br>
+                    </li>
+                    <li>
+                        <label>Restaurants&nbsp</label>
+                        <div class="checkbox-slider pull-right">
+                            <input id="Restaurants" name="Restaurants" type="checkbox"/>
+                            <label for="Restaurants" class="label-default Restaurants"></label>
+                        </div>
+                        <br>
+                    </li>
+<!--
+                    <li class="Nature"Activitiesants"><input type="checkbox" name="Restaurants" value="Restaurants">Restaurants<br></li>
+-->
                 </ul>
             </div>
         </div>
@@ -418,10 +461,10 @@
             </div>
             <div class="col-md-3">
                 <h2 id="mytour">My Tour</h2>
-                <p>Total Distance: <span id="distance"></span></p>
+                <p>Total Distance: <span id="distance"></span>
+                    <div class="btn btn-info btn-sm" onclick="getDirections();">Get Directions!</div>
+                </p>
                 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                  <div class="btn btn-primary btn-sm" onclick="getDirections();">Get Directions!</div>
-                  <br/><br/>
                 </div>
             </div>
         </div>
