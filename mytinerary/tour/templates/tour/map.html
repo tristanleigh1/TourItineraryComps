@@ -132,7 +132,8 @@
                 contentType: "application/json; charset=utf-8",
                 type : 'GET',
                 data : {'name' : marker.name,
-                        'id' : marker.poi_id},
+                        'id' : marker.poi_id,
+                        'radius' : popRadius.getRadius()},
                 dataType : 'json',
                 success : function(json) {
                     plotNearbyPois(json["nearby_pois"], marker);
