@@ -21,16 +21,18 @@ def contact(request):
 
 def pop_radius(request):
     if request.method == 'GET':
-        name = request.GET.get('name', None)
-        poi_id = request.GET.get('id', None)
+#        name = request.GET.get('name', None)
+#        poi_id = request.GET.get('id', None)
+        latitude = float(request.GET.get('lat', None))
+        longitude = float(request.GET.get('lng', None))
         radius = int(request.GET.get('radius', None))
-        response_data = {"name": name, "id": poi_id}
+        
 
-        poi = POI.objects.get(id = poi_id)
-
-        latitude = float(poi.latitude)
-        longitude = float(poi.longitude)
-        city = poi.city
+#        poi = POI.objects.get(id = poi_id)
+#
+#        latitude = float(poi.latitude)
+#        longitude = float(poi.longitude)
+#        city = poi.city
 
         # 110.574km = 1 degree
         # 111.320 * cos(latitude)km = 1 degree
@@ -41,10 +43,12 @@ def pop_radius(request):
         # radius = 0.004
         radius_lng = 0.004 
 
-        nearby_pois = POI.objects.filter(city = city).filter(latitude__lte=latitude+radius_lat, latitude__gte=latitude-radius_lat, longitude__lte=longitude+radius_lng, longitude__gte=longitude-radius_lng)
+#        nearby_pois = POI.objects.filter(city = city).filter(latitude__lte=latitude+radius_lat, latitude__gte=latitude-radius_lat, longitude__lte=longitude+radius_lng, longitude__gte=longitude-radius_lng)
+        nearby_pois = POI.objects.filter(latitude__lte=latitude+radius_lat, latitude__gte=latitude-radius_lat, longitude__lte=longitude+radius_lng, longitude__gte=longitude-radius_lng)
 
         ##(new_latitude-origin_latitude)^2 + (new_longitude - origin_longitude^2 <= radius^2
-        response_data['poi'] = poi.business_name
+#        response_data['poi'] = poi.business_name
+        response_data = {}
         response_data['nearby_pois'] = list()
         for nearby_poi in nearby_pois:
             response_data['nearby_pois'].append({'name' : nearby_poi.business_name,

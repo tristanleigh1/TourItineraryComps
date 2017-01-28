@@ -118,12 +118,7 @@
            });
        }
       addSidebarButtons();
-        var waypoints = [
-            {% for poi in poi_list %}
-            {location: new google.maps.LatLng({lat:{{poi.latitude|stringformat:"f"}}, lng:{{poi.longitude|stringformat:"f"}}})},
-            {% endfor %}
-        ];
-        updateRoute(waypoints);
+      updateRoute();
       }
 
       function findNearbyPOIs(marker) {
@@ -131,8 +126,10 @@
                 url : "/tour/pop_radius/",
                 contentType: "application/json; charset=utf-8",
                 type : 'GET',
-                data : {'name' : marker.name,
-                        'id' : marker.poi_id,
+                data : { //'name' : marker.name,
+                        'lat':marker.getPosition().lat(),
+                        'lng':marker.getPosition().lng(),
+//                            'id' : marker.poi_id,
                         'radius' : popRadius.getRadius()},
                 dataType : 'json',
                 success : function(json) {
@@ -266,13 +263,8 @@
             markers[i].setMap(null)
             markers[i].setMap(map);
         }
-        waypoints = [];
 
-        for (var i = 0; i < markers.length; i++) {
-            waypoints.push({location: markers[i].getPosition()});
-        }
-
-        updateRoute(waypoints);
+        updateRoute();
 
         for (var i=0; i<radiusMarkers.length; i++) {
             marker = radiusMarkers[i];
@@ -312,13 +304,8 @@
             markers[i].setMap(null);
             markers[i].setMap(map);
         }
-
-        waypoints = [];
-        for (var i = 0; i < markers.length; i++) {
-            waypoints.push({location: markers[i].getPosition()});
-        }
-
-        updateRoute(waypoints);
+        
+        updateRoute();
 
         for (var i=0; i<radiusMarkers.length; i++) {
             marker = radiusMarkers[i];
@@ -331,10 +318,14 @@
         addSidebarButtons();
     }
 
-    function updateRoute(waypoints) {
+    function updateRoute() {
+        waypoints = [];
+        for (var i = 1; i<markers.length - 1; i++) {
+            waypoints.push({location: markers[i].getPosition()});
+        }
         directionsService.route({
-            origin: new google.maps.LatLng({lat:{{origin.latitude|stringformat:"f"}}, lng:{{origin.longitude|stringformat:"f"}}}),
-            destination: new google.maps.LatLng({lat:{{destination.latitude|stringformat:"f"}}, lng:{{destination.longitude|stringformat:"f"}}}),
+            origin: markers[0].getPosition(),
+            destination: markers[markers.length - 1].getPosition(),
             waypoints: waypoints,
             travelMode: 'WALKING',
             optimizeWaypoints: false //we may want to enable this
