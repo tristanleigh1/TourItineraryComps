@@ -25,34 +25,49 @@
         popWindow  = new google.maps.InfoWindow();
         map = new google.maps.Map(document.getElementById('map'));
         directionsDisplay.setMap(map);
-        var locations = [
-            {title: '{{origin.address}}',
-            name: '{{origin.business_name}}',
-            id: '{{origin.id}}',
-            category: '{{origin.category}}',
-            position: {lat: {{ origin.latitude|stringformat:"f" }},
-                       lng: {{ origin.longitude|stringformat:"f" }}},
-            rating: '{{origin.num_stars}}',
-            summary: `{{origin.summary}}`},
-            {% for poi in poi_list %}
-                {title: '{{poi.address}}',
-                name: '{{poi.business_name}}',
-                id: '{{poi.id}}',
-                category: '{{poi.category}}',
-                position: {lat: {{ poi.latitude|stringformat:"f" }},
-                           lng: {{ poi.longitude|stringformat:"f" }}},
-                rating: '{{poi.num_stars}}',
-                summary: `{{poi.summary}}`},
-           {% endfor %}
-           {title: '{{destination.address}}',
-            name: '{{destination.business_name}}',
-            id: '{{destination.id}}',
-            category: '{{destination.category}}',
-            position: {lat: {{ destination.latitude|stringformat:"f" }},
-                       lng: {{ destination.longitude|stringformat:"f" }}},
-            rating: '{{destination.num_stars}}',
-            summary: `{{destination.summary}}`},
-       ];
+        var locations;
+        if ("{{mode}}" == "startToEnd") {
+            locations = [
+                {title: '{{origin.address}}',
+                name: '{{origin.business_name}}',
+                id: '{{origin.id}}',
+                category: '{{origin.category}}',
+                position: {lat: {{ origin.latitude|stringformat:"f" }},
+                           lng: {{ origin.longitude|stringformat:"f" }}},
+                rating: '{{origin.num_stars}}',
+                summary: `{{origin.summary}}`},
+                {% for poi in poi_list %}
+                    {title: '{{poi.address}}',
+                    name: '{{poi.business_name}}',
+                    id: '{{poi.id}}',
+                    category: '{{poi.category}}',
+                    position: {lat: {{ poi.latitude|stringformat:"f" }},
+                               lng: {{ poi.longitude|stringformat:"f" }}},
+                    rating: '{{poi.num_stars}}',
+                    summary: `{{poi.summary}}`},
+               {% endfor %}
+               {title: '{{destination.address}}',
+                name: '{{destination.business_name}}',
+                id: '{{destination.id}}',
+                category: '{{destination.category}}',
+                position: {lat: {{ destination.latitude|stringformat:"f" }},
+                           lng: {{ destination.longitude|stringformat:"f" }}},
+                rating: '{{destination.num_stars}}',
+                summary: `{{destination.summary}}`},
+           ];
+       }
+       else {
+           locations = [
+                {title: '{{origin.address}}',
+                name: '{{origin.business_name}}',
+                id: '{{origin.id}}',
+                category: '{{origin.category}}',
+                position: {lat: {{ origin.latitude|stringformat:"f" }},
+                           lng: {{ origin.longitude|stringformat:"f" }}},
+                rating: '{{origin.num_stars}}',
+                summary: `{{origin.summary}}`}
+           ];
+       }
 
        popRadius = new google.maps.Circle({
             strokeWeight: 0,

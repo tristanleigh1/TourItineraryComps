@@ -238,6 +238,32 @@ def map(request):
     # destination = get_object_or_404(POI, pk=2611)
 
     # Form values
+    mode = request.GET['mode']
+    if (mode == "start-to-end"):
+        return startToEnd(request)
+    elif (mode == "exploratory"):
+        return exploratory(request)
+    
+
+def exploratory(request):
+    city = request.GET['city']
+    start_coords = request.GET['startCoords']
+
+    origin = POI()
+    origin.latitude = Decimal(start_coords[1:-1].split(", ")[0])
+    origin.longitude = Decimal(start_coords[1:-1].split(", ")[1])
+    origin.business_name = request.GET['startDestination'].split(',')[0]
+    origin.category = "Origin"
+    destination = get_object_or_404(POI, pk=2569)
+
+    context = { 'mode': "exploratory",
+                'origin': origin,
+                'destination': destination,
+                'city': city,
+                'start_coords': start_coords}
+    return render(request, 'tour/map.html', context)
+    
+def startToEnd(request):
     city = request.GET['city']
     start_coords = request.GET['startCoords']
     end_coords = request.GET['endCoords']
@@ -266,6 +292,7 @@ def map(request):
     final_path = create_path(poi_list, origin, destination, walk_factor, preferences, num_destinations)
 
     context = { #'category_dict': category_dict,
+                'mode': 'startToEnd',
                 'poi_list': final_path,
                 'origin': origin,
                 'destination': destination,
@@ -273,3 +300,4 @@ def map(request):
                 'start_coords': start_coords,
                 'end_coords': end_coords}
     return render(request, 'tour/map.html', context)
+    
