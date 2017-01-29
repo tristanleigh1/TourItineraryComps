@@ -148,7 +148,12 @@
                         'radius' : popRadius.getRadius()},
                 dataType : 'json',
                 success : function(json) {
-                    plotNearbyPois(json["nearby_pois"], marker);
+                    if (json["nearby_pois"].length == 1) {
+                        popRadius.setRadius(popRadius.getRadius()*2);
+                        findNearbyPOIs(marker);
+                    } else {
+                        plotNearbyPois(json["nearby_pois"], marker);
+                    }
                 },
                 cache : false,
                 error : function(xhr, errmsg, err) {
