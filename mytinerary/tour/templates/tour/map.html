@@ -293,6 +293,34 @@
     }
 
     function addPoint(newMarkerId, markerId) {
+        var icon = ""
+        switch (radiusMarkers[newMarkerId].category) {
+            case "Museums":
+                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/blue.png",
+                        scaledSize: new google.maps.Size(45, 45)};
+                break;
+            case "Landmarks":
+                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/pink.png",
+                        scaledSize: new google.maps.Size(45, 45)};
+                break;
+            case "Activities":
+                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/yellow.png",
+                        scaledSize: new google.maps.Size(45, 45)};
+                break;
+            case "Nature":
+                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/green.png",
+                        scaledSize: new google.maps.Size(45, 45)};
+                break;
+            case "Restaurants":
+                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/red.png",
+                        scaledSize: new google.maps.Size(45, 45)};
+                break;
+            default:
+                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/purple.png",
+                        scaledSize: new google.maps.Size(45, 45)};
+                break;
+        }
+ 
         var newMarker = new google.maps.Marker({
                map: map,
                position: radiusMarkers[newMarkerId].position,
@@ -302,8 +330,8 @@
                poi_id: radiusMarkers[newMarkerId].poi_id,
                label: (markerId+1).toString(),
                summary: radiusMarkers[newMarkerId].summary,
-               category: radiusMarkers[newMarkerId].category
-//               icon: radiusMarkers[newMarkerId].icon,
+               category: radiusMarkers[newMarkerId].category,
+               icon: icon
            });
         newMarker.addListener('click', function() {
           createPopRadius(this);
