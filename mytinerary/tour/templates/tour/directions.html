@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Map - Mytinerary</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   {% load static %}
+  <link rel="stylesheet" href="https://bootswatch.com/united/bootstrap.min.css">
+  <link rel="icon" href='{% static "tour/images/icon.png" %}' />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href='{% static "tour/map.css" %}' />
+    <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
+</head>
+<body>
+<!--    <h3>{{city}}</h3>-->
+    <div id="body">
+    {% include "tour/navbar.html" %}
+    </div>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM&callback=initialize">
+    </script>
+</body>
+
+</html>

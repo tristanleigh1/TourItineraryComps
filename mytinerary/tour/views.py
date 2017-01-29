@@ -19,6 +19,9 @@ def about(request):
 def contact(request):
     return render(request, 'tour/contact.html')
 
+def directions(request):
+    return render(request, 'tour/directions.html')
+
 def pop_radius(request):
     if request.method == 'GET':
 #        name = request.GET.get('name', None)
@@ -26,7 +29,7 @@ def pop_radius(request):
         latitude = float(request.GET.get('lat', None))
         longitude = float(request.GET.get('lng', None))
         radius = int(request.GET.get('radius', None))
-        
+
 
 #        poi = POI.objects.get(id = poi_id)
 #
@@ -37,11 +40,11 @@ def pop_radius(request):
         # 110.574km = 1 degree
         # 111.320 * cos(latitude)km = 1 degree
         # 1km = 0.009043 degrees (for latitude)
-        # 1km = 0.008983 / cos(latitude) (for longitude) 
+        # 1km = 0.008983 / cos(latitude) (for longitude)
         radius_lat = (radius / 1000) * 0.009043
-        radius_lng = (radius / 1000) * (0.008983 / math.degrees(math.cos(math.radians(latitude)))) 
+        radius_lng = (radius / 1000) * (0.008983 / math.degrees(math.cos(math.radians(latitude))))
         # radius = 0.004
-        radius_lng = 0.004 
+        radius_lng = 0.004
 
 #        nearby_pois = POI.objects.filter(city = city).filter(latitude__lte=latitude+radius_lat, latitude__gte=latitude-radius_lat, longitude__lte=longitude+radius_lng, longitude__gte=longitude-radius_lng)
         nearby_pois = POI.objects.filter(latitude__lte=latitude+radius_lat, latitude__gte=latitude-radius_lat, longitude__lte=longitude+radius_lng, longitude__gte=longitude-radius_lng)
@@ -243,7 +246,7 @@ def map(request):
         return startToEnd(request)
     elif (mode == "exploratory"):
         return exploratory(request)
-    
+
 
 def exploratory(request):
     city = request.GET['city']
@@ -262,7 +265,7 @@ def exploratory(request):
                 'city': city,
                 'start_coords': start_coords}
     return render(request, 'tour/map.html', context)
-    
+
 def startToEnd(request):
     city = request.GET['city']
     start_coords = request.GET['startCoords']
@@ -300,4 +303,3 @@ def startToEnd(request):
                 'start_coords': start_coords,
                 'end_coords': end_coords}
     return render(request, 'tour/map.html', context)
-    

@@ -38,9 +38,11 @@ body {
 #accordion {
     height: 663px;
     overflow: auto;
-    
 }
 
+#panel .adp table {
+	font-family: "Ubuntu",Tahoma,"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
 .Museums {
     background: #6890fb;
 }
@@ -63,14 +65,14 @@ checkbox-label {
 }
 
 .checkbox-slider > input[type="checkbox"] {
-    display: none;   
+    display: none;
 }
 
 .checkbox-slider > label {
     cursor: pointer;
     height: 0px;
-    position: relative; 
-    width: 40px;  
+    position: relative;
+    width: 40px;
 }
 
 .checkbox-slider > label::before {

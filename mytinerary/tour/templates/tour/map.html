@@ -319,7 +319,7 @@
             markers[i].setMap(null);
             markers[i].setMap(map);
         }
-        
+
         updateRoute();
 
         for (var i=0; i<radiusMarkers.length; i++) {
@@ -389,19 +389,50 @@
     }
 
     function getDirections() {
-      var url = 'https://www.google.com/maps/dir/';
-      var addresses = [
-          //'{{origin.address}}',  <-- Add these when they actually work
-          {% for poi in poi_list %}
-          '{{poi.address}}',
-          {% endfor %}
-          //'{{destination.address}}'
-      ];
-      console.log(addresses);
-      url += addresses.join('/').replace(/\s/g, '+');
-      url += '&dirflg=w';
-      var win = window.open(url, '_blank');
-      win.focus();
+			// var origin = "origin=" + markers[0].getPosition().lat() + ","
+			// 						+ markers[0].getPosition().lng() + "&";
+			// var destination = "destination=" + markers[markers.length-1].getPosition().lat()
+			//  								+ "," + markers[markers.length-1].getPosition().lng() + "&";
+			// var waypoints = "waypoints="
+			// for (var i=1; i < markers.length-1; i++) {
+			// 	if (i != 1) {
+			// 		waypoints += "%7C";
+			// 	}
+			// 	waypoints += "via:" + markers[i].getPosition().lat()
+			// 							+ "%2C" + markers[i].getPosition().lng();
+			// }
+			// var otherParams = "&mode=walking&key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM";
+			//
+			// $.ajax({
+			// 		url : "https://maps.googleapis.com/maps/api/directions/json?"
+			// 				+ origin + destination + waypoints + otherParams,
+			// 		contentType: "application/json; charset=utf-8",
+			// 		type : 'GET',
+			// 		dataType : 'json',
+			// 		success : function(json) {
+			// 				location.href = "/tour/directions/";
+			// 				return true;
+			// 		},
+			// 		cache : false,
+			// 		error : function(xhr, errmsg, err) {
+			// 				console.log(errmsg);
+			// 				console.log(xhr.status + " " + xhr.responseText);
+			// 				return false;
+			// 		}
+			// });
+
+			if (document.getElementById('accordion').style.display == 'none') {
+				document.getElementById('accordion').style.display = 'block';
+				document.getElementById('db').innerHTML = "Get Directions!";
+				document.getElementById('panel').style.display = 'none';
+			} else {
+				document.getElementById('accordion').style.display = 'none';
+				document.getElementById('db').innerHTML = "Go back";
+				document.getElementById('panel').style.display = 'block';
+				directionsDisplay.setPanel(document.getElementById('panel'));
+			}
+
+
     }
 
     </script>
@@ -469,10 +500,15 @@
             <div class="col-md-3">
                 <h2 id="mytour">My Tour</h2>
                 <p>Total Distance: <span id="distance"></span>
-                    <div class="btn btn-info btn-sm" onclick="getDirections();">Get Directions!</div>
-                </p>
+									<form action="/tour/directions/" method="GET" name="directionsButton" onsubmit="return getDirections()">
+                    <div class="btn btn-info btn-sm" id="db" onclick="getDirections();">Get Directions!</div>
+										<input type="hidden" id="startLngLat" name="startCoords">
+		                <input type="hidden" id="endLngLat" name="endCoords">
+									</form>
+								</p>
                 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                 </div>
+								<div id="panel"></div>
             </div>
         </div>
     </div>
