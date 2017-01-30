@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://bootswatch.com/united/bootstrap.min.css">
   <link rel="icon" href='{% static "tour/images/icon.png" %}' />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script>
       var markers = [];
@@ -368,7 +369,7 @@
 
     function updateRoute() {
         waypoints = [];
-        for (var i = 1; i<markers.length - 1; i++) {
+        for (var i = 1; i < markers.length - 1; i++) {
             waypoints.push({location: markers[i].getPosition()});
         }
         directionsService.route({
@@ -401,14 +402,14 @@
           $("#accordion").append(
               `<div class="panel panel-info">
                 <div class="`+ markers[i].category +`">
-                <div class="panel-heading" role="tab" id="heading`+ i +`">
-                  <h4 class="panel-title">
-                    <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse` +
-              i + `" aria-expanded="false" aria-controls="collapse` + i + `">
-                      ` + (i + 1) + `: ` + markers[i].name + `
-                    </a>
-                  </h4>
-                </div>
+                    <div class="panel-heading" role="tab" id="heading`+ i +`">
+                      <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse` +
+                  i + `" aria-expanded="false" aria-controls="collapse` + i + `">
+                          ` + (i + 1) + `: ` + markers[i].name + `
+                        </a>
+                      </h4>
+                    </div>
                 </div>
                 <div id="collapse` + i + `" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading` +
               i + `">
@@ -467,7 +468,59 @@
 
 
     }
+      
+    //drag sidebar buttons to update route
+    $( function() {
+      $( "#accordion" ).sortable({
+        axis: "y",
+        handle: "h4",
+        start: function(event, ui) {
+            var start_idx = ui.item.index();
+            ui.item.data('start_idx', start_idx);
+        },
+        update: function(event, ui) {
+            var start_idx = ui.item.data('start_idx');
+            var end_idx = ui.item.index();
+            markers[start_idx].id = end_idx;
+            markers[start_idx].label = end_idx+1;
+            markers[start_idx].setMap(null);
+            markers[start_idx].setMap(map);
+            
+            //refresh markers on map with updated labels
+            if (start_idx > end_idx) { //drag down
+                markers.splice(end_idx, 0, markers[start_idx]);
+                markers.splice(start_idx+1, 1);
+                for (var i = end_idx + 1; i <= start_idx; i++) {
+                    markers[i].id++;
+                    markers[i].label = i + 1;
+                    markers[i].setMap(null);
+                    markers[i].setMap(map);
+                }
+            } else { //drag up
+                markers.splice(end_idx+1, 0, markers[start_idx]);
+                markers.splice(start_idx, 1);
+                for (var i = start_idx; i < end_idx; i++) {
+                    markers[i].id--;
+                    markers[i].label = i + 1;
+                    markers[i].setMap(null);
+                    markers[i].setMap(map);
+                }
+            }
+            
+            updateRoute();
+            for (var i=0; i<radiusMarkers.length; i++) {
+                marker = radiusMarkers[i];
+                marker.setMap(null);
+            }
+            radiusMarkers.length = 0;
+            popRadius.setVisible(false);
 
+            $("#accordion").empty();
+            addSidebarButtons();
+//            alert(start_idx + ' - ' + end_idx);
+        }
+      });
+    });
     </script>
     <link rel="stylesheet" type="text/css" href='{% static "tour/map.css" %}' />
     <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
