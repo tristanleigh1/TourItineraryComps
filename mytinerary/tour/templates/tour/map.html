@@ -186,6 +186,34 @@
               }
 
               if (poiOutsideRoute) {
+                  var icon = ""
+                  switch (nearby_pois[i].category) {
+                      case "Museums":
+                          icon = {url: "https://maps.gstatic.com/mapfiles/ms/micons/blue-dot.png"};
+                                  //scaledSize: new google.maps.Size(45, 45)};
+                          break;
+                      case "Landmarks":
+                          icon = {url: "https://maps.gstatic.com/mapfiles/ms/micons/pink-dot.png"};
+                                  //scaledSize: new google.maps.Size(45, 45)};
+                          break;
+                      case "Activities":
+                          icon = {url: "http://maps.google.com/mapfiles/ms/micons/yellow-dot.png"};
+                                  //scaledSize: new google.maps.Size(45, 45)};
+                          break;
+                      case "Nature":
+                          icon = {url: "https://maps.gstatic.com/mapfiles/ms/micons/green-dot.png"};
+                                  //scaledSize: new google.maps.Size(45, 45)};
+                          break;
+                      case "Restaurants":
+                          icon = {url: "https://maps.gstatic.com/mapfiles/ms/micons/red-dot.png"};
+                                  //scaledSize: new google.maps.Size(45, 45)};
+                          break;
+                      default:
+                          icon = {url: "https://maps.gstatic.com/mapfiles/ms/micons/purple-dot.png"};
+                                  //scaledSize: new google.maps.Size(45, 45)};
+                          break;
+                  }
+
                   var marker = new google.maps.Marker({
                       map: map,
                       position: {lat: parseFloat(nearby_pois[i].latitude),
@@ -195,7 +223,8 @@
                       id: radiusMarkers.length,
                       rating: nearby_pois[i].rating,
                       summary: nearby_pois[i].summary,
-                      category: nearby_pois[i].category
+                      category: nearby_pois[i].category,
+                      icon: icon
                   });
                   marker.addListener('click', function() {
                       createInfoWindow(this, centerMarker);
@@ -326,7 +355,7 @@
                         scaledSize: new google.maps.Size(45, 45)};
                 break;
         }
- 
+
         var newMarker = new google.maps.Marker({
                map: map,
                position: radiusMarkers[newMarkerId].position,
@@ -384,12 +413,26 @@
 
                 // Compute the total distance of the route
                 var totalDistance = 0;
+                var totalDuration = 0;
+                var METERS_TO_MILES = 0.000621371192;
                 var mytinerary = response.routes[0];
                 for (var i = 0; i < mytinerary.legs.length; i++) {
                   totalDistance += mytinerary.legs[i].distance.value
+                  totalDuration += mytinerary.legs[i].duration.value
                 }
-                totalDistance = totalDistance / 1000; // Always returns in meters
-                document.getElementById("distance").innerHTML = totalDistance.toFixed(1) + " km";
+
+                // Let Google determine if we should use miles or km
+                var units = mytinerary.legs[0].distance.text.substr(-2);
+                if (units == "km") {
+                    totalDistance = totalDistance / 1000;
+                } else {
+                    totalDistance = totalDistance * METERS_TO_MILES;
+                }
+
+                totalDuration = totalDuration / 60
+                document.getElementById("distance").innerHTML = totalDistance.toFixed(1) + units;
+                document.getElementById("walkingTime").innerHTML = totalDuration.toFixed(0) + " mins";
+
 
             } else {
                 window.alert('Directions request failed due to ' + status);
@@ -468,7 +511,7 @@
 
 
     }
-      
+
     //drag sidebar buttons to update route
     $( function() {
       $( "#accordion" ).sortable({
@@ -485,7 +528,7 @@
             markers[start_idx].label = end_idx+1;
             markers[start_idx].setMap(null);
             markers[start_idx].setMap(map);
-            
+
             //refresh markers on map with updated labels
             if (start_idx > end_idx) { //drag down
                 markers.splice(end_idx, 0, markers[start_idx]);
@@ -502,12 +545,12 @@
                 for (var i = start_idx; i < end_idx; i++) {
                     //***************this doesn't look right to me (but it seems to work)*************
                     markers[i].id--;
-                    markers[i].label = i + 1; 
+                    markers[i].label = i + 1;
                     markers[i].setMap(null);
                     markers[i].setMap(map);
                 }
             }
-            
+
             updateRoute();
             for (var i=0; i<radiusMarkers.length; i++) {
                 marker = radiusMarkers[i];
@@ -522,7 +565,7 @@
         }
       });
     });
-    
+
     </script>
     <link rel="stylesheet" type="text/css" href='{% static "tour/map.css" %}' />
     <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
@@ -588,6 +631,7 @@
             <div class="col-md-3">
                 <h2 id="mytour">My Tour</h2>
                 <p>Total Distance: <span id="distance"></span>
+                <br/>Walking Time: <span id="walkingTime"></span>
 									<form action="/tour/directions/" method="GET" name="directionsButton" onsubmit="return getDirections()">
                     <div class="btn btn-info btn-sm" id="db" onclick="getDirections();">Get Directions!</div>
 										<input type="hidden" id="startLngLat" name="startCoords">
