@@ -92,6 +92,7 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
     walk_factor = float(walk_factor) * (3.0/10.0)
 
     # Loop through every existing segment to find the closest one to add the new POI to
+    test = []
     for i in range(len(path_segments)):
         seg = path_segments[i]
         # Calculate closest line (Remember: latitude is x direction, longitude is y)
@@ -100,13 +101,14 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
         rise = y2 - y1
         run = x2 - x1
 
+        test.append(current_poi.business_name)
         if rise == 0:
             # Horizontal line
-            distance_to_segment = abs(y1 - current_poi.longitude)
+            distance_to_segment = abs(y1 - float(current_poi.longitude))
             whereInSegment = "middle"
         elif run == 0:
             # Vertical line
-            distance_to_segment = abs(x1 - current_poi.latitude)
+            distance_to_segment = abs(x1 - float(current_poi.latitude))
             whereInSegment = "middle"
         else:
             # Calculate slopes and y-intercepts
@@ -124,9 +126,6 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
             distance_start_to_end = ((y2 - y1)**2 + (x2-x1)**2)**(1/2)
             distance_start_to_POI = ((intersect_y - y1)**2 + (intersect_x-x1)**2)**(1/2)
             distance_POI_to_end = ((y2 - intersect_y)**2 + (x2-intersect_x)**2)**(1/2)
-
-            #if current_poi.business_name == 'Exploratorium':
-                #raise Exception(distance_start_to_POI + distance_POI_to_end - distance_start_to_end)
 
             # Check if intersection is part of segment
             if abs(distance_start_to_POI + distance_POI_to_end - distance_start_to_end) <= 0.000001:
@@ -214,6 +213,17 @@ def create_path(total_pois, start, end, walk_factor, preferences, num_destinatio
     path_segments = [(start, end)]
     path_pois = []
     total_pois = list(total_pois)
+
+   # count = 0
+    for poi in total_pois:
+        if abs(poi.latitude - start.latitude) < .0015 and abs(poi.longitude - start.longitude) < .0015:
+            total_pois.remove(poi)
+  #          count = count + 1
+        if abs(poi.latitude - end.latitude) < .0015 and abs(poi.longitude - end.longitude) < .0015:
+            total_pois.remove(poi)
+ #           count = count + 1
+
+#    raise Exception(count)
 
     # Check if start or end are POIs, if so remove from list
 

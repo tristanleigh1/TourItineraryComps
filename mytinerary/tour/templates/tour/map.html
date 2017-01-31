@@ -500,8 +500,9 @@
                 markers.splice(end_idx+1, 0, markers[start_idx]);
                 markers.splice(start_idx, 1);
                 for (var i = start_idx; i < end_idx; i++) {
+                    //***************this doesn't look right to me (but it seems to work)*************
                     markers[i].id--;
-                    markers[i].label = i + 1;
+                    markers[i].label = i + 1; 
                     markers[i].setMap(null);
                     markers[i].setMap(map);
                 }
@@ -521,6 +522,7 @@
         }
       });
     });
+    
     </script>
     <link rel="stylesheet" type="text/css" href='{% static "tour/map.css" %}' />
     <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
@@ -536,7 +538,7 @@
                     <li>
                         <label>Museums&nbsp</label>
                         <div class="checkbox-slider pull-right">
-                            <input id="Museums" name="Museums" type="checkbox"/>
+                            <input id="Museums" name="Museums" type="checkbox" checked/>
                             <label for="Museums" class="Museums label-default"></label>
                         </div>
                         <br>
@@ -544,7 +546,7 @@
                     <li>
                         <label>Landmarks&nbsp</label>
                         <div class="checkbox-slider pull-right">
-                            <input id="Landmarks" name="Landmarks" type="checkbox"/>
+                            <input id="Landmarks" name="Landmarks" type="checkbox" checked/>
                             <label for="Landmarks" class="Landmarks label-default"></label>
                         </div>
                         <br>
@@ -552,7 +554,7 @@
                     <li>
                         <label>Activities&nbsp</label>
                         <div class="checkbox-slider pull-right">
-                            <input id="Activities" name="Activities" type="checkbox"/>
+                            <input id="Activities" name="Activities" type="checkbox" checked/>
                             <label for="Activities" class="label-default Activities"></label>
                         </div>
                         <br>
@@ -560,7 +562,7 @@
                     <li>
                         <label>Parks&nbsp</label>
                         <div class="checkbox-slider pull-right">
-                            <input id="Nature" name="Nature" type="checkbox"/>
+                            <input id="Nature" name="Nature" type="checkbox" checked/>
                             <label for="Nature" class="label-default Nature"></label>
                         </div>
                         <br>
@@ -568,7 +570,7 @@
                     <li>
                         <label>Restaurants&nbsp</label>
                         <div class="checkbox-slider pull-right">
-                            <input id="Restaurants" name="Restaurants" type="checkbox"/>
+                            <input id="Restaurants" name="Restaurants" type="checkbox" checked/>
                             <label for="Restaurants" class="label-default Restaurants"></label>
                         </div>
                         <br>
