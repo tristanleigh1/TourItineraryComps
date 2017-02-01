@@ -79,17 +79,22 @@ function geolocate() {
 function validateForm() {
 	var isValid = true;
 	var form = document.forms["indexForm"];
-	if (!form["startDestination"].value || !form["startCoords"].value) {
+	if (!form["startDestination"].value || form["startCoords"].value == null) {
 		document.getElementById('autocomplete1').style.borderColor = "red";
 		isValid = false;
 	} else {
 		document.getElementById('autocomplete1').removeAttribute("style");
 	}
-	if (!form["endDestination"].value || !document.forms["indexForm"]["endCoords"].value) {
-		document.getElementById('autocomplete2').style.borderColor = "red";
-		isValid = false;
-	} else {
-		document.getElementById('autocomplete2').removeAttribute("style");
-	}
+	
+	// Check if we're in exploratory mode before checking if end value exists
+	if ($("#start-to-end-fields").html() != '') {
+        if (!form["endDestination"].value || !document.forms["indexForm"]["endCoords"].value) {
+            document.getElementById('autocomplete2').style.borderColor = "red";
+            isValid = false;
+        } else {
+            document.getElementById('autocomplete2').removeAttribute("style");
+        }
+    }
+    
 	return isValid;
 }

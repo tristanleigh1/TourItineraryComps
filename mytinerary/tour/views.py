@@ -42,7 +42,7 @@ def pop_radius(request):
         # 1km = 0.009043 degrees (for latitude)
         # 1km = 0.008983 / cos(latitude) (for longitude)
         radius_lat = (radius / 1000) * 0.009043
-        radius_lng = (radius / 1000) * (0.008983 / math.degrees(math.cos(math.radians(latitude))))
+        #radius_lng = (radius / 1000) * (0.008983 / math.degrees(math.cos(math.radians(latitude))))
         # radius = 0.004
         radius_lng = 0.004
 
@@ -75,6 +75,11 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
     popularity = current_poi.popularity
     distance_to_path = float("inf")
     closest_segment = None
+    
+    # Cast longitude and latitude to floats
+    poi_longitude = float(current_poi.longitude)
+    poi_latitude = float(current_poi.latitude)
+    
     # To determine if the POI should be added in the middle of a segment or to the
     # beginning or end of a segment, we'll assume middle for now
     finalWhereInSegment = "middle"
@@ -92,7 +97,6 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
     walk_factor = float(walk_factor) * (3.0/10.0)
 
     # Loop through every existing segment to find the closest one to add the new POI to
-    test = []
     for i in range(len(path_segments)):
         seg = path_segments[i]
         # Calculate closest line (Remember: latitude is x direction, longitude is y)
@@ -101,27 +105,24 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
         rise = y2 - y1
         run = x2 - x1
 
-        test.append(current_poi.business_name)
         if rise == 0:
             # Horizontal line
-            distance_to_segment = abs(y1 - float(current_poi.longitude))
+            distance_to_segment = abs(y1 - poi_longitude)
             whereInSegment = "middle"
         elif run == 0:
             # Vertical line
-            distance_to_segment = abs(x1 - float(current_poi.latitude))
+            distance_to_segment = abs(x1 - poi_latitude)
             whereInSegment = "middle"
         else:
             # Calculate slopes and y-intercepts
             slope = rise / run
             orthogonal_slope = (run / rise) * -1.0
             y_int = y1 - (slope * x1)
-            orthogonal_y_int = float(current_poi.longitude) - (orthogonal_slope * float(current_poi.latitude))
+            orthogonal_y_int = poi_longitude - (orthogonal_slope * poi_latitude)
 
             # Find where lines intersect
             intersect_x = (orthogonal_y_int - y_int) / (slope - orthogonal_slope)
             intersect_y = (slope * intersect_x) + y_int
-
-            #raise Exception(type(intersect_x))
 
             distance_start_to_end = ((y2 - y1)**2 + (x2-x1)**2)**(1/2)
             distance_start_to_POI = ((intersect_y - y1)**2 + (intersect_x-x1)**2)**(1/2)
@@ -130,11 +131,11 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
             # Check if intersection is part of segment
             if abs(distance_start_to_POI + distance_POI_to_end - distance_start_to_end) <= 0.000001:
                 # Distance formula
-                distance_to_segment = math.sqrt((intersect_x - float(current_poi.latitude))**2 + (intersect_y - float(current_poi.longitude))**2)
+                distance_to_segment = math.sqrt((intersect_x - poi_latitude)**2 + (intersect_y - poi_longitude)**2)
                 whereInSegment = "middle"
             else:
-                distance_to_start = math.sqrt((x1 - float(current_poi.latitude))**2 + (y1 - float(current_poi.longitude))**2)
-                distance_to_end = math.sqrt((x2 - float(current_poi.latitude))**2 + (y2 - float(current_poi.longitude))**2)
+                distance_to_start = math.sqrt((x1 - poi_latitude)**2 + (y1 - poi_longitude)**2)
+                distance_to_end = math.sqrt((x2 - poi_latitude)**2 + (y2 - poi_longitude)**2)
                 if distance_to_start < distance_to_end:
                     distance_to_segment = distance_to_start
                    # if i > 0

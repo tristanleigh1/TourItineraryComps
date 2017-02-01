@@ -43,6 +43,27 @@ body {
 #panel .adp table {
 	font-family: "Ubuntu",Tahoma,"Helvetica Neue",Helvetica,Arial,sans-serif;
 }
+
+.icon-container {
+	position: relative;
+	width: 32px;
+	height: 32px;
+}
+
+.icon-label {
+	position: absolute;
+	font-size:12px;
+}
+
+img.adp-marker {
+	width: 32px !important;
+	height: 32px !important;
+}
+
+.warnbox-content {
+	font-family: "Ubuntu",Tahoma,"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
 .Museums {
     background: #6890fb;
 }

@@ -19,6 +19,13 @@ def calculate_popularity(business, result_dict):
     popularity = (business['rating'] - 1) * 20 + (business['review_count']/float(max_number_of_reviews)) * 20
     return popularity
 
+def adjust_lat_lon(lat, lon):
+    radius_lat = (40000 / 1000) * 0.009043
+    radius_lon = 0.004
+    lat = float(lat)
+    lon = float(lon)
+    return [(radius_lat + lat, radius_lon + lon), (radius_lat - lat, radius_lon - lon), (radius_lat + lat, radius_lon - lon), (radius_lat - lat, radius_lon + lon)]
+
 #@periodic_task(run_every=crontab(hour=17, minute=00, day_of_week="sun"))
 def populate_db():
     client_id = 'utuJWCc9bdvLlOHfbkXThA'
@@ -38,13 +45,18 @@ def populate_db():
 
     list_of_cities = [('37.774929', '-122.419416'), ('44.977753', '-93.265011'), ('40.712784', '-74.005941'), ('51.507351', '-0.127758'), ('40.416775', '-3.703790')]
     list_of_city_names = ['San Francisco', 'Minneapolis', 'New York', 'London', 'Madrid']
+    
+    for i in range(5):
+        adj_lat_lon_array = adjust_lat_lon(list_of_cities[i][0], list_of_cities[i][1])
+        list_of_cities = list_of_cities + adj_lat_lon_array
+        list_of_city_names = list_of_city_names + [list_of_city_names[i], list_of_city_names[i], list_of_city_names[i], list_of_city_names[i]]
 
     result_dict = {}
 
     print("Finding POIs...")
     for i, coordinates in enumerate(list_of_cities):
         try:
-            query_url1 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s' % (coordinates[0], coordinates[1], 'restaurants', '50', 'rating')
+            query_url1 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'restaurants', '50', 'rating', '40000')
             request1 = urllib.request.Request(query_url1, None, {"Authorization": "Bearer %s" %access_token})
             response1 = urllib.request.urlopen(request1).read().decode('utf-8')
             data1 = json.loads(response1)
@@ -54,9 +66,9 @@ def populate_db():
                 result_dict.setdefault('businesses',[]).append(data1['businesses'][j])
         except:
             continue
-
+        
         try:
-            query_url2 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s' % (coordinates[0], coordinates[1], 'beaches,lakes,parks', '50', 'rating')
+            query_url2 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'beaches,lakes,parks', '50', 'rating', '40000')
             request2 = urllib.request.Request(query_url2, None, {"Authorization": "Bearer %s" %access_token})
             response2 = urllib.request.urlopen(request2).read().decode('utf-8')
             data2 = json.loads(response2)
@@ -68,7 +80,7 @@ def populate_db():
             continue
 
         try:
-            query_url3 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s' % (coordinates[0], coordinates[1], 'aquariums,zoos,stadiumsarenas', '50', 'rating')
+            query_url3 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'aquariums,zoos,stadiumsarenas', '50', 'rating', '40000')
             request3 = urllib.request.Request(query_url3, None, {"Authorization": "Bearer %s" %access_token})
             response3 = urllib.request.urlopen(request3).read().decode('utf-8')
             data3 = json.loads(response3)
@@ -80,7 +92,7 @@ def populate_db():
             continue
 
         try:
-            query_url4 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s' % (coordinates[0], coordinates[1], 'museums', '25', 'rating')
+            query_url4 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'museums', '25', 'rating', '40000')
             request4 = urllib.request.Request(query_url4, None, {"Authorization": "Bearer %s" %access_token})
             response4 = urllib.request.urlopen(request4).read().decode('utf-8')
             data4 = json.loads(response4)
@@ -92,7 +104,7 @@ def populate_db():
             continue
 
         try:
-            query_url5 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s' % (coordinates[0], coordinates[1], 'landmarks', '25', 'rating')
+            query_url5 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'landmarks', '25', 'rating', '40000')
             request5 = urllib.request.Request(query_url5, None, {"Authorization": "Bearer %s" %access_token})
             response5 = urllib.request.urlopen(request5).read().decode('utf-8')
             data5 = json.loads(response5)
