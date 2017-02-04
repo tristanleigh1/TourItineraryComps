@@ -29,8 +29,22 @@ def pop_radius(request):
         latitude = float(request.GET.get('lat', None))
         longitude = float(request.GET.get('lng', None))
         radius = int(request.GET.get('radius', None))
+        filter_status = int(request.GET.get('filter-status', None))
 
-
+        categories = []
+        if filter_status % 2 != 0:
+            categories.append("Restaurants")
+        if (filter_status >> 1) % 2 != 0:
+            categories.append("Nature")
+        if (filter_status >> 2) % 2 != 0:
+            categories.append("Activities")
+        if (filter_status >> 3) % 2 != 0:
+            categories.append("Landmarks")
+        if (filter_status >> 4) % 2 != 0:
+            categories.append("Museums")
+        
+#        if filter_status != 31:
+#            raise Exception(filter_status)
 #        poi = POI.objects.get(id = poi_id)
 #
 #        latitude = float(poi.latitude)
@@ -47,21 +61,25 @@ def pop_radius(request):
         radius_lng = 0.004
 
 #        nearby_pois = POI.objects.filter(city = city).filter(latitude__lte=latitude+radius_lat, latitude__gte=latitude-radius_lat, longitude__lte=longitude+radius_lng, longitude__gte=longitude-radius_lng)
-        nearby_pois = POI.objects.filter(latitude__lte=latitude+radius_lat, latitude__gte=latitude-radius_lat, longitude__lte=longitude+radius_lng, longitude__gte=longitude-radius_lng)
+        nearby_POI_querySets = []
+        for i in range(len(categories)):
+            nearby_pois_for_category = POI.objects.filter(category=categories[i], latitude__lte=latitude+radius_lat, latitude__gte=latitude-radius_lat, longitude__lte=longitude+radius_lng, longitude__gte=longitude-radius_lng)
+            nearby_POI_querySets.append(nearby_pois_for_category)
 
         ##(new_latitude-origin_latitude)^2 + (new_longitude - origin_longitude^2 <= radius^2
 #        response_data['poi'] = poi.business_name
         response_data = {}
         response_data['nearby_pois'] = list()
-        for nearby_poi in nearby_pois:
-            response_data['nearby_pois'].append({'name' : nearby_poi.business_name,
-                                                 'latitude' : nearby_poi.latitude,
-                                                 'longitude' : nearby_poi.longitude,
-                                                 'poi_id' : nearby_poi.id,
-                                                 'rating' : nearby_poi.num_stars,
-                                                 'summary': nearby_poi.summary,
-                                                 'category': nearby_poi.category
-                                                 })
+        for nearby_pois in nearby_POI_querySets:
+            for nearby_poi in nearby_pois:
+                response_data['nearby_pois'].append({'name' : nearby_poi.business_name,
+                                                     'latitude' : nearby_poi.latitude,
+                                                     'longitude' : nearby_poi.longitude,
+                                                     'poi_id' : nearby_poi.id,
+                                                     'rating' : nearby_poi.num_stars,
+                                                     'summary': nearby_poi.summary,
+                                                     'category': nearby_poi.category
+                                                     })
         return JsonResponse(response_data)
     else:
         return HttpResponse(

@@ -40,6 +40,10 @@ body {
     overflow: auto;
 }
 
+#panel {
+    height: 100%;
+}
+
 #panel .adp table {
 	font-family: "Ubuntu",Tahoma,"Helvetica Neue",Helvetica,Arial,sans-serif;
 }
@@ -51,9 +55,11 @@ body {
 }
 
 .icon-label {
+    z-index:100;
 	position: absolute;
-	bottom: 0;
-	font-size:12px;
+	font-size:14px;
+    left:11px;
+    top:0px;
 }
 
 img.adp-marker {

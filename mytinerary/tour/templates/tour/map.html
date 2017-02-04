@@ -18,11 +18,14 @@
       var popRadius;
       var directionsService;
       var directionsDisplay;
+      var filterStatus;
+      var selectedMarker;
 
       function initialize() {
         directionsService = new google.maps.DirectionsService;
         directionsDisplay = new google.maps.DirectionsRenderer;
-        directionsDisplay.setOptions( { suppressMarkers: true } );
+        directionsDisplay.setOptions( { suppressMarkers: true,
+                                       /*preserveViewport: true*/ } );
         popWindow  = new google.maps.InfoWindow();
         map = new google.maps.Map(document.getElementById('map'));
         directionsDisplay.setMap(map);
@@ -135,7 +138,9 @@
        	}
       	addSidebarButtons();
       	updateRoute();
-				initDirectionsListener();
+        selectedMarker = null;
+        filterStatus = 31;
+        initDirectionsListener();
       }
 
       function findNearbyPOIs(marker) {
@@ -147,7 +152,8 @@
                         'lat':marker.getPosition().lat(),
                         'lng':marker.getPosition().lng(),
 //                            'id' : marker.poi_id,
-                        'radius' : popRadius.getRadius()},
+                        'radius' : popRadius.getRadius(),
+                        'filter-status' : filterStatus},
                 dataType : 'json',
                 success : function(json) {
                     if (json["nearby_pois"].length == 1) {
@@ -236,6 +242,7 @@
       }
 
       function createPopRadius(marker) {
+            selectedMarker = marker;
             popRadius.setCenter(marker.position);
             popRadius.setVisible(true);
       }
@@ -395,6 +402,7 @@
 
         $("#accordion").empty();
         addSidebarButtons();
+        selectedMarker = null;
     }
 
     function updateRoute() {
@@ -439,6 +447,9 @@
                 window.alert('Directions request failed due to ' + status);
             }
         });
+//        alert("setting zoom");
+//        map.setZoom(7);
+//        alert("yay");
     }
 
     function addSidebarButtons() {
@@ -482,7 +493,7 @@
 				console.log(icons[i]);
 				console.log(markers[i].icon.url);
 				icons[i].src = markers[i].icon.url;
-				$(icons[i]).wrap('<div class="icon-container>"</div>');
+				$(icons[i]).wrap('<div class="icon-container"></div>');
 				$( '<p class="icon-label">' + (i + 1) + '</p>' ).insertAfter(icons[i]);
 			}
 		}
@@ -583,10 +594,26 @@
 
             $("#accordion").empty();
             addSidebarButtons();
-//            alert(start_idx + ' - ' + end_idx);
         }
       });
     });
+    
+    function updateFilterStatus(spot) {
+        var shiftedStatus = filterStatus >> spot;
+        if (shiftedStatus % 2 == 0) {
+            filterStatus += 2 ** spot;
+        }
+        else {
+            filterStatus -= 2 ** spot;
+        }
+    }
+      
+    function updateFilter(spot) {
+        updateFilterStatus(spot);
+        if (selectedMarker) {
+            findNearbyPOIs(selectedMarker);
+        }
+    }
 
     </script>
     <link rel="stylesheet" type="text/css" href='{% static "tour/map.css" %}' />
@@ -602,16 +629,16 @@
                 <ul class="list-group">
                     <li>
                         <label>Museums&nbsp</label>
-                        <div class="checkbox-slider pull-right">
-                            <input id="Museums" name="Museums" type="checkbox" checked/>
+                        <div class="checkbox-slider pull-right" id="Museums-filter">
+                            <input id="Museums" name="Museums" type="checkbox" onclick="updateFilter(4)" checked/>
                             <label for="Museums" class="Museums label-default"></label>
                         </div>
                         <br>
                     </li>
                     <li>
                         <label>Landmarks&nbsp</label>
-                        <div class="checkbox-slider pull-right">
-                            <input id="Landmarks" name="Landmarks" type="checkbox" checked/>
+                        <div class="checkbox-slider pull-right" id="Landmarks-filter">
+                            <input id="Landmarks" name="Landmarks" type="checkbox" onclick="updateFilter(3)" checked/>
                             <label for="Landmarks" class="Landmarks label-default"></label>
                         </div>
                         <br>
@@ -619,7 +646,7 @@
                     <li>
                         <label>Activities&nbsp</label>
                         <div class="checkbox-slider pull-right">
-                            <input id="Activities" name="Activities" type="checkbox" checked/>
+                            <input id="Activities" name="Activities" type="checkbox" onclick="updateFilter(2)" checked/>
                             <label for="Activities" class="label-default Activities"></label>
                         </div>
                         <br>
@@ -627,7 +654,7 @@
                     <li>
                         <label>Parks&nbsp</label>
                         <div class="checkbox-slider pull-right">
-                            <input id="Nature" name="Nature" type="checkbox" checked/>
+                            <input id="Nature" name="Nature" type="checkbox" onclick="updateFilter(1)" checked/>
                             <label for="Nature" class="label-default Nature"></label>
                         </div>
                         <br>
@@ -635,7 +662,7 @@
                     <li>
                         <label>Restaurants&nbsp</label>
                         <div class="checkbox-slider pull-right">
-                            <input id="Restaurants" name="Restaurants" type="checkbox" checked/>
+                            <input id="Restaurants" name="Restaurants" type="checkbox" onclick="updateFilter(0)" checked/>
                             <label for="Restaurants" class="label-default Restaurants"></label>
                         </div>
                         <br>
