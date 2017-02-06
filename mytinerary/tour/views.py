@@ -42,7 +42,7 @@ def pop_radius(request):
             categories.append("Landmarks")
         if (filter_status >> 4) % 2 != 0:
             categories.append("Museums")
-        
+
 #        if filter_status != 31:
 #            raise Exception(filter_status)
 #        poi = POI.objects.get(id = poi_id)
@@ -93,15 +93,15 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
     popularity = current_poi.popularity
     distance_to_path = float("inf")
     closest_segment = None
-    
+
     # Cast longitude and latitude to floats
     poi_longitude = float(current_poi.longitude)
     poi_latitude = float(current_poi.latitude)
-    
+
     # To determine if the POI should be added in the middle of a segment or to the
     # beginning or end of a segment, we'll assume middle for now
     finalWhereInSegment = "middle"
-    totalPreferencePoints = float(preferences[0]) + float(preferences[1]) + float(preferences[2]) + float(preferences[3])
+    totalPreferencePoints = 1.0 + float(preferences[0]) + float(preferences[1]) + float(preferences[2]) + float(preferences[3])
     score = float("inf")
     if current_poi.category == 'Museums':
         taste = float(preferences[0])/totalPreferencePoints
@@ -299,6 +299,8 @@ def startToEnd(request):
     city = request.GET['city']
     start_coords = request.GET['startCoords']
     end_coords = request.GET['endCoords']
+    start_address = request.GET['startAddress']
+    end_address = request.GET['endAddress']
     num_destinations = request.GET['points']
     walk_factor = request.GET['miles']
     museum_preference = request.GET['museums']
@@ -312,11 +314,13 @@ def startToEnd(request):
     origin.longitude = Decimal(start_coords[1:-1].split(", ")[1])
     origin.business_name = request.GET['startDestination'].split(',')[0]
     origin.category = "Origin"
+    origin.address = start_address
 
     destination.latitude = Decimal(end_coords[1:-1].split(", ")[0])
     destination.longitude = Decimal(end_coords[1:-1].split(", ")[1])
     destination.business_name = request.GET['endDestination'].split(',')[0]
     destination.category = "Destination"
+    destination.address = end_address
 
     preferences = [museum_preference, landmark_preference, activity_preference, nature_preference]
 
@@ -328,7 +332,5 @@ def startToEnd(request):
                 'poi_list': final_path,
                 'origin': origin,
                 'destination': destination,
-                'city': city,
-                'start_coords': start_coords,
-                'end_coords': end_coords}
+                'city': city}
     return render(request, 'tour/map.html', context)

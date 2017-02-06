@@ -23,16 +23,19 @@
 
       function initialize() {
         directionsService = new google.maps.DirectionsService;
-        directionsDisplay = new google.maps.DirectionsRenderer;
-        directionsDisplay.setOptions( { suppressMarkers: true,
-                                       /*preserveViewport: true*/ } );
+//        directionsDisplay = new google.maps.DirectionsRenderer;
+//        directionsDisplay.setOptions( { suppressMarkers: true, preserveViewport: true } );
+        directionsDisplay = new google.maps.DirectionsRenderer({
+            suppressMarkers: true,
+//            preserveViewport: true
+        });
         popWindow  = new google.maps.InfoWindow();
         map = new google.maps.Map(document.getElementById('map'));
         directionsDisplay.setMap(map);
         var locations;
         if ("{{mode}}" == "startToEnd") {
             locations = [
-                {title: '{{origin.address}}',
+                {address: '{{origin.address}}',
                 name: '{{origin.business_name}}',
                 id: '{{origin.id}}',
                 category: '{{origin.category}}',
@@ -41,7 +44,7 @@
                 rating: '{{origin.num_stars}}',
                 summary: `{{origin.summary}}`},
                 {% for poi in poi_list %}
-                    {title: '{{poi.address}}',
+                    {address: '{{poi.address}}',
                     name: '{{poi.business_name}}',
                     id: '{{poi.id}}',
                     category: '{{poi.category}}',
@@ -50,7 +53,7 @@
                     rating: '{{poi.num_stars}}',
                     summary: `{{poi.summary}}`},
                {% endfor %}
-               {title: '{{destination.address}}',
+               {address: '{{destination.address}}',
                 name: '{{destination.business_name}}',
                 id: '{{destination.id}}',
                 category: '{{destination.category}}',
@@ -62,7 +65,7 @@
        }
        else {
            locations = [
-                {title: '{{origin.address}}',
+                {address: '{{origin.address}}',
                 name: '{{origin.business_name}}',
                 id: '{{origin.id}}',
                 category: '{{origin.category}}',
@@ -89,6 +92,7 @@
            var category = locations[i].category;
            var rating = locations[i].rating;
            var summary = locations[i].summary;
+           var address = locations[i].address;
            var icon = ""
            switch (category) {
                 case "Museums":
@@ -127,7 +131,8 @@
                label: (i+1).toString(),
                icon: icon,
                summary: summary,
-               category: category
+               category: category,
+               address: address
            });
            markers.push(marker);
            marker.addListener('click', function() {
@@ -231,6 +236,7 @@
                       rating: nearby_pois[i].rating,
                       summary: nearby_pois[i].summary,
                       category: nearby_pois[i].category,
+                      address: nearby_pois[i].address,
                       icon: icon
                   });
                   marker.addListener('click', function() {
@@ -374,6 +380,7 @@
                label: (markerId+1).toString(),
                summary: radiusMarkers[newMarkerId].summary,
                category: radiusMarkers[newMarkerId].category,
+               address: radiusMarkers[newMarkerId].address,
                icon: icon
            });
         newMarker.addListener('click', function() {
@@ -419,6 +426,8 @@
          }, function(response, status) {
             if (status === 'OK') {
                 directionsDisplay.setDirections(response);
+
+//                map.setZoom(7);
 
                 // Compute the total distance of the route
                 var totalDistance = 0;
@@ -490,54 +499,37 @@
 
 			var icons = document.getElementsByClassName("adp-marker");
 			for (var i = 0; i < icons.length; i++) {
-				console.log(icons[i]);
-				console.log(markers[i].icon.url);
+				//console.log(icons[i]);
+				//console.log(markers[i].icon.url);
 				icons[i].src = markers[i].icon.url;
 				$(icons[i]).wrap('<div class="icon-container"></div>');
 				$( '<p class="icon-label">' + (i + 1) + '</p>' ).insertAfter(icons[i]);
 			}
 		}
 
-    function getDirections() {
-			// var origin = "origin=" + markers[0].getPosition().lat() + ","
-			// 						+ markers[0].getPosition().lng() + "&";
-			// var destination = "destination=" + markers[markers.length-1].getPosition().lat()
-			//  								+ "," + markers[markers.length-1].getPosition().lng() + "&";
-			// var waypoints = "waypoints="
-			// for (var i=1; i < markers.length-1; i++) {
-			// 	if (i != 1) {
-			// 		waypoints += "%7C";
-			// 	}
-			// 	waypoints += "via:" + markers[i].getPosition().lat()
-			// 							+ "%2C" + markers[i].getPosition().lng();
-			// }
-			// var otherParams = "&mode=walking&key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM";
-			//
-			// $.ajax({
-			// 		url : "https://maps.googleapis.com/maps/api/directions/json?"
-			// 				+ origin + destination + waypoints + otherParams,
-			// 		contentType: "application/json; charset=utf-8",
-			// 		type : 'GET',
-			// 		dataType : 'json',
-			// 		success : function(json) {
-			// 				location.href = "/tour/directions/";
-			// 				return true;
-			// 		},
-			// 		cache : false,
-			// 		error : function(xhr, errmsg, err) {
-			// 				console.log(errmsg);
-			// 				console.log(xhr.status + " " + xhr.responseText);
-			// 				return false;
-			// 		}
-			// });
+		// Constructs the URL for the google maps version of your route
+		function sendDirections() {
+			var url = 'https://www.google.com/maps/dir';
+			for (var i = 0; i < markers.length; i++) {
+				url += "/" + markers[i].address;
+			}
+			url = url.replace(/\s/g, "+");
+			url = url.replace(/,/g, "");
+			url += "/data=!4m2!4m1!3e2"; // Data for making travel mode walking
 
+			window.open(url, "_blank");
+		}
+
+    function getDirections() {
 			if (document.getElementById('accordion').style.display == 'none') {
 				document.getElementById('accordion').style.display = 'block';
 				document.getElementById('db').innerHTML = "Get Directions!";
+				document.getElementById('sendDirections').style.display = 'none';
 				document.getElementById('panel').style.display = 'none';
 			} else {
 				document.getElementById('accordion').style.display = 'none';
 				document.getElementById('db').innerHTML = "Go back";
+				document.getElementById('sendDirections').style.display = 'inline-block';
 				document.getElementById('panel').style.display = 'block';
 				directionsDisplay.setPanel(document.getElementById('panel'));
 			}
@@ -597,17 +589,17 @@
         }
       });
     });
-    
+
     function updateFilterStatus(spot) {
         var shiftedStatus = filterStatus >> spot;
         if (shiftedStatus % 2 == 0) {
-            filterStatus += 2 ** spot;
+            filterStatus += Math.pow(2, spot);
         }
         else {
-            filterStatus -= 2 ** spot;
+            filterStatus -= Math.pow(2, spot);
         }
     }
-      
+
     function updateFilter(spot) {
         updateFilterStatus(spot);
         if (selectedMarker) {
@@ -683,6 +675,7 @@
                 <br/>Walking Time: <span id="walkingTime"></span>
 									<form action="/tour/directions/" method="GET" name="directionsButton" onsubmit="return getDirections()">
                     <div class="btn btn-info btn-sm" id="db" onclick="getDirections();">Get Directions!</div>
+										<div class="btn btn-info btn-sm" id="sendDirections" onclick="sendDirections();">Open in Maps</div>
 										<input type="hidden" id="startLngLat" name="startCoords">
 		                <input type="hidden" id="endLngLat" name="endCoords">
 									</form>

@@ -21,9 +21,12 @@ function initAutocomplete() {
 
     autocompleteStart.addListener('place_changed', function() {
         document.getElementById('startLngLat').value = autocompleteStart.getPlace().geometry.location;
+        document.getElementById('startAddress').value = autocompleteStart.getPlace().formatted_address;
     });
     autocompleteEnd.addListener('place_changed', function() {
         document.getElementById('endLngLat').value = autocompleteEnd.getPlace().geometry.location;
+        document.getElementById('endAddress').value = autocompleteEnd.getPlace().formatted_address;
+
     });
 
     google.maps.event.addDomListener(ac1, 'keydown', function(e) {
@@ -85,7 +88,7 @@ function validateForm() {
 	} else {
 		document.getElementById('autocomplete1').removeAttribute("style");
 	}
-	
+
 	// Check if we're in exploratory mode before checking if end value exists
 	if ($("#start-to-end-fields").html() != '') {
         if (!form["endDestination"].value || !document.forms["indexForm"]["endCoords"].value) {
@@ -95,6 +98,6 @@ function validateForm() {
             document.getElementById('autocomplete2').removeAttribute("style");
         }
     }
-    
+
 	return isValid;
 }

@@ -15,8 +15,9 @@ function startToEnd() {
                           onFocus="geolocate()">
       </div>
     </div>
-          <input type="hidden" id="endLngLat" name="endCoords">
-              <div class="form-group row ">
+    <input type="hidden" id="endLngLat" name="endCoords">
+    <input type="hidden" id="endAddress" name="endAddress">
+    <div class="form-group row ">
       <label class="col-sm-3 control-label">Number of Stops</label>
       <div class="col-sm-6">
         <input type="range" class="form-control slide-input" id="points" name="points" min="0" max="8" step="1"
@@ -87,7 +88,7 @@ function startToEnd() {
     setQuantifier($("#landmarks").val(), "landmarkValBox");
     setQuantifier($("#activities").val(), "activityValBox");
     setQuantifier($("#parks").val(), "parkValBox");
-    
+
     initAutocomplete();
 }
 

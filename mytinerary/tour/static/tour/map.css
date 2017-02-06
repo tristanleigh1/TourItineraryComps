@@ -32,20 +32,36 @@ body {
 }
 
 #map {
-    height:800px;
+    height:700px;
 }
 
 #accordion {
-    height: 663px;
+    height: 550px;
     overflow: auto;
 }
 
-#panel {
-    height: 100%;
+#sendDirections {
+	display: none;
 }
+
+#panel {
+    height: 550px;
+    overflow: auto;
+}
+
+.panel-title {
+    height: 100%;
+    width: 100%;
+}
+
+
 
 #panel .adp table {
 	font-family: "Ubuntu",Tahoma,"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+#panel .adp-warnbox {
+	display: none;
 }
 
 .icon-container {
