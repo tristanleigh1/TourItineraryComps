@@ -27,3 +27,16 @@ function getIconFromCategory(category, scale) {
 	}
 	return icon;
 }
+
+
+
+function modifyIcons() {
+		document.getElementById("panel").removeEventListener('DOMSubtreeModified', modifyIcons, false);
+
+		var icons = document.getElementsByClassName("adp-marker");
+		for (var i = 0; i < icons.length; i++) {
+				icons[i].src = markers[i].icon.url;
+				$(icons[i]).wrap('<div class="icon-container"></div>');
+				$( '<p class="icon-label">' + (i + 1) + '</p>' ).insertAfter(icons[i]);
+		}
+}

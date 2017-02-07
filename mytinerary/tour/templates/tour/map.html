@@ -468,19 +468,6 @@
             }
         }
 
-        function modifyIcons() {
-            document.getElementById("panel").removeEventListener('DOMSubtreeModified', modifyIcons, false);
-
-            var icons = document.getElementsByClassName("adp-marker");
-            for (var i = 0; i < icons.length; i++) {
-                //console.log(icons[i]);
-                //console.log(markers[i].icon.url);
-                icons[i].src = markers[i].icon.url;
-                $(icons[i]).wrap('<div class="icon-container"></div>');
-                $( '<p class="icon-label">' + (i + 1) + '</p>' ).insertAfter(icons[i]);
-            }
-        }
-
         // Constructs the URL for the google maps version of your route
         function sendDirections() {
             var url = 'https://www.google.com/maps/dir';
@@ -646,12 +633,19 @@
                     <h2 id="mytour">My Tour</h2>
                     <p>Total Distance: <span id="distance"></span>
                         <br/>Walking Time: <span id="walkingTime"></span>
-                        <form action="/tour/directions/" method="GET" name="directionsButton" onsubmit="return getDirections()">
-                            <div class="btn btn-info btn-sm" id="db" onclick="getDirections();">Get Directions!</div>
-                            <div class="btn btn-info btn-sm" id="sendDirections" onclick="sendDirections();">Open in Maps</div>
-                            <input type="hidden" id="startLngLat" name="startCoords">
-                            <input type="hidden" id="endLngLat" name="endCoords">
-                        </form>
+                        <div class="row"> 
+                            <div class="col-md-6">
+                            <form action="/tour/directions/" method="GET" name="directionsButton" onsubmit="return getDirections()">
+                                <div class="btn btn-info btn-sm" id="db" onclick="getDirections();">Get Directions!</div>
+                                <div class="btn btn-info btn-sm" id="sendDirections" onclick="sendDirections();">Open in Maps</div>
+                                <input type="hidden" id="startLngLat" name="startCoords">
+                                <input type="hidden" id="endLngLat" name="endCoords">
+                            </form>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="btn btn-info btn-sm pull-right" onClick="window.location.reload()">Refresh Route</div>
+                            </div>
+                        </div>
                     </p>
                     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                     </div>
