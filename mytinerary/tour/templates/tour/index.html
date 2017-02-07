@@ -1,71 +1,71 @@
 <!DOCTYPE HTML>
 
 <html>
-  <head>
-    <title>Home - Mytinerary</title>
-    <link rel="stylesheet" href="https://bootswatch.com/united/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<head>
+  <title>Home - Mytinerary</title>
+  <link rel="stylesheet" href="https://bootswatch.com/united/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-    {% load static %}
-    <link rel="icon" href='{% static "tour/images/icon.png" %}' />
-    <link rel="stylesheet" type="text/css" href='{% static "tour/stylesheet.css" %}' />
-    <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
-    <script src='{% static "tour/js/autocomplete.js" %}'></script>
-    <script src='{% static "tour/js/rangevalues.js" %}'></script>
-  </head>
-  <body>
-	{% include "tour/navbar.html" %}
-	<div class="col-lg-4 col-lg-offset-4">
-        <form action="/tour/map/" method="GET" class="preference-form" name="indexForm" onsubmit="return validateForm()">
-			<div class="form-horizontal">
+  {% load static %}
+  <link rel="icon" href='{% static "tour/images/icon.png" %}' />
+  <link rel="stylesheet" type="text/css" href='{% static "tour/stylesheet.css" %}' />
+  <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
+  <script src='{% static "tour/js/autocomplete.js" %}'></script>
+  <script src='{% static "tour/js/rangevalues.js" %}'></script>
+</head>
+<body>
+  {% include "tour/navbar.html" %}
+  <div class="col-lg-4 col-lg-offset-4">
+    <form action="/tour/map/" method="GET" class="preference-form" name="indexForm" onsubmit="return validateForm()">
+      <div class="form-horizontal">
 
-					<div class="form-group row">
-						<div class="col-sm-3"></div>
-						<div class="btn-group col-sm-9" data-toggle="buttons">
-							<label class="btn btn-info active" onclick="startToEnd();">
-								<input type="radio" name="mode" id="start-to-end" value="start-to-end" autocomplete="off" checked> Start-to-End Mode
-							</label>
-							<label class="btn btn-info" onclick="exploratory();">
-								<input type="radio" name="mode" id="exploratory" value="exploratory" autocomplete="off"> Exploratory Mode
-							</label>
-						</div>
-					</div>
-					<div class="form-group row">
-						<label class="col-sm-3 control-label">City</label>
-						<div class="col-sm-6">
-							<select class="form-control" name="city" id="citySelect">
-								<option value="London">London</option>
-								<option value="Madrid">Madrid</option>
-								<option value="Minneapolis">Minneapolis</option>
-								<option value="New York">New York</option>
-								<option value="San Francisco">San Francisco</option>
-							</select>
-						</div>
-					</div>
-					<div class="form-group row">
-						<label class="col-sm-3 control-label">Start Location</label>
-						<div class="col-sm-6">
-                            <input  type="text"
-                                style="width:100%"
-                                class="form-control"
-                                id="autocomplete1"
-                                name="startDestination"
-                                onFocus="geolocate()">
-						</div>
-					</div>
-          <input type="hidden" id="startLngLat" name="startCoords">
-          <input type="hidden" id="startAddress" name="startAddress">
-					<div id="start-to-end-fields"></div>
+        <div class="form-group row">
+          <div class="col-sm-3"></div>
+          <div class="btn-group col-sm-9" data-toggle="buttons">
+            <label class="btn btn-info active" onclick="startToEnd();">
+              <input type="radio" name="mode" id="start-to-end" value="start-to-end" autocomplete="off" checked> Start-to-End Mode
+            </label>
+            <label class="btn btn-info" onclick="exploratory();">
+              <input type="radio" name="mode" id="exploratory" value="exploratory" autocomplete="off"> Exploratory Mode
+            </label>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-3 control-label">City</label>
+          <div class="col-sm-6">
+            <select class="form-control" name="city" id="citySelect">
+              <option value="London">London</option>
+              <option value="Madrid">Madrid</option>
+              <option value="Minneapolis">Minneapolis</option>
+              <option value="New York">New York</option>
+              <option value="San Francisco">San Francisco</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-3 control-label">Start Location</label>
+          <div class="col-sm-6">
+            <input  type="text"
+            style="width:100%"
+            class="form-control"
+            id="autocomplete1"
+            name="startDestination"
+            onFocus="geolocate()">
+          </div>
+        </div>
+        <input type="hidden" id="startLngLat" name="startCoords">
+        <input type="hidden" id="startAddress" name="startAddress">
+        <div id="start-to-end-fields"></div>
 
-					<div class="form-group row">
-						<div class="col-sm-3"></div>
-						<input type="submit" class="col-sm-6 btn btn-info" value="Make my Tour!">
-					</div>
-			</div>
-		</form>
-	</div>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM&libraries=places&callback=startToEnd"
-     async defer></script>
-  </body>
+        <div class="form-group row">
+          <div class="col-sm-3"></div>
+          <input type="submit" class="col-sm-6 btn btn-info" value="Make my Tour!">
+        </div>
+      </div>
+    </form>
+  </div>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM&libraries=places&callback=startToEnd"
+  async defer></script>
+</body>
 </html>

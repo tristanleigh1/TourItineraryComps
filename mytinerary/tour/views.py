@@ -77,7 +77,6 @@ def pop_radius(request):
                                                      'longitude' : nearby_poi.longitude,
                                                      'poi_id' : nearby_poi.id,
                                                      'rating' : nearby_poi.num_stars,
-                                                     'summary': nearby_poi.summary,
                                                      'category': nearby_poi.category
                                                      })
         return JsonResponse(response_data)
@@ -86,6 +85,21 @@ def pop_radius(request):
                 json.dumps({"error":"an error occured."}),
                 content_type="application/json"
         )
+
+def get_summary_for_added_point(request):
+    if request.method == 'GET':
+        poi_id = request.GET.get('id', None)
+        query_set = list(POI.objects.filter(id=poi_id))
+
+        response_data = {}
+        response_data['summary'] = query_set[0].summary
+        return JsonResponse(response_data)
+    else:
+        return HttpResponse(
+                json.dumps({"error":"an error occured."}),
+                content_type="application/json"
+        )
+
 
 def calculate_score(current_poi, path_segments, walk_factor, preferences):
     empirical_coefficient = 0.0006
