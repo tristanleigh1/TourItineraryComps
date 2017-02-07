@@ -7,6 +7,7 @@
     {% load static %}
     <link rel="stylesheet" href="https://bootswatch.com/united/bootstrap.min.css">
     <link rel="icon" href='{% static "tour/images/icon.png" %}' />
+		<script src='{% static "tour/js/utils.js" %}'></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -85,7 +86,6 @@
             var rating = locations[i].rating;
             var summary = locations[i].summary;
             var address = locations[i].address;
-            var icon = ""
             var popRadius = new google.maps.Circle({
                 strokeWeight: 0,
                 fillColor: '#FF0000',
@@ -94,32 +94,7 @@
                 radius: 500,
                 visible: false
             });
-            switch (category) {
-                case "Museums":
-                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/blue.png",
-                scaledSize: new google.maps.Size(45, 45)};
-                break;
-                case "Landmarks":
-                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/pink.png",
-                scaledSize: new google.maps.Size(45, 45)};
-                break;
-                case "Activities":
-                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/yellow.png",
-                scaledSize: new google.maps.Size(45, 45)};
-                break;
-                case "Nature":
-                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/green.png",
-                scaledSize: new google.maps.Size(45, 45)};
-                break;
-                case "Restaurants":
-                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/red.png",
-                scaledSize: new google.maps.Size(45, 45)};
-                break;
-                default:
-                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/purple.png",
-                scaledSize: new google.maps.Size(45, 45)};
-                break;
-            }
+						var icon = getIconFromCategory(category, true);
             //else if ($.inArray('Parks', locations[i].category) > -1
             var marker = new google.maps.Marker({
                 map: map,
@@ -202,35 +177,16 @@
         }
         radiusMarkers.length = 0;
 
+				// Plot the pois only if they fall into the circle
+				var circleRadius = centerMarker.popRadius.getRadius();
+				var center = centerMarker.position;
         for (var i=0; i<nearby_pois.length; i++) {
-            var icon = ""
-            switch (nearby_pois[i].category) {
-                case "Museums":
-                icon = {url: "https://maps.gstatic.com/mapfiles/ms/micons/blue-dot.png"};
-                //scaledSize: new google.maps.Size(45, 45)};
-                break;
-                case "Landmarks":
-                icon = {url: "https://maps.gstatic.com/mapfiles/ms/micons/pink-dot.png"};
-                //scaledSize: new google.maps.Size(45, 45)};
-                break;
-                case "Activities":
-                icon = {url: "http://maps.google.com/mapfiles/ms/micons/yellow-dot.png"};
-                //scaledSize: new google.maps.Size(45, 45)};
-                break;
-                case "Nature":
-                icon = {url: "https://maps.gstatic.com/mapfiles/ms/micons/green-dot.png"};
-                //scaledSize: new google.maps.Size(45, 45)};
-                break;
-                case "Restaurants":
-                icon = {url: "https://maps.gstatic.com/mapfiles/ms/micons/red-dot.png"};
-                //scaledSize: new google.maps.Size(45, 45)};
-                break;
-                default:
-                icon = {url: "https://maps.gstatic.com/mapfiles/ms/micons/purple-dot.png"};
-                //scaledSize: new google.maps.Size(45, 45)};
-                break;
-            }
+						var point = new google.maps.LatLng(parseFloat(nearby_pois[i].latitude), parseFloat(nearby_pois[i].longitude));
+						if (google.maps.geometry.spherical.computeDistanceBetween(point, center) >= circleRadius) {
+							continue;
+						}
 
+          	var icon = getIconFromCategory(nearby_pois[i].category, false);
             var popRadius = new google.maps.Circle({
                 strokeWeight: 0,
                 fillColor: '#FF0000',
@@ -242,8 +198,7 @@
 
             var marker = new google.maps.Marker({
                 map: map,
-                position: {lat: parseFloat(nearby_pois[i].latitude),
-                            lng: parseFloat(nearby_pois[i].longitude)},
+                position: point,
                 name: nearby_pois[i].name,
                 poi_id: nearby_pois[i].poi_id,
                 id: radiusMarkers.length,
@@ -378,33 +333,8 @@
                     console.log(xhr.status + " " + xhr.responseText);
                 }
             });
-            var icon = ""
-            switch (radiusMarkers[newMarkerId].category) {
-                case "Museums":
-                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/blue.png",
-                scaledSize: new google.maps.Size(45, 45)};
-                break;
-                case "Landmarks":
-                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/pink.png",
-                scaledSize: new google.maps.Size(45, 45)};
-                break;
-                case "Activities":
-                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/yellow.png",
-                scaledSize: new google.maps.Size(45, 45)};
-                break;
-                case "Nature":
-                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/green.png",
-                scaledSize: new google.maps.Size(45, 45)};
-                break;
-                case "Restaurants":
-                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/red.png",
-                scaledSize: new google.maps.Size(45, 45)};
-                break;
-                default:
-                icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/purple.png",
-                scaledSize: new google.maps.Size(45, 45)};
-                break;
-            }
+
+            var icon = getIconFromCategory(radiusMarkers[newMarkerId].category, true);
 
             var popRadius = new google.maps.Circle({
                 strokeWeight: 0,

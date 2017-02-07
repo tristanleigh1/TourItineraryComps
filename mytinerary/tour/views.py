@@ -22,13 +22,21 @@ def contact(request):
 def directions(request):
     return render(request, 'tour/directions.html')
 
+def km_to_lat_lng(km, latitude):
+    # 1km = 0.009043 degrees (for latitude)
+    KM_TO_DEGREES_LAT = 0.009043
+    # 1km = 0.008983 / cos(latitude) (for longitude)
+    degrees_lat = km * KM_TO_DEGREES_LAT
+    degrees_lng = km / (111.320 * math.cos(math.radians(latitude)))
+    return degrees_lat, degrees_lng
+
 def pop_radius(request):
     if request.method == 'GET':
 #        name = request.GET.get('name', None)
 #        poi_id = request.GET.get('id', None)
         latitude = float(request.GET.get('lat', None))
         longitude = float(request.GET.get('lng', None))
-        radius = int(request.GET.get('radius', None))
+        radius_size = int(request.GET.get('radius', None)) / 1000
         filter_status = int(request.GET.get('filter-status', None))
 
         categories = []
@@ -51,23 +59,15 @@ def pop_radius(request):
 #        longitude = float(poi.longitude)
 #        city = poi.city
 
-        # 110.574km = 1 degree
-        # 111.320 * cos(latitude)km = 1 degree
-        # 1km = 0.009043 degrees (for latitude)
-        # 1km = 0.008983 / cos(latitude) (for longitude)
-        radius_lat = (radius / 1000) * 0.009043
-        #radius_lng = (radius / 1000) * (0.008983 / math.degrees(math.cos(math.radians(latitude))))
-        # radius = 0.004
-        radius_lng = 0.004
+        degrees_lat, degrees_lng = km_to_lat_lng(radius_size, latitude)
 
-#        nearby_pois = POI.objects.filter(city = city).filter(latitude__lte=latitude+radius_lat, latitude__gte=latitude-radius_lat, longitude__lte=longitude+radius_lng, longitude__gte=longitude-radius_lng)
         nearby_POI_querySets = []
         for i in range(len(categories)):
-            nearby_pois_for_category = POI.objects.filter(category=categories[i], latitude__lte=latitude+radius_lat, latitude__gte=latitude-radius_lat, longitude__lte=longitude+radius_lng, longitude__gte=longitude-radius_lng)
+            nearby_pois_for_category = POI.objects.filter(category=categories[i], latitude__lte=latitude+degrees_lat, latitude__gte=latitude-degrees_lat, longitude__lte=longitude+degrees_lng, longitude__gte=longitude-degrees_lng)
             nearby_POI_querySets.append(nearby_pois_for_category)
 
         ##(new_latitude-origin_latitude)^2 + (new_longitude - origin_longitude^2 <= radius^2
-#        response_data['poi'] = poi.business_name
+#       response_data['poi'] = poi.business_name
         response_data = {}
         response_data['nearby_pois'] = list()
         for nearby_pois in nearby_POI_querySets:
