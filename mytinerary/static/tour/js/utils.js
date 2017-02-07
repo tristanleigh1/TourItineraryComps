@@ -29,8 +29,8 @@ function getIconFromCategory(category, scale) {
 }
 
 
+
 function modifyIcons() {
-		console.log("here");
 		document.getElementById("panel").removeEventListener('DOMSubtreeModified', modifyIcons, false);
 
 		var icons = document.getElementsByClassName("adp-marker");

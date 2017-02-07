@@ -7,21 +7,21 @@
     {% load static %}
     <link rel="stylesheet" href="https://bootswatch.com/united/bootstrap.min.css">
     <link rel="icon" href='{% static "tour/images/icon.png" %}' />
-		<script src='{% static "tour/js/utils.js" %}'></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src='{% static "tour/js/utils.js" %}'></script>
+    <script src='{% static "tour/js/route.js" %}'></script>
     <script>
-    var markers = [];
-    var radiusMarkers = [];
-    var popWindow;
-    var map;
-    var directionsService;
-    var directionsDisplay;
-    var filterStatus;
-    var selectedMarker;
-
     function initialize() {
+        var markers = [];
+        var radiusMarkers = [];
+        var popWindow;
+        var map;
+        var directionsService;
+        var directionsDisplay;
+        var filterStatus;
+        var selectedMarker;
         directionsService = new google.maps.DirectionsService;
         //        directionsDisplay = new google.maps.DirectionsRenderer;
         //        directionsDisplay.setOptions( { suppressMarkers: true, preserveViewport: true } );
@@ -40,7 +40,7 @@
                 id: '{{origin.id}}',
                 category: '{{origin.category}}',
                 position: {lat: {{ origin.latitude|stringformat:"f" }},
-                lng: {{ origin.longitude|stringformat:"f" }}},
+                           lng: {{ origin.longitude|stringformat:"f" }}},
                 rating: '{{origin.num_stars}}',
                 summary: `{{origin.summary}}`},
 
@@ -50,7 +50,7 @@
                 id: '{{poi.id}}',
                 category: '{{poi.category}}',
                 position: {lat: {{ poi.latitude|stringformat:"f" }},
-                lng: {{ poi.longitude|stringformat:"f" }}},
+                           lng: {{ poi.longitude|stringformat:"f" }}},
                 rating: '{{poi.num_stars}}',
                 summary: `{{poi.summary}}`},
                 {% endfor %}
@@ -60,7 +60,7 @@
                 id: '{{destination.id}}',
                 category: '{{destination.category}}',
                 position: {lat: {{ destination.latitude|stringformat:"f" }},
-                lng: {{ destination.longitude|stringformat:"f" }}},
+                           lng: {{ destination.longitude|stringformat:"f" }}},
                 rating: '{{destination.num_stars}}',
                 summary: `{{destination.summary}}`},
             ];
@@ -72,12 +72,12 @@
                 id: '{{origin.id}}',
                 category: '{{origin.category}}',
                 position: {lat: {{ origin.latitude|stringformat:"f" }},
-                lng: {{ origin.longitude|stringformat:"f" }}},
+                           lng: {{ origin.longitude|stringformat:"f" }}},
                 rating: '{{origin.num_stars}}',
                 summary: `{{origin.summary}}`}
             ];
         }
-
+        
         for (var i = 0; i < locations.length; i++) {
             var poi_id = locations[i].id;
             var position = locations[i].position;
@@ -94,7 +94,7 @@
                 radius: 500,
                 visible: false
             });
-						var icon = getIconFromCategory(category, true);
+                        var icon = getIconFromCategory(category, true);
             //else if ($.inArray('Parks', locations[i].category) > -1
             var marker = new google.maps.Marker({
                 map: map,
@@ -117,545 +117,104 @@
                 findNearbyPOIs(this);
             });
         }
-        addSidebarButtons();
-        updateRoute();
-        selectedMarker = null;
-        filterStatus = 31;
-        initDirectionsListener();
-    }
-
-    function findNearbyPOIs(marker) {
-        $.ajax({
-            url : "/tour/pop_radius/",
-            contentType: "application/json; charset=utf-8",
-            type : 'GET',
-            data : {
-                'lat' : marker.getPosition().lat(),
-                'lng' : marker.getPosition().lng(),
-                'radius' : marker.popRadius.getRadius(),
-                'filter-status' : filterStatus
-            },
-            dataType : 'json',
-            success : function(json) {
-                // Only adds nearby POIs that aren't already in route
-                var nearby_pois = [];
-                for (var i=0; i < json["nearby_pois"].length; i++) {
-                    for (var j=0; j < markers.length; j++) {
-                        if (markers[j].poi_id == json["nearby_pois"][i].poi_id) {
-                            delete json["nearby_pois"][i];
-                            break;
-                        }
-                    }
-                    if (typeof json["nearby_pois"][i] !== 'undefined') {
-                        nearby_pois.push(json["nearby_pois"][i]);
-                    }
-                }
-                if (nearby_pois.length <= 1 && marker.popRadius.getRadius() <= 10000) {
-                    marker.popRadius.setRadius(marker.popRadius.getRadius() + 500);
-                    findNearbyPOIs(marker);
-                } else {
-                    plotNearbyPois(nearby_pois, marker);
-                }
-            },
-            cache : false,
-            error : function(xhr, errmsg, err) {
-                for (var i=0; i<radiusMarkers.length; i++) {
-                    marker = radiusMarkers[i];
-                    marker.setMap(null);
-                }
-                console.log(errmsg);
-                console.log(xhr.status + " " + xhr.responseText);
-            }
+        
+        setup({
+            markers: markers,
+            radiusMarkers: radiusMarkers,
+            popWindow: popWindow,
+            map: map,
+            directionsService: directionsService,
+            directionsDisplay: directionsDisplay,
+            filterStatus: filterStatus,
+            selectedMarker: selectedMarker
         });
     }
-
-    function plotNearbyPois(nearby_pois, centerMarker) {
-        // Get rid of markers from previous radius
-        for (var i=0; i<radiusMarkers.length; i++) {
-            marker = radiusMarkers[i];
-            marker.setMap(null);
-        }
-        radiusMarkers.length = 0;
-
-				// Plot the pois only if they fall into the circle
-				var circleRadius = centerMarker.popRadius.getRadius();
-				var center = centerMarker.position;
-        for (var i=0; i<nearby_pois.length; i++) {
-						var point = new google.maps.LatLng(parseFloat(nearby_pois[i].latitude), parseFloat(nearby_pois[i].longitude));
-						if (google.maps.geometry.spherical.computeDistanceBetween(point, center) >= circleRadius) {
-							continue;
-						}
-
-          	var icon = getIconFromCategory(nearby_pois[i].category, false);
-            var popRadius = new google.maps.Circle({
-                strokeWeight: 0,
-                fillColor: '#FF0000',
-                fillOpacity: 0.35,
-                map: map,
-                radius: 500,
-                visible: false
-            });
-
-            var marker = new google.maps.Marker({
-                map: map,
-                position: point,
-                name: nearby_pois[i].name,
-                poi_id: nearby_pois[i].poi_id,
-                id: radiusMarkers.length,
-                rating: nearby_pois[i].rating,
-                category: nearby_pois[i].category,
-                address: nearby_pois[i].address,
-                icon: icon,
-                popRadius: popRadius
-                });
-                marker.addListener('click', function() {
-                    createInfoWindow(this, centerMarker);
-                });
-                radiusMarkers.push(marker);
-            }
-        }
-
-        function createPopRadius(marker) {
-            selectedMarker = marker;
-            marker.popRadius.setCenter(marker.position);
-            for (var i = 0; i < markers.length; i++) {
-                markers[i].popRadius.setVisible(false);
-            }
-            marker.popRadius.setVisible(true);
-        }
-
-        // Called when path POI marker is clicked
-        function createInfoWindow(marker, centerMarker) {
-            var onclick;
-            var centerMarkerId;
-
-            // There is no centerMarker if the marker is on our path
-            if (centerMarker == null) {
-                onclick = ' onclick="removePoint(' + marker.id + ');">' +
-                '<span class="glyphicon glyphicon-trash"></span>';
-            } else {
-                centerMarkerId = centerMarker.id;
-                onclick = ' onclick="addPoint(' + marker.id + ', ' +
-                centerMarker.id + ');">Add';
-            }
-
-            var content = '<p>' + marker.name + '</p><p>Yelp rating: ' +
-            marker.rating + '</p><div class="btn btn-primary btn-sm"' + onclick +
-            '</div><div class="btn btn-link btn-sm"' +
-            'onclick="setInfoWindowContent('+ marker.id + ', ' + centerMarkerId +
-            ');">More Info...</div>';
-
-            popWindow.marker = marker;
-            popWindow.setContent(content);
-            popWindow.open(map, marker);
-        }
-
-        //Called when user clicks on "More Info..." button in info window
-        function setInfoWindowContent(markerId, centerMarkerId) {
-            var marker;
-            var onclick;
-
-            if (!centerMarkerId) {
-                marker = markers[markerId];
-                onclick = ' onclick="removePoint(' + marker.id + ');">' +
-                '<span class="glyphicon glyphicon-trash"></span>';
-            } else {
-                marker = radiusMarkers[markerId];
-                onclick = ' onclick="addPoint(' + marker.id + ', ' +
-                centerMarkerId + ');">Add';
-            }
-
-            var content = '<p>' + marker.name + '</p><p>Yelp rating: '
-            + marker.rating + '</p><img src="https://maps.googleapis.com/maps/'
-            + 'api/streetview?size=600x300&location=' + marker.getPosition().lat()
-            + ',' + marker.getPosition().lng()
-            + '&key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM" ><br/><div class="'
-            + 'btn btn-primary btn-sm"' + onclick + '</div><div class="'
-            + 'btn btn-link btn-sm" onclick="resetInfoWindow('+ marker.id + ', '
-            + centerMarkerId + ');">Less Info</div>';
-
-            popWindow.setContent(content);
-        }
-
-        function resetInfoWindow(markerId, centerMarkerId) {
-            if (centerMarkerId == null) {
-                var marker = markers[markerId];
-                createInfoWindow(marker, null);
-            } else {
-                var centerMarker = markers[centerMarkerId];
-                createInfoWindow(radiusMarkers[markerId], centerMarker);
-            }
-        }
-
-        function removePoint(markerId) {
-            markers[markerId].popRadius.setVisible(false);
-            markers[markerId].setMap(null);
-            markers.splice(markerId, 1);
-            for (var i = markerId; i < markers.length; i++) {
-                markers[i].id--;
-                markers[i].label--;
-                markers[i].setMap(null)
-                markers[i].popRadius.setVisible(false);
-                markers[i].setMap(map);
-            }
-
-            updateRoute();
-
-            for (var i=0; i<radiusMarkers.length; i++) {
-                marker = radiusMarkers[i];
-                marker.setMap(null);
-                marker.popRadius.setVisible(false);
-            }
-
-
-            $("#accordion").empty();
-            addSidebarButtons();
-        }
-
-        function addPoint(newMarkerId, markerId) {
-            var summary = ""
-            // Synchronous call to get summary for new point added to map
-            $.ajax({
-                async: false,
-                url : "/tour/get_summary_for_added_point/",
-                contentType: "application/json; charset=utf-8",
-                type : 'GET',
-                data : {
-                    'id' : radiusMarkers[newMarkerId].poi_id
-                },
-                dataType : 'json',
-                success : function(json) {
-                    summary = json['summary'];
-                },
-                cache : false,
-                error : function(xhr, errmsg, err) {
-                    console.log(errmsg);
-                    console.log(xhr.status + " " + xhr.responseText);
-                }
-            });
-
-            var icon = getIconFromCategory(radiusMarkers[newMarkerId].category, true);
-
-            var popRadius = new google.maps.Circle({
-                strokeWeight: 0,
-                fillColor: '#FF0000',
-                fillOpacity: 0.35,
-                map: map,
-                radius: 500,
-                visible: false
-            });
-
-            var newMarker = new google.maps.Marker({
-                map: map,
-                position: radiusMarkers[newMarkerId].position,
-                name: radiusMarkers[newMarkerId].name,
-                rating: radiusMarkers[newMarkerId].rating,
-                id: markerId,
-                poi_id: radiusMarkers[newMarkerId].poi_id,
-                label: (markerId+1).toString(),
-                summary: summary,
-                category: radiusMarkers[newMarkerId].category,
-                address: radiusMarkers[newMarkerId].address,
-                icon: icon,
-                popRadius: popRadius
-            });
-            newMarker.addListener('click', function() {
-                createPopRadius(this);
-                createInfoWindow(this, null);
-                findNearbyPOIs(this);
-            });
-            markers.splice(markerId+1, 0, newMarker);
-
-            //refresh markers on map with updated labels
-            for (var i = markerId+1; i < markers.length; i++) {
-                markers[i].id++;
-                markers[i].label = i + 1;
-                markers[i].setMap(null);
-                markers[i].popRadius.setVisible(false);
-                markers[i].setMap(map);
-            }
-
-            updateRoute();
-
-            for (var i=0; i<radiusMarkers.length; i++) {
-                marker = radiusMarkers[i];
-                marker.setMap(null);
-                marker.popRadius.setVisible(false);
-            }
-            radiusMarkers.length = 0;
-
-            $("#accordion").empty();
-            addSidebarButtons();
-            selectedMarker = null;
-        }
-
-        function updateRoute() {
-            waypoints = [];
-            for (var i = 1; i < markers.length - 1; i++) {
-                waypoints.push({location: markers[i].getPosition()});
-            }
-            directionsService.route({
-                origin: markers[0].getPosition(),
-                destination: markers[markers.length - 1].getPosition(),
-                waypoints: waypoints,
-                travelMode: 'WALKING',
-                optimizeWaypoints: false //we may want to enable this
-            }, function(response, status) {
-                if (status === 'OK') {
-                    directionsDisplay.setDirections(response);
-
-                    //                map.setZoom(7);
-
-                    // Compute the total distance of the route
-                    var totalDistance = 0;
-                    var totalDuration = 0;
-                    var METERS_TO_MILES = 0.000621371192;
-                    var mytinerary = response.routes[0];
-                    for (var i = 0; i < mytinerary.legs.length; i++) {
-                        totalDistance += mytinerary.legs[i].distance.value
-                        totalDuration += mytinerary.legs[i].duration.value
-                    }
-
-                    // Let Google determine if we should use miles or km
-                    var units = mytinerary.legs[0].distance.text.substr(-2);
-                    if (units == "km") {
-                        totalDistance = totalDistance / 1000;
-                    } else {
-                        totalDistance = totalDistance * METERS_TO_MILES;
-                    }
-
-                    totalDuration = totalDuration / 60
-                    document.getElementById("distance").innerHTML = totalDistance.toFixed(1) + units;
-                    document.getElementById("walkingTime").innerHTML = totalDuration.toFixed(0) + " mins";
-
-
-                } else {
-                    window.alert('Directions request failed due to ' + status);
-                }
-            });
-        }
-
-        function addSidebarButtons() {
-            for (var i = 0; i < markers.length; i++) {
-                $("#accordion").append(
-                    `<div class="panel panel-info">
-                        <div class="`+ markers[i].category +`">
-                            <div class="panel-heading" role="tab" id="heading`+ i +`">
-                                <h4 class="panel-title">
-                                    <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse` +
-                                        i + `" aria-expanded="false" aria-controls="collapse` + i + `">
-                                        ` + (i + 1) + `: ` + markers[i].name + `
-                                    </a>
-                                </h4>
-                            </div>
-                        </div>
-                        <div id="collapse` + i + `" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading` +
-                            i + `">
-                            <div class="panel-body">
-                                ` + markers[i].summary + `
-                            </div>
-                            </div>
-                    </div>`
-                );
-            }
-        }
-
-        // Adds a listener to the directions panel for when it's finished loading
-        function initDirectionsListener() {
-            directionsPanel = document.getElementById("panel");
-            if (directionsPanel.addEventListener) {
-                directionsPanel.addEventListener('DOMSubtreeModified', modifyIcons, false);
-            }
-        }
-
-        // Constructs the URL for the google maps version of your route
-        function sendDirections() {
-            var url = 'https://www.google.com/maps/dir';
-            for (var i = 0; i < markers.length; i++) {
-                url += "/" + markers[i].address;
-            }
-            url = url.replace(/\s/g, "+");
-            url = url.replace(/,/g, "");
-            url += "/data=!4m2!4m1!3e2"; // Data for making travel mode walking
-
-            window.open(url, "_blank");
-        }
-
-        function getDirections() {
-            if (document.getElementById('accordion').style.display == 'none') {
-                document.getElementById('accordion').style.display = 'block';
-                document.getElementById('db').innerHTML = "Get Directions!";
-                document.getElementById('sendDirections').style.display = 'none';
-                document.getElementById('panel').style.display = 'none';
-            } else {
-                document.getElementById('accordion').style.display = 'none';
-                document.getElementById('db').innerHTML = "Go back";
-                document.getElementById('sendDirections').style.display = 'inline-block';
-                document.getElementById('panel').style.display = 'block';
-                directionsDisplay.setPanel(document.getElementById('panel'));
-            }
-
-
-        }
-
-        //drag sidebar buttons to update route
-        $( function() {
-            $( "#accordion" ).sortable({
-                axis: "y",
-                handle: "h4",
-                start: function(event, ui) {
-                    var start_idx = ui.item.index();
-                    ui.item.data('start_idx', start_idx);
-                },
-                update: function(event, ui) {
-                    var start_idx = ui.item.data('start_idx');
-                    var end_idx = ui.item.index();
-                    markers[start_idx].id = end_idx;
-                    markers[start_idx].label = end_idx+1;
-                    markers[start_idx].setMap(null);
-                    markers[start_idx].setMap(map);
-
-                    //refresh markers on map with updated labels
-                    if (start_idx > end_idx) { //drag down
-                        markers.splice(end_idx, 0, markers[start_idx]);
-                        markers.splice(start_idx+1, 1);
-                        for (var i = end_idx + 1; i <= start_idx; i++) {
-                            markers[i].id++;
-                            markers[i].label = i + 1;
-                            markers[i].setMap(null);
-                            markers[i].popRadius.setVisible(false);
-                            markers[i].setMap(map);
-                        }
-                    } else { //drag up
-                        markers.splice(end_idx+1, 0, markers[start_idx]);
-                        markers.splice(start_idx, 1);
-                        for (var i = start_idx; i < end_idx; i++) {
-                            //***************this doesn't look right to me (but it seems to work)*************
-                            markers[i].id--;
-                            markers[i].label = i + 1;
-                            markers[i].setMap(null);
-                            markers[i].popRadius.setVisible(false);
-                            markers[i].setMap(map);
-                        }
-                    }
-
-                    updateRoute();
-                    for (var i=0; i<radiusMarkers.length; i++) {
-                        marker = radiusMarkers[i];
-                        marker.setMap(null);
-                        marker.popRadius.setVisible(false);
-                    }
-                    radiusMarkers.length = 0;
-
-                    $("#accordion").empty();
-                    addSidebarButtons();
-                }
-            });
-        });
-
-        function updateFilterStatus(spot) {
-            var shiftedStatus = filterStatus >> spot;
-            if (shiftedStatus % 2 == 0) {
-                filterStatus += Math.pow(2, spot);
-            }
-            else {
-                filterStatus -= Math.pow(2, spot);
-            }
-        }
-
-        function updateFilter(spot) {
-            updateFilterStatus(spot);
-            if (selectedMarker) {
-                findNearbyPOIs(selectedMarker);
-            }
-        }
-
-        </script>
-        <link rel="stylesheet" type="text/css" href='{% static "tour/map.css" %}' />
-        <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
-    </head>
-    <body>
-        <!--    <h3>{{city}}</h3>-->
-        <div id="body">
-            {% include "tour/navbar.html" %}
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-12" id="filter-bar">
-                        <ul class="list-group">
-                            <li>
-                                <label>Museums&nbsp</label>
-                                <div class="checkbox-slider pull-right" id="Museums-filter">
-                                    <input id="Museums" name="Museums" type="checkbox" onclick="updateFilter(4)" checked/>
-                                    <label for="Museums" class="Museums label-default"></label>
-                                </div>
-                                <br>
-                            </li>
-                            <li>
-                                <label>Landmarks&nbsp</label>
-                                <div class="checkbox-slider pull-right" id="Landmarks-filter">
-                                    <input id="Landmarks" name="Landmarks" type="checkbox" onclick="updateFilter(3)" checked/>
-                                    <label for="Landmarks" class="Landmarks label-default"></label>
-                                </div>
-                                <br>
-                            </li>
-                            <li>
-                                <label>Activities&nbsp</label>
-                                <div class="checkbox-slider pull-right">
-                                    <input id="Activities" name="Activities" type="checkbox" onclick="updateFilter(2)" checked/>
-                                    <label for="Activities" class="label-default Activities"></label>
-                                </div>
-                                <br>
-                            </li>
-                            <li>
-                                <label>Parks&nbsp</label>
-                                <div class="checkbox-slider pull-right">
-                                    <input id="Nature" name="Nature" type="checkbox" onclick="updateFilter(1)" checked/>
-                                    <label for="Nature" class="label-default Nature"></label>
-                                </div>
-                                <br>
-                            </li>
-                            <li>
-                                <label>Restaurants&nbsp</label>
-                                <div class="checkbox-slider pull-right">
-                                    <input id="Restaurants" name="Restaurants" type="checkbox" onclick="updateFilter(0)" checked/>
-                                    <label for="Restaurants" class="label-default Restaurants"></label>
-                                </div>
-                                <br>
-                            </li>
-                    </ul>
-                </div>
-            </div>
+    </script>
+    <link rel="stylesheet" type="text/css" href='{% static "tour/map.css" %}' />
+    <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
+</head>
+<body>
+    <!--    <h3>{{city}}</h3>-->
+    <div id="body">
+        {% include "tour/navbar.html" %}
+        <div class="container-fluid">
             <div class="row">
-                <div class="col-md-9">
-                    <div id="map"></div>
-                </div>
-                <div class="col-md-3">
-                    <h2 id="mytour">My Tour</h2>
-                    <p>Total Distance: <span id="distance"></span>
-                        <br/>Walking Time: <span id="walkingTime"></span>
-                        <div class="row"> 
-                            <div class="col-md-6">
-                            <form action="/tour/directions/" method="GET" name="directionsButton" onsubmit="return getDirections()">
-                                <div class="btn btn-info btn-sm" id="db" onclick="getDirections();">Get Directions!</div>
-                                <div class="btn btn-info btn-sm" id="sendDirections" onclick="sendDirections();">Open in Maps</div>
-                                <input type="hidden" id="startLngLat" name="startCoords">
-                                <input type="hidden" id="endLngLat" name="endCoords">
-                            </form>
+                <div class="col-md-12" id="filter-bar">
+                    <ul class="list-group">
+                        <li>
+                            <label>Museums&nbsp</label>
+                            <div class="checkbox-slider pull-right" id="Museums-filter">
+                                <input id="Museums" name="Museums" type="checkbox" onclick="updateFilter(4)" checked/>
+                                <label for="Museums" class="Museums label-default"></label>
                             </div>
-                            <div class="col-md-6">
-                                <div class="btn btn-info btn-sm pull-right" onClick="window.location.reload()">Refresh Route</div>
+                            <br>
+                        </li>
+                        <li>
+                            <label>Landmarks&nbsp</label>
+                            <div class="checkbox-slider pull-right" id="Landmarks-filter">
+                                <input id="Landmarks" name="Landmarks" type="checkbox" onclick="updateFilter(3)" checked/>
+                                <label for="Landmarks" class="Landmarks label-default"></label>
                             </div>
-                        </div>
-                    </p>
-                    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                    </div>
-                    <div id="panel"></div>
-                </div>
+                            <br>
+                        </li>
+                        <li>
+                            <label>Activities&nbsp</label>
+                            <div class="checkbox-slider pull-right">
+                                <input id="Activities" name="Activities" type="checkbox" onclick="updateFilter(2)" checked/>
+                                <label for="Activities" class="label-default Activities"></label>
+                            </div>
+                            <br>
+                        </li>
+                        <li>
+                            <label>Parks&nbsp</label>
+                            <div class="checkbox-slider pull-right">
+                                <input id="Nature" name="Nature" type="checkbox" onclick="updateFilter(1)" checked/>
+                                <label for="Nature" class="label-default Nature"></label>
+                            </div>
+                            <br>
+                        </li>
+                        <li>
+                            <label>Restaurants&nbsp</label>
+                            <div class="checkbox-slider pull-right">
+                                <input id="Restaurants" name="Restaurants" type="checkbox" onclick="updateFilter(0)" checked/>
+                                <label for="Restaurants" class="label-default Restaurants"></label>
+                            </div>
+                            <br>
+                        </li>
+                </ul>
             </div>
         </div>
-        <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM&callback=initialize">
-        </script>
-    </body>
+        <div class="row">
+            <div class="col-md-9">
+                <div id="map"></div>
+            </div>
+            <div class="col-md-3">
+                <h2 id="mytour">My Tour</h2>
+                <p>Total Distance: <span id="distance"></span>
+                    <br/>Walking Time: <span id="walkingTime"></span>
+                    <div class="row"> 
+                        <div class="col-md-6">
+                        <form action="/tour/directions/" method="GET" name="directionsButton" onsubmit="return getDirections()">
+                            <div class="btn btn-info btn-sm" id="db" onclick="getDirections();">Get Directions!</div>
+                            <div class="btn btn-info btn-sm" id="sendDirections" onclick="sendDirections();">Open in Maps</div>
+                            <input type="hidden" id="startLngLat" name="startCoords">
+                            <input type="hidden" id="endLngLat" name="endCoords">
+                        </form>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="btn btn-info btn-sm pull-right" onClick="window.location.reload()">Refresh Route</div>
+                        </div>
+                    </div>
+                </p>
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                </div>
+                <div id="panel"></div>
+            </div>
+        </div>
+    </div>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM&callback=initialize">
+    </script>
+</body>
 
-    </html>
+</html>
