@@ -20,14 +20,12 @@
         var map;
         var directionsService;
         var directionsDisplay;
-        var filterStatus;
-        var selectedMarker;
         directionsService = new google.maps.DirectionsService;
         //        directionsDisplay = new google.maps.DirectionsRenderer;
         //        directionsDisplay.setOptions( { suppressMarkers: true, preserveViewport: true } );
         directionsDisplay = new google.maps.DirectionsRenderer({
             suppressMarkers: true,
-            //            preserveViewport: true
+//            preserveViewport: true
         });
         popWindow  = new google.maps.InfoWindow();
         map = new google.maps.Map(document.getElementById('map'));
@@ -125,8 +123,8 @@
             map: map,
             directionsService: directionsService,
             directionsDisplay: directionsDisplay,
-            filterStatus: filterStatus,
-            selectedMarker: selectedMarker
+            filterStatus: 31,
+            selectedMarker: null
         });
     }
     </script>

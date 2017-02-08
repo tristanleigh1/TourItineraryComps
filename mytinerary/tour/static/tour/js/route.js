@@ -4,8 +4,8 @@ function setup(params) {
     namespace = params;
     addSidebarButtons();
     updateRoute();
-    namespace.selectedMarker = null;
-    namespace.filterStatus = 31;
+    //this is making the map load take too long
+    adjustZoom();
     initDirectionsListener();
 }
 
@@ -261,6 +261,7 @@ function addPoint(newMarkerId, markerId) {
     }
 
     updateRoute();
+    adjustZoom();
 
     for (var i=0; i<namespace.radiusMarkers.length; i++) {
         marker = namespace.radiusMarkers[i];
@@ -455,6 +456,15 @@ function updateFilter(spot) {
     }
 }
 
+function adjustZoom() {
+    var listener = google.maps.event.addListener(namespace.map, "idle", function() { 
+        if (namespace.map.getZoom() > 16) {
+            namespace.map.setZoom(16); 
+            google.maps.event.removeListener(listener);
+        }
+    });
+}
+
 function getIconFromCategory(category, scale) {
 	var icon;
 	switch (category) {
@@ -484,7 +494,6 @@ function getIconFromCategory(category, scale) {
 	}
 	return icon;
 }
-
 
 
 function modifyIcons() {
