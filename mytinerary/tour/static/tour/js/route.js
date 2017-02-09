@@ -6,7 +6,6 @@ function setup(params) {
     updateRoute();
     //this is making the map load take too long
     adjustZoom();
-    initDirectionsListener();
 }
 
 function findNearbyPOIs(marker) {
@@ -281,6 +280,7 @@ function updateRoute() {
     for (var i = 1; i < namespace.markers.length - 1; i++) {
         waypoints.push({location: namespace.markers[i].getPosition()});
     }
+
     namespace.directionsService.route({
         origin: namespace.markers[0].getPosition(),
         destination: namespace.markers[namespace.markers.length - 1].getPosition(),
@@ -320,6 +320,12 @@ function updateRoute() {
             window.alert('Directions request failed due to ' + status);
         }
     });
+
+    if (document.getElementById('panel').innerHTML == "") {
+      initDirectionsListener();
+    } else {
+      modifyIcons();
+    }
 }
 
 function addSidebarButtons() {
@@ -356,6 +362,21 @@ function initDirectionsListener() {
     }
 }
 
+function modifyIcons() {
+    document.getElementById("panel").removeEventListener('DOMSubtreeModified', modifyIcons, false);
+
+    var icons = document.getElementsByClassName("adp-marker");
+    var iconLabelsExist = document.getElementsByClassName("icon-label").length;
+    for (var i = 0; i < icons.length; i++) {
+        //console.log(icons[i].src);
+        icons[i].src = namespace.markers[i].icon.url;
+        if (!iconLabelsExist) {
+          $(icons[i]).wrap('<div class="icon-container"></div>');
+          $( '<p class="icon-label">' + (i + 1) + '</p>' ).insertAfter(icons[i]);
+        }
+    }
+}
+
 // Constructs the URL for the google.maps version of your route
 function sendDirections() {
     var url = 'https://www.google.com/maps/dir';
@@ -370,11 +391,13 @@ function sendDirections() {
 }
 
 function getDirections() {
+    // If the directions pane is open
     if (document.getElementById('accordion').style.display == 'none') {
         document.getElementById('accordion').style.display = 'block';
         document.getElementById('db').innerHTML = "Get Directions!";
         document.getElementById('sendDirections').style.display = 'none';
         document.getElementById('panel').style.display = 'none';
+    // If the accordion pane is open
     } else {
         document.getElementById('accordion').style.display = 'none';
         document.getElementById('db').innerHTML = "Go back";
@@ -460,52 +483,40 @@ function updateFilter(spot) {
 }
 
 function adjustZoom() {
-    var listener = google.maps.event.addListener(namespace.map, "idle", function() { 
+    var listener = google.maps.event.addListener(namespace.map, "idle", function() {
         if (namespace.map.getZoom() > 16) {
-            namespace.map.setZoom(16); 
+            namespace.map.setZoom(16);
             google.maps.event.removeListener(listener);
         }
     });
 }
 
 function getIconFromCategory(category, scale) {
-	var icon;
-	switch (category) {
-			case "Museums":
-			icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/blue.png"}
-			break;
-			case "Landmarks":
-			icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/pink.png"}
-			break;
-			case "Activities":
-			icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/yellow.png"}
-			break;
-			case "Nature":
-			icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/green.png"}
-			break;
-			case "Restaurants":
-			icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/red.png"}
-			break;
-			default:
-			icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/purple.png"}
-			break;
-	}
-	if (scale == true) {
-		icon["scaledSize"] = new google.maps.Size(45, 45);
-	} else {
-		icon["url"] = icon["url"].replace(".png", "-dot.png");
-	}
-	return icon;
-}
-
-
-function modifyIcons() {
-    document.getElementById("panel").removeEventListener('DOMSubtreeModified', modifyIcons, false);
-
-    var icons = document.getElementsByClassName("adp-marker");
-    for (var i = 0; i < icons.length; i++) {
-            icons[i].src = namespace.markers[i].icon.url;
-            $(icons[i]).wrap('<div class="icon-container"></div>');
-            $( '<p class="icon-label">' + (i + 1) + '</p>' ).insertAfter(icons[i]);
-    }
+  var icon;
+  switch (category) {
+      case "Museums":
+      icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/blue.png"}
+      break;
+      case "Landmarks":
+      icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/pink.png"}
+      break;
+      case "Activities":
+      icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/yellow.png"}
+      break;
+      case "Nature":
+      icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/green.png"}
+      break;
+      case "Restaurants":
+      icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/red.png"}
+      break;
+      default:
+      icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/purple.png"}
+      break;
+  }
+  if (scale == true) {
+    icon["scaledSize"] = new google.maps.Size(45, 45);
+  } else {
+    icon["url"] = icon["url"].replace(".png", "-dot.png");
+  }
+  return icon;
 }

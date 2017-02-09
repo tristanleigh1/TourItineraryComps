@@ -10,7 +10,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src='{% static "tour/js/utils.js" %}'></script>
     <script src='{% static "tour/js/route.js" %}'></script>
     <script>
     function initialize() {
@@ -75,7 +74,7 @@
                 summary: `{{origin.summary}}`}
             ];
         }
-        
+
         for (var i = 0; i < locations.length; i++) {
             var poi_id = locations[i].id;
             var position = locations[i].position;
@@ -115,7 +114,7 @@
                 findNearbyPOIs(this);
             });
         }
-        
+
         setup({
             markers: markers,
             radiusMarkers: radiusMarkers,
@@ -190,7 +189,7 @@
                 <h2 id="mytour">My Tour</h2>
                 <p>Total Distance: <span id="distance"></span>
                     <br/>Walking Time: <span id="walkingTime"></span>
-                    <div class="row"> 
+                    <div class="row">
                         <div class="col-md-6">
                         <form action="/tour/directions/" method="GET" name="directionsButton" onsubmit="return getDirections()">
                             <div class="btn btn-info btn-sm" id="db" onclick="getDirections();">Get Directions!</div>
