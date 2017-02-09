@@ -6,8 +6,9 @@ import urllib.request
 from urllib.error import HTTPError
 import json
 import base64
-#from celery.schedules import crontab
-#from celery.task import periodic_task
+#from apscheduler.schedulers.blocking import BlockingScheduler
+
+#sched = BlockingScheduler()
 
 def calculate_popularity(business, result_dict):
     popularity = 0
@@ -26,7 +27,7 @@ def adjust_lat_lon(lat, lon):
     lon = float(lon)
     return [(radius_lat + lat, radius_lon + lon), (radius_lat - lat, radius_lon - lon), (radius_lat + lat, radius_lon - lon), (radius_lat - lat, radius_lon + lon)]
 
-#@periodic_task(run_every=crontab(hour=17, minute=00, day_of_week="sun"))
+#@sched.scheduled_job('cron', day_of_week='sun', hour=3)
 def populate_db():
     client_id = 'utuJWCc9bdvLlOHfbkXThA'
     secret = '812V05KxL5KMsYgPTksEl6ZzqILBf9Nv5spXvmtU3M9FAgpxQEYHPLW0QnDP24J8'
@@ -211,6 +212,9 @@ def populate_db():
             p.save()
 
     print("Complete!")
+
+#sched.configure(options_from_ini_file)
+#sched.start()
 
 def main():
     populate_db()
