@@ -72,12 +72,15 @@ function plotNearbyPois(nearby_pois, centerMarker) {
 
         var icon = getIconFromCategory(nearby_pois[i].category, false);
         var popRadius = new google.maps.Circle({
+            center: point,
             strokeWeight: 0,
             fillColor: '#FF0000',
             fillOpacity: 0.35,
             map: namespace.map,
             radius: 500,
-            visible: false
+            visible: false,
+            editable: true,
+            draggable: true
         });
 
         var marker = new google.maps.Marker({
@@ -154,7 +157,7 @@ function setInfoWindowContent(markerId, centerMarkerId) {
     + marker.rating + '</p><img src="https://maps.googleapis.com/maps/'
     + 'api/streetview?size=400x150&location=' + marker.getPosition().lat()
     + ',' + marker.getPosition().lng()
-    + '&key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM" ><br/><div class="'
+    + '&key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM" ><br/><br/><div class="'
     + 'btn btn-primary btn-sm"' + onclick + '</div><div class="'
     + 'btn btn-link btn-sm" onclick="resetInfoWindow('+ marker.id + ', '
     + centerMarkerId + ');">Less Info</div>';
@@ -221,13 +224,18 @@ function addPoint(newMarkerId, markerId) {
 
     var icon = getIconFromCategory(namespace.radiusMarkers[newMarkerId].category, true);
 
+
+    //var point = new google.maps.LatLng(parseFloat(nearby_pois[i].latitude), parseFloat(nearby_pois[i].longitude));
     var popRadius = new google.maps.Circle({
+        center: namespace.radiusMarkers[newMarkerId].position,
         strokeWeight: 0,
         fillColor: '#FF0000',
         fillOpacity: 0.35,
         map: namespace.map,
         radius: 500,
-        visible: false
+        visible: false,
+        editable: true,
+        draggable: true
     });
 
     var newMarker = new google.maps.Marker({
@@ -331,8 +339,8 @@ function updateRoute() {
 function addSidebarButtons() {
     for (var i = 0; i < namespace.markers.length; i++) {
         $("#accordion").append(
-            `<div class="panel panel-info">
-                <div class="`+ namespace.markers[i].category +`">
+            `<div class="panel panel-default">
+                <div class="shell `+ namespace.markers[i].category +`">
                     <div class="panel-heading" role="tab" id="heading`+ i +`">
                         <h4 class="panel-title">
                             <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse` +
@@ -413,7 +421,7 @@ function getDirections() {
 $( function() {
     $( "#accordion" ).sortable({
         axis: "y",
-        handle: "h4",
+        handle: ".panel-heading",
         start: function(event, ui) {
             var start_idx = ui.item.index();
             ui.item.data('start_idx', start_idx);
@@ -482,12 +490,13 @@ function updateFilter(spot) {
     }
 }
 
+//make sure map isn't zoomed in too much
 function adjustZoom() {
     var listener = google.maps.event.addListener(namespace.map, "idle", function() {
         if (namespace.map.getZoom() > 16) {
             namespace.map.setZoom(16);
-            google.maps.event.removeListener(listener);
         }
+        google.maps.event.removeListener(listener);
     });
 }
 

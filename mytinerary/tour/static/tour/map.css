@@ -88,25 +88,50 @@ img.adp-marker {
 }
 
 .Museums {
-    background: #6890fb;
+    background-color: #6890fb;
+/*    background-color: #6890fb;*/
 }
 .Landmarks {
-    background: #e661ac;
+    background-color: #e661ac;
+/*    background-color: #e661ac;*/
 }
 .Activities {
-    background: #fdf569;
+    background-color: #fdf569;
+/*    background-color: #fdf569;*/
 }
 .Nature {
-    background: #00e64d;
+    background-color: #00e64d;
+/*    background-color: #00e64d;*/
 }
 .Restaurants {
-    background: #fd7567;
+    background-color: #fd7567;
+/*    background-color: #fd7567;*/
 }
 
-checkbox-label {
-    padding-right: 5px;
-    border: 1px solid black;
+.Origin {
+    background-color: #8e67fd;
+/*    background-color: #8e67fd;*/
 }
+.Destination {
+    background-color: #8e67fd;
+/*    background-color: #8e67fd;*/
+}
+
+.shell {
+    border-radius: 3px;
+}
+
+.panel-heading {
+    border-radius: 3px;
+    cursor: pointer;
+    height: 100%;
+}
+
+/*
+.panel-title {
+    border-radius: 3px;
+}
+*/
 
 .checkbox-slider > input[type="checkbox"] {
     display: none;
@@ -128,7 +153,7 @@ checkbox-label {
     margin-top: -8px;
     position:absolute;
     opacity: 0.3;
-    transition: all 0.4s ease-in-out;
+    transition: all 0.2s ease-in-out;
     width: 40px;
 }
 
