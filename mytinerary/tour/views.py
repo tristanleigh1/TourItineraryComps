@@ -6,7 +6,7 @@ import json
 from .models import *
 import math
 from decimal import *
-
+import googlemaps
 
 # Create your views here.
 #GET: tour/
@@ -240,12 +240,48 @@ def find_next_poi(poi_list, path_segments, walk_factor, preferences):
     #    raise Exception('here')
     return poi_to_add
 
+def removeIfPOI(total_pois, start, end):
+    gmaps = googlemaps.Client(key='AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM')
+    count = 0
+    for poi in total_pois:
+        poi_geocode = gmaps.geocode(poi.address)
+        if len(poi_geocode) == 0:
+            continue
+        poi_location = poi_geocode[0]['geometry']['location']
+        if abs(float(poi_location['lat']) - float(start.latitude)) < .0001 and abs(float(poi_location['lng']) - float(start.longitude)) < .0001:
+            total_poi.remove(poi)
+            count = count + 1
+        if abs(float(poi_location['lat']) - float(end.latitude)) < .0001 and abs(float(poi_location['lng']) - float(end.longitude)) < .0001:
+            total_poi.remove(poi)
+            count = count + 1
+    # Geocoding an address
+#    start_geocode = gmaps.geocode(start.address)
+#    end_geocode = gmaps.geocode(end.address)
+#    start_location = start_geocode[0]['geometry']['location']
+#    start_lat, start_lng = float(start_location['lat']), float(start_location['lng'])
+#
+#    end_location = end_geocode[0]['geometry']['location']
+#    end_lat, end_lng = float(end_location['lat']), float(end_location['lng'])
+#    count = 0
+#    for poi in total_pois:
+#        if abs(float(poi.latitude) - start_lat) < .0001 and abs(float(poi.longitude) - start_lng) < .0001:
+#            total_pois.remove(poi)
+#            raise Exception(poi)
+#            count = count + 1
+#        if abs(float(poi.latitude) - end_lat) < .0001 and abs(float(poi.longitude) - end_lng) < .001:
+#            total_pois.remove(poi)
+#            count = count + 1
+    raise Exception(count)
+    return total_pois
+
 def create_path(total_pois, start, end, walk_factor, preferences, num_destinations):
     MAX_POIS = int(num_destinations)
     # path_segments is a list of pairs of points
     path_segments = [(start, end)]
     path_pois = []
     total_pois = list(total_pois)
+
+   # total_pois = removeIfPOI(total_pois, start, end)
 
    # count = 0
     for poi in total_pois:

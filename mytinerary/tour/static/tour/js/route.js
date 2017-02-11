@@ -112,7 +112,7 @@ function createPopRadius(marker) {
     marker.popRadius.setVisible(true);
 }
 
-// Called when path POI marker is clicked
+// Called when POI marker is clicked
 function createInfoWindow(marker, centerMarker) {
     var onclick;
     var centerMarkerId;
@@ -201,6 +201,15 @@ function removePoint(markerId) {
 }
 
 function addPoint(newMarkerId, markerId) {
+		// Make sure we do not exceed Google's limit of 23 waypoints (+ start/end)
+		var MAX_POINTS = 25;
+		if (namespace.markers.length == MAX_POINTS) {
+			var errorMessage = "<p><b>Sorry, you cannot add more stops.</b></p>"
+			$(".btn.btn-primary.btn-sm").before(errorMessage);
+			$(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
+			return false;
+		}
+
     var summary = ""
     // Synchronous call to get summary for new point added to namespace.map
     $.ajax({
@@ -323,7 +332,8 @@ function updateRoute() {
             document.getElementById("distance").innerHTML = totalDistance.toFixed(1) + units;
             document.getElementById("walkingTime").innerHTML = totalDuration.toFixed(0) + " mins";
 
-
+				} else if (status === 'MAX_WAYPOINTS_EXCEEDED') {
+						window.alert('You cannot add more than 23 stops.');
         } else {
             window.alert('Directions request failed due to ' + status);
         }
