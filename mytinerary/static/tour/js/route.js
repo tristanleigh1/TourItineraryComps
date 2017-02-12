@@ -9,6 +9,8 @@ function setup(params) {
 }
 
 function findNearbyPOIs(marker) {
+		console.log("finding pois " + marker.popRadius.getRadius());
+		console.log(marker.name);
     $.ajax({
         url : "/tour/pop_radius/",
         contentType: "application/json; charset=utf-8",
@@ -34,12 +36,16 @@ function findNearbyPOIs(marker) {
                     nearby_pois.push(json["nearby_pois"][i]);
                 }
             }
+
+						/* I (Caleb) am commenting this out because now the user can update the radius
             if (nearby_pois.length == 0 && marker.popRadius.getRadius() <= 18000) {
                 marker.popRadius.setRadius(marker.popRadius.getRadius() + 500);
                 findNearbyPOIs(marker);
             } else {
                 plotNearbyPois(nearby_pois, marker);
             }
+						*/
+						plotNearbyPois(nearby_pois, marker);
         },
         cache : false,
         error : function(xhr, errmsg, err) {
@@ -79,8 +85,7 @@ function plotNearbyPois(nearby_pois, centerMarker) {
             map: namespace.map,
             radius: 500,
             visible: false,
-            editable: true,
-            draggable: true
+            editable: true
         });
 
         var marker = new google.maps.Marker({
@@ -93,8 +98,16 @@ function plotNearbyPois(nearby_pois, centerMarker) {
             category: nearby_pois[i].category,
             address: nearby_pois[i].address,
             icon: icon,
-            popRadius: popRadius
+            popRadius: popRadius,
+            summary: nearby_pois[i].summary, 
         });
+
+				google.maps.event.addListener(marker.popRadius, 'radius_changed', function() {
+					if (marker.popRadius.getRadius() != 500) {
+						findNearbyPOIs(marker);
+					}
+				});
+
         marker.addListener('click', function() {
             createInfoWindow(this, centerMarker);
         });
@@ -128,7 +141,7 @@ function createInfoWindow(marker, centerMarker) {
     }
 
     var content = '<p>' + marker.name + '</p><p>Yelp rating: ' +
-    marker.rating + '/5</p><div class="btn btn-primary btn-sm"' + onclick +
+    marker.rating + '/5.0</p><div class="btn btn-primary btn-sm"' + onclick +
     '</div><div class="btn btn-link btn-sm"' +
     'onclick="setInfoWindowContent('+ marker.id + ', ' + centerMarkerId +
     ');">More Info...</div>';
@@ -154,16 +167,52 @@ function setInfoWindowContent(markerId, centerMarkerId) {
     }
 
     var content = '<p>' + marker.name + '</p><p>Yelp rating: '
-    + marker.rating + '</p><img src="https://maps.googleapis.com/maps/'
-    + 'api/streetview?size=400x150&location=' + marker.getPosition().lat()
+    + marker.rating + '/5.0</p>'
+    + `<div id="myCarousel" class="carousel slide" data-interval="false" >
+            <div class="carousel-inner" style="height:150px;width:400px" overflow:"auto">
+                <div class="active item">
+                    <img src="https://maps.googleapis.com/maps/api/streetview?size=400x150&location=` + marker.getPosition().lat()
     + ',' + marker.getPosition().lng()
-    + '&key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM" ><br/><br/><div class="'
-    + 'btn btn-primary btn-sm"' + onclick + '</div><div class="'
-    + 'btn btn-link btn-sm" onclick="resetInfoWindow('+ marker.id + ', '
-    + centerMarkerId + ');">Less Info</div>';
+    + `&key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM" >
+                </div>
+                <div class="item">
+                    <p>` + marker.summary + `</p>
+                </div> 
+            </div>
+              <!--<div class="btn btn-sm btn-info" href="#myCarousel" data-slide="prev">Prev</div>-->
+              
+        </div>
+    ` + '<br/><div class="btn btn-primary btn-sm"' + onclick + '</div><div class="btn btn-link btn-sm" onclick="resetInfoWindow('+ marker.id + ', ' + centerMarkerId + ');">Less Info</div><div class="btn btn-sm btn-primary pull-right" href="#myCarousel" data-slide="next">Next</div>';
+//    + '<div class="btn btn-link btn-sm" onclick="setInfoWindowSummary('+ marker.id + ', '
+//    + centerMarkerId + ');">Show Summary</div>';
 
     namespace.popWindow.setContent(content);
 }
+
+////Called when user clicks on "Show Summary" button in info window
+//function setInfoWindowSummary(markerId, centerMarkerId) {
+//    var marker;
+//    var onclick;
+//
+//    if (!centerMarkerId) {
+//        marker = namespace.markers[markerId];
+//        onclick = ' onclick="removePoint(' + marker.id + ');">' +
+//        '<span class="glyphicon glyphicon-trash"></span>';
+//    } else {
+//        marker = namespace.radiusMarkers[markerId];
+//        onclick = ' onclick="addPoint(' + marker.id + ', ' +
+//        centerMarkerId + ');">Add';
+//    }
+//
+//    var content = '<p>' + marker.name + '</p><p>Yelp rating: '
+//    + marker.rating + '</p><p style="height:150px;width:400px" overflow:"scroll";>' + marker.summary + '</p><div class="'
+//    + 'btn btn-primary btn-sm"' + onclick + '</div><div class="'
+//    + 'btn btn-link btn-sm" onclick="resetInfoWindow('+ marker.id + ', '
+//    + centerMarkerId + ');">Less Info</div><div class="btn btn-link btn-sm" onclick="setInfoWindowContent('+ marker.id + ', '
+//    + centerMarkerId + ');">Show Street View</div>';
+//
+//    namespace.popWindow.setContent(content);
+//}
 
 function resetInfoWindow(markerId, centerMarkerId) {
     if (centerMarkerId == null) {
@@ -233,8 +282,6 @@ function addPoint(newMarkerId, markerId) {
 
     var icon = getIconFromCategory(namespace.radiusMarkers[newMarkerId].category, true);
 
-
-    //var point = new google.maps.LatLng(parseFloat(nearby_pois[i].latitude), parseFloat(nearby_pois[i].longitude));
     var popRadius = new google.maps.Circle({
         center: namespace.radiusMarkers[newMarkerId].position,
         strokeWeight: 0,
@@ -243,8 +290,7 @@ function addPoint(newMarkerId, markerId) {
         map: namespace.map,
         radius: 500,
         visible: false,
-        editable: true,
-        draggable: true
+        editable: true
     });
 
     var newMarker = new google.maps.Marker({
@@ -261,6 +307,13 @@ function addPoint(newMarkerId, markerId) {
         icon: icon,
         popRadius: popRadius
     });
+
+		google.maps.event.addListener(newMarker.popRadius, 'radius_changed', function() {
+			if (newMarker.popRadius.getRadius() != 500) {
+				findNearbyPOIs(newMarker);
+			}
+		});
+
     newMarker.addListener('click', function() {
         createPopRadius(this);
         createInfoWindow(this, null);

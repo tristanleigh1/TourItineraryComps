@@ -83,16 +83,18 @@
             var rating = locations[i].rating;
             var summary = locations[i].summary;
             var address = locations[i].address;
+            var icon = getIconFromCategory(category, true);
+
             var popRadius = new google.maps.Circle({
                 strokeWeight: 0,
                 fillColor: '#FF0000',
                 fillOpacity: 0.35,
                 map: map,
                 radius: 500,
-                visible: false
+                visible: false,
+								editable: true
             });
-                        var icon = getIconFromCategory(category, true);
-            //else if ($.inArray('Parks', locations[i].category) > -1
+
             var marker = new google.maps.Marker({
                 map: map,
                 position: position,
@@ -107,6 +109,15 @@
                 address: address,
                 popRadius: popRadius
             });
+
+						// Getting weird scoping problems with this 
+						google.maps.event.addListener(marker.popRadius, 'radius_changed', function() {
+							console.log(marker.name + " popRadius changed to : " + marker.popRadius.getRadius())
+							if (marker.popRadius.getRadius() != 500) {
+								findNearbyPOIs(marker);
+							}
+						});
+
             markers.push(marker);
             marker.addListener('click', function() {
                 createPopRadius(this);

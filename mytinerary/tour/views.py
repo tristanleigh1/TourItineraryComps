@@ -36,8 +36,10 @@ def pop_radius(request):
 #        poi_id = request.GET.get('id', None)
         latitude = float(request.GET.get('lat', None))
         longitude = float(request.GET.get('lng', None))
-        radius_size = int(request.GET.get('radius', None)) / 1000
+        radius_size = float(request.GET.get('radius', None)) / 1000
         filter_status = int(request.GET.get('filter-status', None))
+
+        # raise Exception(radius_size )
 
         categories = []
         if filter_status % 2 != 0:
@@ -77,7 +79,8 @@ def pop_radius(request):
                                                      'longitude' : nearby_poi.longitude,
                                                      'poi_id' : nearby_poi.id,
                                                      'rating' : nearby_poi.num_stars,
-                                                     'category': nearby_poi.category
+                                                     'category': nearby_poi.category,
+                                                     'summary': nearby_poi.summary
                                                      })
         return JsonResponse(response_data)
     else:
