@@ -110,13 +110,15 @@
                 popRadius: popRadius
             });
 
-						// Getting weird scoping problems with this 
-						google.maps.event.addListener(marker.popRadius, 'radius_changed', function() {
-							console.log(marker.name + " popRadius changed to : " + marker.popRadius.getRadius())
-							if (marker.popRadius.getRadius() != 500) {
-								findNearbyPOIs(marker);
+					// Needs to be in a closure for proper scoping: http://stackoverflow.com/questions/8909652/adding-click-event-listeners-in-loop
+                    (function (_marker) {
+						google.maps.event.addListener(_marker.popRadius, 'radius_changed', function() {
+							//console.log(_marker.name + " popRadius changed to : " + _marker.popRadius.getRadius())
+							if (_marker.popRadius.getRadius() != 500) {
+								findNearbyPOIs(_marker);
 							}
 						});
+                    })(marker);
 
             markers.push(marker);
             marker.addListener('click', function() {

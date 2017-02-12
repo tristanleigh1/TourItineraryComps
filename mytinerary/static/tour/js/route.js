@@ -9,8 +9,6 @@ function setup(params) {
 }
 
 function findNearbyPOIs(marker) {
-		console.log("finding pois " + marker.popRadius.getRadius());
-		console.log(marker.name);
     $.ajax({
         url : "/tour/pop_radius/",
         contentType: "application/json; charset=utf-8",
@@ -120,7 +118,9 @@ function createPopRadius(marker) {
     marker.popRadius.setCenter(marker.position);
     for (var i = 0; i < namespace.markers.length; i++) {
         namespace.markers[i].popRadius.setVisible(false);
-        namespace.markers[i].popRadius.setRadius(500);
+        if (namespace.markers[i].popRadius.getRadius() != 500) {
+            namespace.markers[i].popRadius.setRadius(500);
+        }
     }
     marker.popRadius.setVisible(true);
 }
@@ -387,6 +387,14 @@ function updateRoute() {
 
 				} else if (status === 'MAX_WAYPOINTS_EXCEEDED') {
 						window.alert('You cannot add more than 23 stops.');
+                } else if (status === 'ZERO_RESULTS') {
+                    // TODO: Something that actually works for when there aren't results
+	                var errorMessage = "<p><b>Sorry, this POI is inaccessable from your path.</b></p>"
+	                $(".btn.btn-primary.btn-sm").before(errorMessage);
+	                $(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
+                    //removePoint(markerId);
+                    console.log("zero results");
+                    return false;
         } else {
             window.alert('Directions request failed due to ' + status);
         }
@@ -397,6 +405,8 @@ function updateRoute() {
     } else {
       modifyIcons();
     }
+    
+    return true;
 }
 
 function addSidebarButtons() {
