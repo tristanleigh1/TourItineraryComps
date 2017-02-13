@@ -284,18 +284,31 @@ def create_path(total_pois, start, end, walk_factor, preferences, num_destinatio
     path_pois = []
     total_pois = list(total_pois)
 
-   # total_pois = removeIfPOI(total_pois, start, end)
-
-   # count = 0
+    gmaps = googlemaps.Client(key='AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM')
+    count = 0
     for poi in total_pois:
         if abs(poi.latitude - start.latitude) < .0015 and abs(poi.longitude - start.longitude) < .0015:
-            total_pois.remove(poi)
-  #          count = count + 1
+            poi_geocode = gmaps.geocode(poi.address)
+            if len(poi_geocode) != 0:
+                poi_location = poi_geocode[0]['geometry']['location']
+                if abs(float(poi_location['lat']) - float(start.latitude)) < .000001 and abs(float(poi_location['lng']) - float(start.longitude)) < .000001:
+                    total_pois.remove(poi)
+                    count = count + 1
+            else:
+                total_pois.remove(poi)
+                count = count + 1
         if abs(poi.latitude - end.latitude) < .0015 and abs(poi.longitude - end.longitude) < .0015:
-            total_pois.remove(poi)
- #           count = count + 1
+            poi_geocode = gmaps.geocode(poi.address)
+            if len(poi_geocode) != 0:
+                poi_location = poi_geocode[0]['geometry']['location']
+                if abs(float(poi_location['lat']) - float(end.latitude)) < .000001 and abs(float(poi_location['lng']) - float(end.longitude)) < .000001:
+                    total_pois.remove(poi)
+                    count = count + 1
+            else:
+                total_pois.remove(poi)
+                count = count + 1
 
-#    raise Exception(count)
+    #raise Exception(count)
 
     # Check if start or end are POIs, if so remove from list
 

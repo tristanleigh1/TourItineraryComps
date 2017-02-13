@@ -1,14 +1,15 @@
 import os
 import sys
+import time
 import urllib
 import urllib.parse
 import urllib.request
 from urllib.error import HTTPError
 import json
 import base64
-#from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.schedulers.blocking import BlockingScheduler
 
-#sched = BlockingScheduler()
+sched = BlockingScheduler()
 
 def calculate_popularity(business, result_dict):
     popularity = 0
@@ -27,7 +28,7 @@ def adjust_lat_lon(lat, lon):
     lon = float(lon)
     return [(radius_lat + lat, radius_lon + lon), (radius_lat - lat, radius_lon - lon), (radius_lat + lat, radius_lon - lon), (radius_lat - lat, radius_lon + lon)]
 
-#@sched.scheduled_job('cron', day_of_week='sun', hour=3)
+@sched.scheduled_job('cron', day_of_week='sun', hour=3)
 def populate_db():
     client_id = 'utuJWCc9bdvLlOHfbkXThA'
     secret = '812V05KxL5KMsYgPTksEl6ZzqILBf9Nv5spXvmtU3M9FAgpxQEYHPLW0QnDP24J8'
@@ -147,6 +148,10 @@ def populate_db():
 
         if not lon:
             continue
+        
+        dup_lat_lon_pois = POI.objects.filter(latitude = lat, longitude = lon).exclude(business_name = b.get('name', 'N/A'))
+        if dup_lat_lon_pois.exists():
+            continue
 
         b['popularity'] = calculate_popularity(b, result_dict)
 
@@ -213,11 +218,10 @@ def populate_db():
 
     print("Complete!")
 
-#sched.configure(options_from_ini_file)
-#sched.start()
+sched.start()
+sched.print_jobs()
 
-def main():
-    populate_db()
+while True:
+    time.sleep(10)
 
-if __name__ == "__main__":
-    main()
+sched.shutdown()

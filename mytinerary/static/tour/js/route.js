@@ -128,7 +128,7 @@ function createPopRadius(marker) {
 // Called when POI marker is clicked
 function createInfoWindow(marker, centerMarker) {
     var onclick;
-    var centerMarkerId;
+    var centerMarkerId
 
     // There is no centerMarker if the marker is on our path
     if (centerMarker == null) {
@@ -145,7 +145,7 @@ function createInfoWindow(marker, centerMarker) {
     '</div><div class="btn btn-link btn-sm"' +
     'onclick="setInfoWindowContent('+ marker.id + ', ' + centerMarkerId +
     ');">More Info...</div>';
-
+    console.log(content);
     namespace.popWindow.marker = marker;
     namespace.popWindow.setContent(content);
     namespace.popWindow.open(namespace.map, marker);
@@ -156,8 +156,11 @@ function setInfoWindowContent(markerId, centerMarkerId) {
     var marker;
     var onclick;
 
-    if (!centerMarkerId) {
+    if (typeof centerMarkerId === "undefined") {
         marker = namespace.markers[markerId];
+        console.log(marker);
+        console.log(markerId);
+        console.log(marker.id)
         onclick = ' onclick="removePoint(' + marker.id + ');">' +
         '<span class="glyphicon glyphicon-trash"></span>';
     } else {
@@ -225,18 +228,22 @@ function resetInfoWindow(markerId, centerMarkerId) {
 }
 
 function removePoint(markerId) {
-    namespace.markers[markerId].popRadius.setVisible(false);
-    namespace.markers[markerId].setMap(null);
-    namespace.markers.splice(markerId, 1);
-    for (var i = markerId; i < namespace.markers.length; i++) {
-        namespace.markers[i].id--;
-        namespace.markers[i].label--;
-        namespace.markers[i].setMap(null)
-        namespace.markers[i].popRadius.setVisible(false);
-        namespace.markers[i].setMap(namespace.map);
-    }
+    if (namespace.markers.length == 1) {
+        alert("Cannot delete last POI! Add more than one point to delete one.");
+    } else {
+        namespace.markers[markerId].popRadius.setVisible(false);
+        namespace.markers[markerId].setMap(null);
+        namespace.markers.splice(markerId, 1);
+        for (var i = markerId; i < namespace.markers.length; i++) {
+            namespace.markers[i].id--;
+            namespace.markers[i].label--;
+            namespace.markers[i].setMap(null)
+            namespace.markers[i].popRadius.setVisible(false);
+            namespace.markers[i].setMap(namespace.map);
+        }
 
-    updateRoute();
+        updateRoute();
+    }
 
     for (var i=0; i<namespace.radiusMarkers.length; i++) {
         marker = namespace.radiusMarkers[i];
