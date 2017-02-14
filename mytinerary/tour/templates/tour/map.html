@@ -30,7 +30,7 @@
         map = new google.maps.Map(document.getElementById('map'));
         directionsDisplay.setMap(map);
         var locations;
-        if ("{{mode}}" == "startToEnd") {
+        {% if mode == "startToEnd" %}
             locations = [
                 {address: '{{origin.address}}',
                 name: '{{origin.business_name}}',
@@ -61,8 +61,7 @@
                 rating: '{{destination.num_stars}}',
                 summary: `{{destination.summary}}`},
             ];
-        }
-        else {
+        {% else %}
             locations = [
                 {address: '{{origin.address}}',
                 name: '{{origin.business_name}}',
@@ -73,7 +72,7 @@
                 rating: '{{origin.num_stars}}',
                 summary: `{{origin.summary}}`}
             ];
-        }
+        {% endif %}
 
         for (var i = 0; i < locations.length; i++) {
             var poi_id = locations[i].id;

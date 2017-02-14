@@ -35,7 +35,6 @@ function setup(params) {
 * within its pop radius.
 */
 function findNearbyPOIs(marker) {
-    console.log("1");
     $.ajax({
         url : "/tour/pop_radius/",
         contentType: "application/json; charset=utf-8",
@@ -49,6 +48,7 @@ function findNearbyPOIs(marker) {
         dataType : 'json',
         success : function (json) {
             // Only adds nearby POIs that aren't already in route
+            console.log(json);
             var nearby_pois = [];
             for (var i=0; i < json["nearby_pois"].length; i++) {
                 for (var j=0; j < namespace.markers.length; j++) {
@@ -75,17 +75,17 @@ function findNearbyPOIs(marker) {
     }
     */
     plotNearbyPois(nearby_pois, marker);
-},
-cache : false,
-error : function(xhr, errmsg, err) {
-    for (var i=0; i<namespace.radiusMarkers.length; i++) {
+    },
+    cache : false,
+    error : function(xhr, errmsg, err) {
+     for (var i=0; i<namespace.radiusMarkers.length; i++) {
         marker = namespace.radiusMarkers[i];
         marker.setMap(null);
     }
     console.log(errmsg);
     console.log(xhr.status + " " + xhr.responseText);
-}
-});
+    }
+    });
 }
 
 function plotNearbyPois(nearby_pois, centerMarker) {
@@ -386,8 +386,6 @@ function updateRoute() {
         if (status === 'OK') {
             namespace.directionsDisplay.setDirections(response);
 
-            //                namespace.map.setZoom(7);
-
             // Compute the total distance of the route
             var totalDistance = 0;
             var totalDuration = 0;
@@ -486,12 +484,79 @@ function modifyIcons() {
 // Constructs the URL for the google.maps version of your route
 function sendDirections() {
     var url = 'https://www.google.com/maps/dir';
-    for (var i = 0; i < namespace.markers.length; i++) {
-        url += "/" + namespace.markers[i].address;
+    var directionsAddresses = []
+    var route = namespace.directionsDisplay.getDirections().routes[0];
+    if (route.legs.length > 13) {
+        alert("Google maps cannot render this many points");
+        return;
+    }
+    for (var i = 0; i < route.legs.length; i++) {
+        if (i == 0) {
+            directionsAddresses.push(route.legs[i].start_address);
+        }
+        directionsAddresses.push(route.legs[i].end_address);
+    }
+    console.log(directionsAddresses);
+    
+    for (var i = 0; i < directionsAddresses.length; i++) {
+        url += "/" + directionsAddresses[i];
     }
     url = url.replace(/\s/g, "+");
     url = url.replace(/,/g, "");
     url += "/data=!4m2!4m1!3e2"; // Data for making travel mode walking
+    $("#sendDirections").before('<div> Phone: (<input type="text" name="phone-1" maxlength="3">) <input type="text" name="phone-2" maxlength="3">- <input type="text" name="phone-3" maxlength="4"> </div>');
+     
+    $.ajax({
+        url : "/tour/send_directions/",
+        contentType: "application/json; charset=utf-8",
+        type : 'GET',
+        data : {
+            'lat' : marker.getPosition().lat(),
+            'lng' : marker.getPosition().lng(),
+            'radius' : marker.popRadius.getRadius(),
+            'filter-status' : namespace.filterStatus,
+        },
+        dataType : 'json',
+        success : function (json) {
+            // Only adds nearby POIs that aren't already in route
+            console.log(json);
+            var nearby_pois = [];
+            for (var i=0; i < json["nearby_pois"].length; i++) {
+                for (var j=0; j < namespace.markers.length; j++) {
+                    if (namespace.markers[j].poi_id == json["nearby_pois"][i].poi_id) {
+                        delete json["nearby_pois"][i];
+                        break;
+                    }
+                    if (namespace.markers[j].name == json["nearby_pois"][i].name) {
+                        delete json["nearby_pois"][i];
+                        break;
+                    }
+                }
+                if (typeof json["nearby_pois"][i] !== 'undefined') {
+                    nearby_pois.push(json["nearby_pois"][i]);
+                }
+            }
+
+            /* I (Caleb) am commenting this out because now the user can update the radius
+            if (nearby_pois.length == 0 && marker.popRadius.getRadius() <= 18000) {
+            marker.popRadius.setRadius(marker.popRadius.getRadius() + 500);
+            findNearbyPOIs(marker);
+        } else {
+        plotNearbyPois(nearby_pois, marker);
+    }
+    */
+    plotNearbyPois(nearby_pois, marker);
+    },
+    cache : false,
+    error : function(xhr, errmsg, err) {
+     for (var i=0; i<namespace.radiusMarkers.length; i++) {
+        marker = namespace.radiusMarkers[i];
+        marker.setMap(null);
+    }
+    console.log(errmsg);
+    console.log(xhr.status + " " + xhr.responseText);
+    }
+    });
 
     window.open(url, "_blank");
 }
