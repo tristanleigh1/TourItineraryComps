@@ -9,6 +9,7 @@ function setup(params) {
 }
 
 function findNearbyPOIs(marker) {
+  console.log("1");
     $.ajax({
         url : "/tour/pop_radius/",
         contentType: "application/json; charset=utf-8",
@@ -17,7 +18,7 @@ function findNearbyPOIs(marker) {
             'lat' : marker.getPosition().lat(),
             'lng' : marker.getPosition().lng(),
             'radius' : marker.popRadius.getRadius(),
-            'filter-status' : namespace.filterStatus
+            'filter-status' : namespace.filterStatus,
         },
         dataType : 'json',
         success : function (json) {
@@ -29,6 +30,11 @@ function findNearbyPOIs(marker) {
                         delete json["nearby_pois"][i];
                         break;
                     }
+                    if (namespace.markers[j].name == json["nearby_pois"][i].name) {
+                        delete json["nearby_pois"][i];
+                        break;
+                    }
+
                 }
                 if (typeof json["nearby_pois"][i] !== 'undefined') {
                     nearby_pois.push(json["nearby_pois"][i]);
@@ -58,6 +64,7 @@ function findNearbyPOIs(marker) {
 }
 
 function plotNearbyPois(nearby_pois, centerMarker) {
+
     // Get rid of namespace.markers from previous radius
     for (var i=0; i<namespace.radiusMarkers.length; i++) {
         marker = namespace.radiusMarkers[i];
@@ -97,14 +104,14 @@ function plotNearbyPois(nearby_pois, centerMarker) {
             address: nearby_pois[i].address,
             icon: icon,
             popRadius: popRadius,
-            summary: nearby_pois[i].summary, 
+            summary: nearby_pois[i].summary,
         });
 
-				google.maps.event.addListener(marker.popRadius, 'radius_changed', function() {
-					if (marker.popRadius.getRadius() != 500) {
-						findNearbyPOIs(marker);
-					}
-				});
+        google.maps.event.addListener(marker.popRadius, 'radius_changed', function() {
+            if (marker.popRadius.getRadius() != 500) {
+                findNearbyPOIs(marker);
+            }
+        });
 
         marker.addListener('click', function() {
             createInfoWindow(this, centerMarker);
@@ -169,53 +176,28 @@ function setInfoWindowContent(markerId, centerMarkerId) {
         centerMarkerId + ');">Add';
     }
 
-    var content = '<p>' + marker.name + '</p><p>Yelp rating: '
-    + marker.rating + '/5.0</p>'
-    + `<div id="myCarousel" class="carousel slide" data-interval="false" >
-            <div class="carousel-inner" style="height:150px;width:400px" overflow:"auto">
-                <div class="active item">
-                    <img src="https://maps.googleapis.com/maps/api/streetview?size=400x150&location=` + marker.getPosition().lat()
-    + ',' + marker.getPosition().lng()
-    + `&key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM" >
-                </div>
-                <div class="item">
-                    <p>` + marker.summary + `</p>
-                </div> 
+    var content = '<p>' + marker.name + `</p>
+    <p>Yelp rating: `+ marker.rating + `/5.0</p>
+    <div id="myCarousel" class="carousel slide" data-interval="false" >
+        <div class="carousel-inner" style="height:150px;width:400px;overflow-y:auto;">
+            <div class="active item">
+                <img src="https://maps.googleapis.com/maps/api/streetview?size=400x150&location=`
++ marker.getPosition().lat() + ',' + marker.getPosition().lng() + `&key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM" >
             </div>
-              <!--<div class="btn btn-sm btn-info" href="#myCarousel" data-slide="prev">Prev</div>-->
-              
+            <div class="item">
+                <p>` + marker.summary + `</p>
+            </div>
         </div>
-    ` + '<br/><div class="btn btn-primary btn-sm"' + onclick + '</div><div class="btn btn-link btn-sm" onclick="resetInfoWindow('+ marker.id + ', ' + centerMarkerId + ');">Less Info</div><div class="btn btn-sm btn-primary pull-right" href="#myCarousel" data-slide="next">Next</div>';
-//    + '<div class="btn btn-link btn-sm" onclick="setInfoWindowSummary('+ marker.id + ', '
-//    + centerMarkerId + ');">Show Summary</div>';
+          <!--<div class="btn btn-sm btn-info" href="#myCarousel" data-slide="prev">Prev</div>-->
+
+    </div>
+    <br/>
+    <div class="btn btn-primary btn-sm"` + onclick + `</div>
+    <div class="btn btn-link btn-sm" onclick="resetInfoWindow(`+ marker.id + ', ' + centerMarkerId + `);">Less Info</div>
+    <div class="btn btn-sm btn-primary pull-right" href="#myCarousel" data-slide="next">Next</div>`;
 
     namespace.popWindow.setContent(content);
 }
-
-////Called when user clicks on "Show Summary" button in info window
-//function setInfoWindowSummary(markerId, centerMarkerId) {
-//    var marker;
-//    var onclick;
-//
-//    if (!centerMarkerId) {
-//        marker = namespace.markers[markerId];
-//        onclick = ' onclick="removePoint(' + marker.id + ');">' +
-//        '<span class="glyphicon glyphicon-trash"></span>';
-//    } else {
-//        marker = namespace.radiusMarkers[markerId];
-//        onclick = ' onclick="addPoint(' + marker.id + ', ' +
-//        centerMarkerId + ');">Add';
-//    }
-//
-//    var content = '<p>' + marker.name + '</p><p>Yelp rating: '
-//    + marker.rating + '</p><p style="height:150px;width:400px" overflow:"scroll";>' + marker.summary + '</p><div class="'
-//    + 'btn btn-primary btn-sm"' + onclick + '</div><div class="'
-//    + 'btn btn-link btn-sm" onclick="resetInfoWindow('+ marker.id + ', '
-//    + centerMarkerId + ');">Less Info</div><div class="btn btn-link btn-sm" onclick="setInfoWindowContent('+ marker.id + ', '
-//    + centerMarkerId + ');">Show Street View</div>';
-//
-//    namespace.popWindow.setContent(content);
-//}
 
 function resetInfoWindow(markerId, centerMarkerId) {
     if (centerMarkerId == null) {
@@ -232,6 +214,14 @@ function removePoint(markerId) {
         alert("Cannot delete last POI! Add more than one point to delete one.");
     } else {
         namespace.markers[markerId].popRadius.setVisible(false);
+        
+        // Remove nearby_pois from map
+        for (var i=0; i<namespace.radiusMarkers.length; i++) {
+            marker = namespace.radiusMarkers[i];
+            marker.setMap(null);
+        }
+        namespace.radiusMarkers.length = 0;
+
         namespace.markers[markerId].setMap(null);
         namespace.markers.splice(markerId, 1);
         for (var i = markerId; i < namespace.markers.length; i++) {
@@ -267,6 +257,7 @@ function addPoint(newMarkerId, markerId) {
 		}
 
     var summary = ""
+    //************************WE SHOULD GET RID OF THIS************************
     // Synchronous call to get summary for new point added to namespace.map
     $.ajax({
         async: false,
@@ -412,7 +403,7 @@ function updateRoute() {
     } else {
       modifyIcons();
     }
-    
+
     return true;
 }
 

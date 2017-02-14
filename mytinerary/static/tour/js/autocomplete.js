@@ -14,6 +14,7 @@
 function initAutocomplete() {
     var ac1 = document.getElementById('autocomplete1');
     var ac2 = document.getElementById('autocomplete2');
+
     autocompleteStart = new google.maps.places.Autocomplete(
         /** @type {!HTMLInputElement} */(ac1));
     autocompleteEnd = new google.maps.places.Autocomplete(
@@ -26,7 +27,9 @@ function initAutocomplete() {
     autocompleteEnd.addListener('place_changed', function() {
         document.getElementById('endLngLat').value = autocompleteEnd.getPlace().geometry.location;
         document.getElementById('endAddress').value = autocompleteEnd.getPlace().formatted_address;
-
+    });
+    $(ac1).on('input', function() { 
+        document.getElementById('startLngLat').value = '';
     });
 
     google.maps.event.addDomListener(ac1, 'keydown', function(e) {
@@ -43,36 +46,30 @@ function initAutocomplete() {
     });
 }
 
+function getCityLatLng(city) {
+    switch(city) {
+        case 'London':
+            return { lat: 51.507, lng: -0.127 }
+        case 'Madrid':
+            return { lat: 40.416, lng: -3.704 }
+        case 'Minneapolis':
+            return { lat: 44.978, lng: -93.265 }
+        case 'New York':
+            return { lat: 40.748, lng: -73.986 }
+        case 'San Francisco':
+            return { lat: 37.775, lng: -122.419 }
+    }
+}
+
+
+
 // Bias the autocomplete object to the user's geographical location,
 // as supplied by the city the user selects
 function geolocate() {
 
-    var geolocations = {
-        'London': {
-            lat: 51.507,
-            lng: -0.127
-        },
-        'Madrid': {
-            lat: 40.416,
-            lng: -3.704
-        },
-        'Minneapolis': {
-            lat: 44.977753,
-            lng: -93.265011
-        },
-        'New York': {
-            lat: 40.748,
-            lng: -73.986
-        },
-        'San Francisco': {
-            lat: 37.774929,
-            lng: -122.419416
-        }
-    }
-
     var city = document.getElementById('citySelect').value;
     var circle = new google.maps.Circle({
-          center: geolocations[city],
+          center: getCityLatLng(city),
           radius: 100000 // 100 km
         });
     autocompleteStart.setBounds(circle.getBounds());
@@ -82,7 +79,7 @@ function geolocate() {
 function validateForm() {
 	var isValid = true;
 	var form = document.forms["indexForm"];
-	if (!form["startDestination"].value || form["startCoords"].value == null) {
+	if (!form["startDestination"].value || form["startCoords"].value == '') {
 		document.getElementById('autocomplete1').style.borderColor = "red";
 		isValid = false;
 	} else {
@@ -91,7 +88,7 @@ function validateForm() {
 
 	// Check if we're in exploratory mode before checking if end value exists
 	if ($("#start-to-end-fields").html() != '') {
-        if (!form["endDestination"].value || !document.forms["indexForm"]["endCoords"].value) {
+        if (!form["endDestination"].value || !form["endCoords"].value) {
             document.getElementById('autocomplete2').style.borderColor = "red";
             isValid = false;
         } else {
@@ -99,5 +96,20 @@ function validateForm() {
         }
     }
 
+    // Check if either location is too far from the city center
+    var city = document.getElementById('citySelect').value;
+    var start = form["startCoords"].value;
+    var end = form["endCoords"].value;
+    var max = 1.0;
+    if (start != '' && end != '') {
+        var startLat = parseInt(start.lat);
+        var startLng = parseInt(start.lng);
+        var endLat = parseInt(end.lat);
+        var endLng = parseInt(end.lng);
+        if (startLat < city.lat + max || startLng < city.lng + max || endLat < city.lat + max || endLng < city.lng + max) {
+            alert("Start or end too far away!");
+        }
+    }
+    
 	return isValid;
 }

@@ -30,14 +30,41 @@ def km_to_lat_lng(km, latitude):
     degrees_lng = km / (111.320 * math.cos(math.radians(latitude)))
     return degrees_lat, degrees_lng
 
+def isStartOrEnd(poi, start, end):
+    gmaps = googlemaps.Client(key='AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM')
+    if start and abs(poi.latitude - start.latitude) < .0015 and abs(poi.longitude - start.longitude) < .0015:
+        poi_geocode = gmaps.geocode(poi.address)
+        if len(poi_geocode) != 0:
+            poi_location = poi_geocode[0]['geometry']['location']
+            if abs(float(poi_location['lat']) - float(start.latitude)) < .000001 and abs(float(poi_location['lng']) - float(start.longitude)) < .000001:
+                return True
+        else:
+            return True
+    if end and abs(poi.latitude - end.latitude) < .0015 and abs(poi.longitude - end.longitude) < .0015:
+        poi_geocode = gmaps.geocode(poi.address)
+        if len(poi_geocode) != 0:
+            poi_location = poi_geocode[0]['geometry']['location']
+            if abs(float(poi_location['lat']) - float(end.latitude)) < .000001 and abs(float(poi_location['lng']) - float(end.longitude)) < .000001:
+                return True
+        else:
+            return True
+    return False
+
 def pop_radius(request):
     if request.method == 'GET':
-#        name = request.GET.get('name', None)
-#        poi_id = request.GET.get('id', None)
         latitude = float(request.GET.get('lat', None))
         longitude = float(request.GET.get('lng', None))
         radius_size = float(request.GET.get('radius', None)) / 1000
         filter_status = int(request.GET.get('filter-status', None))
+        # markers = request.GET.get('current-markers', None)
+
+        # raise Exception(markers)
+        # start = None
+        # end = None
+        # if markers:
+        #     start = markers[0]
+        #     if len(markers) > 1:
+        #         end = markers[-1]
 
         # raise Exception(radius_size )
 
@@ -67,21 +94,21 @@ def pop_radius(request):
         for i in range(len(categories)):
             nearby_pois_for_category = POI.objects.filter(category=categories[i], latitude__lte=latitude+degrees_lat, latitude__gte=latitude-degrees_lat, longitude__lte=longitude+degrees_lng, longitude__gte=longitude-degrees_lng)
             nearby_POI_querySets.append(nearby_pois_for_category)
-
         ##(new_latitude-origin_latitude)^2 + (new_longitude - origin_longitude^2 <= radius^2
 #       response_data['poi'] = poi.business_name
         response_data = {}
         response_data['nearby_pois'] = list()
         for nearby_pois in nearby_POI_querySets:
             for nearby_poi in nearby_pois:
+                #if not isStartOrEnd(nearby_poi, start, end):
                 response_data['nearby_pois'].append({'name' : nearby_poi.business_name,
-                                                     'latitude' : nearby_poi.latitude,
-                                                     'longitude' : nearby_poi.longitude,
-                                                     'poi_id' : nearby_poi.id,
-                                                     'rating' : nearby_poi.num_stars,
-                                                     'category': nearby_poi.category,
-                                                     'summary': nearby_poi.summary
-                                                     })
+                                                         'latitude' : nearby_poi.latitude,
+                                                         'longitude' : nearby_poi.longitude,
+                                                         'poi_id' : nearby_poi.id,
+                                                         'rating' : nearby_poi.num_stars,
+                                                         'category': nearby_poi.category,
+                                                         'summary': nearby_poi.summary
+                                                         })
         return JsonResponse(response_data)
     else:
         return HttpResponse(
@@ -243,39 +270,6 @@ def find_next_poi(poi_list, path_segments, walk_factor, preferences):
     #    raise Exception('here')
     return poi_to_add
 
-def removeIfPOI(total_pois, start, end):
-    gmaps = googlemaps.Client(key='AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM')
-    count = 0
-    for poi in total_pois:
-        poi_geocode = gmaps.geocode(poi.address)
-        if len(poi_geocode) == 0:
-            continue
-        poi_location = poi_geocode[0]['geometry']['location']
-        if abs(float(poi_location['lat']) - float(start.latitude)) < .0001 and abs(float(poi_location['lng']) - float(start.longitude)) < .0001:
-            total_poi.remove(poi)
-            count = count + 1
-        if abs(float(poi_location['lat']) - float(end.latitude)) < .0001 and abs(float(poi_location['lng']) - float(end.longitude)) < .0001:
-            total_poi.remove(poi)
-            count = count + 1
-    # Geocoding an address
-#    start_geocode = gmaps.geocode(start.address)
-#    end_geocode = gmaps.geocode(end.address)
-#    start_location = start_geocode[0]['geometry']['location']
-#    start_lat, start_lng = float(start_location['lat']), float(start_location['lng'])
-#
-#    end_location = end_geocode[0]['geometry']['location']
-#    end_lat, end_lng = float(end_location['lat']), float(end_location['lng'])
-#    count = 0
-#    for poi in total_pois:
-#        if abs(float(poi.latitude) - start_lat) < .0001 and abs(float(poi.longitude) - start_lng) < .0001:
-#            total_pois.remove(poi)
-#            raise Exception(poi)
-#            count = count + 1
-#        if abs(float(poi.latitude) - end_lat) < .0001 and abs(float(poi.longitude) - end_lng) < .001:
-#            total_pois.remove(poi)
-#            count = count + 1
-    raise Exception(count)
-    return total_pois
 
 def create_path(total_pois, start, end, walk_factor, preferences, num_destinations):
     MAX_POIS = int(num_destinations)
@@ -284,33 +278,12 @@ def create_path(total_pois, start, end, walk_factor, preferences, num_destinatio
     path_pois = []
     total_pois = list(total_pois)
 
-    gmaps = googlemaps.Client(key='AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM')
+    # gmaps = googlemaps.Client(key='AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM')
     count = 0
     for poi in total_pois:
-        if abs(poi.latitude - start.latitude) < .0015 and abs(poi.longitude - start.longitude) < .0015:
-            poi_geocode = gmaps.geocode(poi.address)
-            if len(poi_geocode) != 0:
-                poi_location = poi_geocode[0]['geometry']['location']
-                if abs(float(poi_location['lat']) - float(start.latitude)) < .000001 and abs(float(poi_location['lng']) - float(start.longitude)) < .000001:
-                    total_pois.remove(poi)
-                    count = count + 1
-            else:
-                total_pois.remove(poi)
-                count = count + 1
-        if abs(poi.latitude - end.latitude) < .0015 and abs(poi.longitude - end.longitude) < .0015:
-            poi_geocode = gmaps.geocode(poi.address)
-            if len(poi_geocode) != 0:
-                poi_location = poi_geocode[0]['geometry']['location']
-                if abs(float(poi_location['lat']) - float(end.latitude)) < .000001 and abs(float(poi_location['lng']) - float(end.longitude)) < .000001:
-                    total_pois.remove(poi)
-                    count = count + 1
-            else:
-                total_pois.remove(poi)
-                count = count + 1
-
-    #raise Exception(count)
-
-    # Check if start or end are POIs, if so remove from list
+        if isStartOrEnd(poi, start, end):
+            total_pois.remove(poi)
+            # Check if start or end are POIs, if so remove from list
 
     # given a start and end address (which we take as lat lng):
     # 1. Check if it's a POI
