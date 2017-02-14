@@ -1,5 +1,27 @@
+/**
+*  route.js
+*
+*  This file contains helper functions for map.html.
+*  3/7/16
+*/
+
+/*
+namespace = {
+    markers: markers,
+    radiusMarkers: radiusMarkers,
+    popWindow: popWindow,
+    map: map,
+    directionsService: directionsService,
+    directionsDisplay: directionsDisplay,
+    filterStatus: 31,
+    selectedMarker: null
+}
+*/
 var namespace;
 
+/**
+* Initialize parameters and initial route
+*/
 function setup(params) {
     namespace = params;
     addSidebarButtons();
@@ -8,8 +30,12 @@ function setup(params) {
     adjustZoom();
 }
 
+/**
+* Takes a marker on the route and queries the database for POIs that are
+* within its pop radius.
+*/
 function findNearbyPOIs(marker) {
-  console.log("1");
+    console.log("1");
     $.ajax({
         url : "/tour/pop_radius/",
         contentType: "application/json; charset=utf-8",
@@ -34,33 +60,32 @@ function findNearbyPOIs(marker) {
                         delete json["nearby_pois"][i];
                         break;
                     }
-
                 }
                 if (typeof json["nearby_pois"][i] !== 'undefined') {
                     nearby_pois.push(json["nearby_pois"][i]);
                 }
             }
 
-						/* I (Caleb) am commenting this out because now the user can update the radius
+            /* I (Caleb) am commenting this out because now the user can update the radius
             if (nearby_pois.length == 0 && marker.popRadius.getRadius() <= 18000) {
-                marker.popRadius.setRadius(marker.popRadius.getRadius() + 500);
-                findNearbyPOIs(marker);
-            } else {
-                plotNearbyPois(nearby_pois, marker);
-            }
-						*/
-						plotNearbyPois(nearby_pois, marker);
-        },
-        cache : false,
-        error : function(xhr, errmsg, err) {
-            for (var i=0; i<namespace.radiusMarkers.length; i++) {
-                marker = namespace.radiusMarkers[i];
-                marker.setMap(null);
-            }
-            console.log(errmsg);
-            console.log(xhr.status + " " + xhr.responseText);
-        }
-    });
+            marker.popRadius.setRadius(marker.popRadius.getRadius() + 500);
+            findNearbyPOIs(marker);
+        } else {
+        plotNearbyPois(nearby_pois, marker);
+    }
+    */
+    plotNearbyPois(nearby_pois, marker);
+},
+cache : false,
+error : function(xhr, errmsg, err) {
+    for (var i=0; i<namespace.radiusMarkers.length; i++) {
+        marker = namespace.radiusMarkers[i];
+        marker.setMap(null);
+    }
+    console.log(errmsg);
+    console.log(xhr.status + " " + xhr.responseText);
+}
+});
 }
 
 function plotNearbyPois(nearby_pois, centerMarker) {
@@ -72,14 +97,14 @@ function plotNearbyPois(nearby_pois, centerMarker) {
     }
     namespace.radiusMarkers.length = 0;
 
-            // Plot the pois only if they fall into the circle
-            var circleRadius = centerMarker.popRadius.getRadius();
-            var center = centerMarker.position;
+    // Plot the pois only if they fall into the circle
+    var circleRadius = centerMarker.popRadius.getRadius();
+    var center = centerMarker.position;
     for (var i=0; i<nearby_pois.length; i++) {
-                    var point = new google.maps.LatLng(parseFloat(nearby_pois[i].latitude), parseFloat(nearby_pois[i].longitude));
-                    if (google.maps.geometry.spherical.computeDistanceBetween(point, center) >= circleRadius) {
-                        continue;
-                    }
+        var point = new google.maps.LatLng(parseFloat(nearby_pois[i].latitude), parseFloat(nearby_pois[i].longitude));
+        if (google.maps.geometry.spherical.computeDistanceBetween(point, center) >= circleRadius) {
+            continue;
+        }
 
         var icon = getIconFromCategory(nearby_pois[i].category, false);
         var popRadius = new google.maps.Circle({
@@ -179,16 +204,16 @@ function setInfoWindowContent(markerId, centerMarkerId) {
     var content = '<p>' + marker.name + `</p>
     <p>Yelp rating: `+ marker.rating + `/5.0</p>
     <div id="myCarousel" class="carousel slide" data-interval="false" >
-        <div class="carousel-inner" style="height:150px;width:400px;overflow-y:auto;">
-            <div class="active item">
-                <img src="https://maps.googleapis.com/maps/api/streetview?size=400x150&location=`
-+ marker.getPosition().lat() + ',' + marker.getPosition().lng() + `&key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM" >
-            </div>
-            <div class="item">
-                <p>` + marker.summary + `</p>
-            </div>
-        </div>
-          <!--<div class="btn btn-sm btn-info" href="#myCarousel" data-slide="prev">Prev</div>-->
+    <div class="carousel-inner" style="height:150px;width:400px;overflow-y:auto;">
+    <div class="active item">
+    <img src="https://maps.googleapis.com/maps/api/streetview?size=400x150&location=`
+    + marker.getPosition().lat() + ',' + marker.getPosition().lng() + `&key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM" >
+    </div>
+    <div class="item">
+    <p>` + marker.summary + `</p>
+    </div>
+    </div>
+    <!--<div class="btn btn-sm btn-info" href="#myCarousel" data-slide="prev">Prev</div>-->
 
     </div>
     <br/>
@@ -214,7 +239,7 @@ function removePoint(markerId) {
         alert("Cannot delete last POI! Add more than one point to delete one.");
     } else {
         namespace.markers[markerId].popRadius.setVisible(false);
-        
+
         // Remove nearby_pois from map
         for (var i=0; i<namespace.radiusMarkers.length; i++) {
             marker = namespace.radiusMarkers[i];
@@ -247,14 +272,14 @@ function removePoint(markerId) {
 }
 
 function addPoint(newMarkerId, markerId) {
-		// Make sure we do not exceed Google's limit of 23 waypoints (+ start/end)
-		var MAX_POINTS = 25;
-		if (namespace.markers.length == MAX_POINTS) {
-			var errorMessage = "<p><b>Sorry, you cannot add more stops.</b></p>"
-			$(".btn.btn-primary.btn-sm").before(errorMessage);
-			$(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
-			return false;
-		}
+    // Make sure we do not exceed Google's limit of 23 waypoints (+ start/end)
+    var MAX_POINTS = 25;
+    if (namespace.markers.length == MAX_POINTS) {
+        var errorMessage = "<p><b>Sorry, you cannot add more stops.</b></p>"
+        $(".btn.btn-primary.btn-sm").before(errorMessage);
+        $(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
+        return false;
+    }
 
     var summary = ""
     //************************WE SHOULD GET RID OF THIS************************
@@ -306,11 +331,11 @@ function addPoint(newMarkerId, markerId) {
         popRadius: popRadius
     });
 
-		google.maps.event.addListener(newMarker.popRadius, 'radius_changed', function() {
-			if (newMarker.popRadius.getRadius() != 500) {
-				findNearbyPOIs(newMarker);
-			}
-		});
+    google.maps.event.addListener(newMarker.popRadius, 'radius_changed', function() {
+        if (newMarker.popRadius.getRadius() != 500) {
+            findNearbyPOIs(newMarker);
+        }
+    });
 
     newMarker.addListener('click', function() {
         createPopRadius(this);
@@ -383,25 +408,25 @@ function updateRoute() {
             document.getElementById("distance").innerHTML = totalDistance.toFixed(1) + units;
             document.getElementById("walkingTime").innerHTML = totalDuration.toFixed(0) + " mins";
 
-				} else if (status === 'MAX_WAYPOINTS_EXCEEDED') {
-						window.alert('You cannot add more than 23 stops.');
-                } else if (status === 'ZERO_RESULTS') {
-                    // TODO: Something that actually works for when there aren't results
-	                var errorMessage = "<p><b>Sorry, this POI is inaccessable from your path.</b></p>"
-	                $(".btn.btn-primary.btn-sm").before(errorMessage);
-	                $(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
-                    //removePoint(markerId);
-                    console.log("zero results");
-                    return false;
+        } else if (status === 'MAX_WAYPOINTS_EXCEEDED') {
+            window.alert('You cannot add more than 23 stops.');
+        } else if (status === 'ZERO_RESULTS') {
+            // TODO: Something that actually works for when there aren't results
+            var errorMessage = "<p><b>Sorry, this POI is inaccessable from your path.</b></p>"
+            $(".btn.btn-primary.btn-sm").before(errorMessage);
+            $(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
+            //removePoint(markerId);
+            console.log("zero results");
+            return false;
         } else {
             window.alert('Directions request failed due to ' + status);
         }
     });
 
     if (document.getElementById('panel').innerHTML == "") {
-      initDirectionsListener();
+        initDirectionsListener();
     } else {
-      modifyIcons();
+        modifyIcons();
     }
 
     return true;
@@ -411,22 +436,22 @@ function addSidebarButtons() {
     for (var i = 0; i < namespace.markers.length; i++) {
         $("#accordion").append(
             `<div class="panel panel-default">
-                <div class="shell `+ namespace.markers[i].category +`">
-                    <div class="panel-heading" role="tab" id="heading`+ i +`">
-                        <h4 class="panel-title">
-                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse` +
-                                i + `" aria-expanded="false" aria-controls="collapse` + i + `">
-                                ` + (i + 1) + `: ` + namespace.markers[i].name + `
-                            </a>
-                        </h4>
-                    </div>
-                </div>
-                <div id="collapse` + i + `" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading` +
-                    i + `">
-                    <div class="panel-body">
-                        ` + namespace.markers[i].summary + `
-                    </div>
-                    </div>
+            <div class="shell `+ namespace.markers[i].category +`">
+            <div class="panel-heading" role="tab" id="heading`+ i +`">
+            <h4 class="panel-title">
+            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse` +
+            i + `" aria-expanded="false" aria-controls="collapse` + i + `">
+            ` + (i + 1) + `: ` + namespace.markers[i].name + `
+            </a>
+            </h4>
+            </div>
+            </div>
+            <div id="collapse` + i + `" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading` +
+            i + `">
+            <div class="panel-body">
+            ` + namespace.markers[i].summary + `
+            </div>
+            </div>
             </div>`
         );
         namespace.markers[i].popRadius.setVisible(false);
@@ -450,8 +475,8 @@ function modifyIcons() {
         //console.log(icons[i].src);
         icons[i].src = namespace.markers[i].icon.url;
         if (!iconLabelsExist) {
-          $(icons[i]).wrap('<div class="icon-container"></div>');
-          $( '<p class="icon-label">' + (i + 1) + '</p>' ).insertAfter(icons[i]);
+            $(icons[i]).wrap('<div class="icon-container"></div>');
+            $( '<p class="icon-label">' + (i + 1) + '</p>' ).insertAfter(icons[i]);
         }
     }
 }
@@ -476,7 +501,7 @@ function getDirections() {
         document.getElementById('db').innerHTML = "Get Directions!";
         document.getElementById('sendDirections').style.display = 'none';
         document.getElementById('panel').style.display = 'none';
-    // If the accordion pane is open
+        // If the accordion pane is open
     } else {
         document.getElementById('accordion').style.display = 'none';
         document.getElementById('db').innerHTML = "Go back";
@@ -572,31 +597,31 @@ function adjustZoom() {
 }
 
 function getIconFromCategory(category, scale) {
-  var icon;
-  switch (category) {
-      case "Museums":
-      icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/blue.png"}
-      break;
-      case "Landmarks":
-      icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/pink.png"}
-      break;
-      case "Activities":
-      icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/yellow.png"}
-      break;
-      case "Nature":
-      icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/green.png"}
-      break;
-      case "Restaurants":
-      icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/red.png"}
-      break;
-      default:
-      icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/purple.png"}
-      break;
-  }
-  if (scale == true) {
-    icon["scaledSize"] = new google.maps.Size(45, 45);
-  } else {
-    icon["url"] = icon["url"].replace(".png", "-dot.png");
-  }
-  return icon;
+    var icon;
+    switch (category) {
+        case "Museums":
+        icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/blue.png"}
+        break;
+        case "Landmarks":
+        icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/pink.png"}
+        break;
+        case "Activities":
+        icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/yellow.png"}
+        break;
+        case "Nature":
+        icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/green.png"}
+        break;
+        case "Restaurants":
+        icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/red.png"}
+        break;
+        default:
+        icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/purple.png"}
+        break;
+    }
+    if (scale == true) {
+        icon["scaledSize"] = new google.maps.Size(45, 45);
+    } else {
+        icon["url"] = icon["url"].replace(".png", "-dot.png");
+    }
+    return icon;
 }

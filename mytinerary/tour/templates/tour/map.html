@@ -92,7 +92,7 @@
                 map: map,
                 radius: 500,
                 visible: false,
-								editable: true
+  editable: true
             });
 
             var marker = new google.maps.Marker({
@@ -110,14 +110,14 @@
                 popRadius: popRadius
             });
 
-					// Needs to be in a closure for proper scoping: http://stackoverflow.com/questions/8909652/adding-click-event-listeners-in-loop
+  // Needs to be in a closure for proper scoping: http://stackoverflow.com/questions/8909652/adding-click-event-listeners-in-loop
             (function (_marker) {
-						google.maps.event.addListener(_marker.popRadius, 'radius_changed', function() {
-							//console.log(_marker.name + " popRadius changed to : " + _marker.popRadius.getRadius())
-							if (_marker.popRadius.getRadius() != 500) {
-								findNearbyPOIs(_marker);
-							}
-						});
+  google.maps.event.addListener(_marker.popRadius, 'radius_changed', function() {
+  //console.log(_marker.name + " popRadius changed to : " + _marker.popRadius.getRadius())
+  if (_marker.popRadius.getRadius() != 500) {
+  findNearbyPOIs(_marker);
+  }
+  });
                     })(marker);
 
             markers.push(marker);

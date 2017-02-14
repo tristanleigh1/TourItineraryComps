@@ -79,37 +79,52 @@ function geolocate() {
 function validateForm() {
 	var isValid = true;
 	var form = document.forms["indexForm"];
+    var cityName = document.getElementById('citySelect').value;
+    var city = getCityLatLng(cityName);  
+    var start = form["startCoords"].value.split(",");
+    var max = 0.1;
+    var errorMsg1 = "<p id=errorMsg1 style='color:crimson'>Start location is too far from " + cityName + "</p>";
+    var errorMsg2 = "<p id=errorMsg2 style='color:crimson'>End location is too far from " + cityName + "</p>";
+
+    // Remove previous error styling
+	document.getElementById('autocomplete1').removeAttribute("style");
+    $("#errorMsg1").html('');
+
+    // Check if the start location is valid
 	if (!form["startDestination"].value || form["startCoords"].value == '') {
 		document.getElementById('autocomplete1').style.borderColor = "red";
 		isValid = false;
 	} else {
-		document.getElementById('autocomplete1').removeAttribute("style");
+        // Check if end location is too far from city
+        var startLat = parseFloat(start[0].substring(1));
+        var startLng = parseFloat(start[1].substring(0, start[1].length-1));
+        if (startLat < city.lat - max || startLng < city.lng - max || startLat > city.lat + max || startLng > city.lng + max) {
+            $("#autocomplete1").after(errorMsg1);
+            isValid = false;
+        } 
 	}
 
-	// Check if we're in exploratory mode before checking if end value exists
+	// Check if we're in exploratory mode before checking if end location is valid
 	if ($("#start-to-end-fields").html() != '') {
+        var end = form["endCoords"].value.split(",");
+
+        // Remove previous error styling
+        document.getElementById('autocomplete2').removeAttribute("style");
+        $("#errorMsg2").html('');
+
         if (!form["endDestination"].value || !form["endCoords"].value) {
             document.getElementById('autocomplete2').style.borderColor = "red";
             isValid = false;
         } else {
-            document.getElementById('autocomplete2').removeAttribute("style");
+            // Check if end location is too far from city
+            var endLat = parseFloat(end[0].substring(1));
+            var endLng = parseFloat(end[0].substring(0, end[1].length-1));
+            if (endLat < city.lat - max || endLng < city.lng - max || endLat > city.lat + max || endLng > city.lng + max) {
+                $("#autocomplete2").after(errorMsg2);
+                isValid = false;
+            }
         }
     }
 
-    // Check if either location is too far from the city center
-    var city = document.getElementById('citySelect').value;
-    var start = form["startCoords"].value;
-    var end = form["endCoords"].value;
-    var max = 1.0;
-    if (start != '' && end != '') {
-        var startLat = parseInt(start.lat);
-        var startLng = parseInt(start.lng);
-        var endLat = parseInt(end.lat);
-        var endLng = parseInt(end.lng);
-        if (startLat < city.lat + max || startLng < city.lng + max || endLat < city.lat + max || endLng < city.lng + max) {
-            alert("Start or end too far away!");
-        }
-    }
-    
 	return isValid;
 }
