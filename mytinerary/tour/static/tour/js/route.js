@@ -115,7 +115,8 @@ function plotNearbyPois(nearby_pois, centerMarker) {
             map: namespace.map,
             radius: 500,
             visible: false,
-            editable: true
+            editable: true,
+            draggable: false
         });
 
         var marker = new google.maps.Marker({
@@ -313,7 +314,8 @@ function addPoint(newMarkerId, markerId) {
         map: namespace.map,
         radius: 500,
         visible: false,
-        editable: true
+        editable: true,
+        draggable: false
     });
 
     var newMarker = new google.maps.Marker({
