@@ -105,6 +105,7 @@ def pop_radius(request):
                                                          'latitude' : nearby_poi.latitude,
                                                          'longitude' : nearby_poi.longitude,
                                                          'poi_id' : nearby_poi.id,
+                                                         'address' : nearby_poi.address,
                                                          'rating' : nearby_poi.num_stars,
                                                          'category': nearby_poi.category,
                                                          'summary': nearby_poi.summary
@@ -325,11 +326,11 @@ def exploratory(request):
     origin.longitude = Decimal(start_coords[1:-1].split(", ")[1])
     origin.business_name = request.GET['startDestination'].split(',')[0]
     origin.category = "Origin"
-    destination = get_object_or_404(POI, pk=2569)
+    #destination = get_object_or_404(POI, pk=2569)
+    # 'destination': destination,
 
     context = { 'mode': "exploratory",
                 'origin': origin,
-                'destination': destination,
                 'city': city,
                 'start_coords': start_coords}
     return render(request, 'tour/map.html', context)
