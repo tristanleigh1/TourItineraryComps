@@ -1,6 +1,19 @@
 //$(document).ready(function() {
-//    startToEnd();
+//    var quantifiers = ["None", "Few", "Some", "Many", "Lots!"];
+//                    
+//    $(".slider")
+//        .slider({ 
+//            min: 0, 
+//            max: quantifiers.length-1, 
+//            value: 3 
+//        })
+//        .slider("pips", {
+//            rest: "label",
+//            labels: quantifiers
+//        })
 //});
+
+
 
 function startToEnd() {
   $("#start-to-end-fields").html(`
@@ -73,22 +86,38 @@ function startToEnd() {
     <div class="form-group row">
       <label class="col-sm-3 control-label">Parks</label>
       <div class="col-sm-6">
-        <input type="range" id="parks" name="parks" min="0" max="4" step="1"
-    oninput="setQuantifier(this.value,'parkValBox')"
-    onchange="setQuantifier(this.value,'parkValBox')" class="form-control slide-input">
+        <div id="parks" class="slider"></div>
+        <input type="hidden" id="parksInput" name="parks">
       </div>
       <div class="col-sm-2 range-val">
         <div id="parkValBox"></div>&nbsp;
       </div>
     </div>
     `);
-    setVal($("#points").val(), "pointValBox");
-    setDirectness($("#miles").val(), "distanceValBox");
-    setQuantifier($("#museums").val(), "museumValBox");
-    setQuantifier($("#landmarks").val(), "landmarkValBox");
-    setQuantifier($("#activities").val(), "activityValBox");
-    setQuantifier($("#parks").val(), "parkValBox");
-
+//    setVal($("#points").val(), "pointValBox");
+//    setDirectness($("#miles").val(), "distanceValBox");
+//    setQuantifier($("#museums").val(), "museumValBox");
+//    setQuantifier($("#landmarks").val(), "landmarkValBox");
+//    setQuantifier($("#activities").val(), "activityValBox");
+//    setQuantifier($("#parks").val(), "parkValBox");
+    
+    var quantifiers = ["None", "Few", "Some", "Many", "Lots!"];
+    $(".slider")
+        .slider({ 
+            min: 0, 
+            max: quantifiers.length-1, 
+            value: 2,
+            animate: 300,
+            slide: function( event, ui ) {
+//                $("#parks").val( ui.value );
+                $("#parksInput").val(ui.value);
+//                alert(ui.value);
+            }
+        })
+        .slider("pips", {
+            rest: "label",
+            labels: quantifiers
+        });
     initAutocomplete();
 }
 
@@ -96,46 +125,46 @@ function exploratory() {
   $("#start-to-end-fields").empty();
 }
 
-function setVal(newVal, idName){
-    $("#" + idName).html(newVal);
-}
-
-function setQuantifier(newVal, idName) {
-    switch(newVal) {
-        case "0":
-            $("#" + idName).html("None");
-            break;
-        case "1":
-            $("#" + idName).html("Few");
-            break;
-        case "2":
-            $("#" + idName).html("Some");
-            break;
-        case "3":
-            $("#" + idName).html("Many");
-            break;
-        case "4":
-            $("#" + idName).html("Lots!");
-            break;
-    }
-}
-
-function setDirectness(newVal, idName) {
-    switch(newVal) {
-        case "0":
-            $("#" + idName).html("In a Rush");
-            break;
-        case "3":
-            $("#" + idName).html("More Direct");
-            break;
-        case "6":
-            $("#" + idName).html("Default");
-            break;
-        case "9":
-            $("#" + idName).html("Scenic Route");
-            break;
-        case "12":
-            $("#" + idName).html("Only the Best!");
-            break;
-    }
-}
+//function setVal(newVal, idName){
+//    $("#" + idName).html(newVal);
+//}
+//
+//function setQuantifier(newVal, idName) {
+//    switch(newVal) {
+//        case "0":
+//            $("#" + idName).html("None");
+//            break;
+//        case "1":
+//            $("#" + idName).html("Few");
+//            break;
+//        case "2":
+//            $("#" + idName).html("Some");
+//            break;
+//        case "3":
+//            $("#" + idName).html("Many");
+//            break;
+//        case "4":
+//            $("#" + idName).html("Lots!");
+//            break;
+//    }
+//}
+//
+//function setDirectness(newVal, idName) {
+//    switch(newVal) {
+//        case "0":
+//            $("#" + idName).html("In a Rush");
+//            break;
+//        case "3":
+//            $("#" + idName).html("More Direct");
+//            break;
+//        case "6":
+//            $("#" + idName).html("Default");
+//            break;
+//        case "9":
+//            $("#" + idName).html("Scenic Route");
+//            break;
+//        case "12":
+//            $("#" + idName).html("Only the Best!");
+//            break;
+//    }
+//}

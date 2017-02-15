@@ -8,6 +8,6 @@ urlpatterns = [
     url(r'^about/$', views.about, name='about'),
     url(r'^contact/$', views.contact, name='contact'),
     url(r'^pop_radius/$', views.pop_radius, name='pop_radius'),
-	url(r'^directions/$', views.directions, name='directions'),
+	url(r'^send_directions/$', views.send_directions, name='send_directions'),
     url(r'^get_summary_for_added_point/$', views.get_summary_for_added_point, name='get_summary_for_added_point'),
 ]

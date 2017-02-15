@@ -517,6 +517,12 @@ function modifyIcons() {
     }
 }
 
+function autotab(current,to) {
+    if (current.getAttribute && current.value.length==current.getAttribute("maxlength")) {
+        to.focus() 
+    }
+}
+
 // Constructs the URL for the google.maps version of your route
 function sendDirections() {
     var url = 'https://www.google.com/maps/dir';
@@ -532,68 +538,29 @@ function sendDirections() {
         }
         directionsAddresses.push(route.legs[i].end_address);
     }
-    console.log(directionsAddresses);
-    
+
     for (var i = 0; i < directionsAddresses.length; i++) {
         url += "/" + directionsAddresses[i];
     }
     url = url.replace(/\s/g, "+");
     url = url.replace(/,/g, "");
     url += "/data=!4m2!4m1!3e2"; // Data for making travel mode walking
-    $("#sendDirections").before('<div> Phone: (<input type="text" name="phone-1" maxlength="3">) <input type="text" name="phone-2" maxlength="3">- <input type="text" name="phone-3" maxlength="4"> </div>');
-     
+    $("#sendDirections").before('<div> Phone: (<form name = "phoneNumber"><input type="text" name="phone-1" maxlength="3" oninput="autotab(this, document.phoneNumber.phone-1)">) <input type="text" name="phone-2" maxlength="3" oninput="autotab(this, document.phoneNumber.phone-2)">- <input type="text" name="phone-3" maxlength="4" oninput="autotab(this, document.phoneNumber.phone-3)"> </div>');
+
     $.ajax({
         url : "/tour/send_directions/",
-        contentType: "application/json; charset=utf-8",
         type : 'GET',
-        data : {
-            'lat' : marker.getPosition().lat(),
-            'lng' : marker.getPosition().lng(),
-            'filter-status' : namespace.filterStatus,
+        data : { 'url' : url},
+        success : function(success) {
+            console.log(success);
         },
-        dataType : 'json',
-        success : function (json) {
-            // Only adds nearby POIs that aren't already in route
-            console.log(json);
-            var nearby_pois = [];
-            for (var i=0; i < json["nearby_pois"].length; i++) {
-                for (var j=0; j < namespace.markers.length; j++) {
-                    if (namespace.markers[j].poi_id == json["nearby_pois"][i].poi_id) {
-                        delete json["nearby_pois"][i];
-                        break;
-                    }
-                    if (namespace.markers[j].name == json["nearby_pois"][i].name) {
-                        delete json["nearby_pois"][i];
-                        break;
-                    }
-                }
-                if (typeof json["nearby_pois"][i] !== 'undefined') {
-                    nearby_pois.push(json["nearby_pois"][i]);
-                }
-            }
-
-            /* I (Caleb) am commenting this out because now the user can update the radius
-            if (nearby_pois.length == 0 && marker.popRadius.getRadius() <= 18000) {
-            marker.popRadius.setRadius(marker.popRadius.getRadius() + 500);
-            findNearbyPOIs(marker);
-        } else {
-        plotNearbyPois(nearby_pois, marker);
-    }
-    */
-    plotNearbyPois(nearby_pois, marker);
-    },
-    cache : false,
-    error : function(xhr, errmsg, err) {
-     for (var i=0; i<namespace.radiusMarkers.length; i++) {
-        marker = namespace.radiusMarkers[i];
-        marker.setMap(null);
-    }
-    console.log(errmsg);
-    console.log(xhr.status + " " + xhr.responseText);
-    }
+        cache : false,
+        error : function(xhr, errmsg, err) {
+            window.open(url, "_blank");
+        	console.log(errmsg);
+        	console.log(xhr.status + " " + xhr.responseText);
+        }
     });
-
-    window.open(url, "_blank");
 }
 
 function getDirections() {

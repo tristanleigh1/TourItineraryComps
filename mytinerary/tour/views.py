@@ -7,6 +7,7 @@ from .models import *
 import math
 from decimal import *
 import googlemaps
+from twilio.rest import TwilioRestClient
 
 # Create your views here.
 #GET: tour/
@@ -18,9 +19,6 @@ def about(request):
 
 def contact(request):
     return render(request, 'tour/contact.html')
-
-def directions(request):
-    return render(request, 'tour/directions.html')
 
 def km_to_lat_lng(km, latitude):
     # 1km = 0.009043 degrees (for latitude)
@@ -131,6 +129,25 @@ def get_summary_for_added_point(request):
                 content_type="application/json"
         )
 
+def send_directions(request):
+    ACCOUNT_SID = "AC713f1165cf353a8f68d1000502d8bc93"
+    AUTH_TOKEN = "dda8d0bc7b169ccd4c515179e4dba4a4"
+
+    client = TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN)
+
+    if request.method == 'GET':
+        url = request.GET.get('url', None)
+        #client.messages.create(
+        #    to="+15189290834",
+        #    from_="+14135917043",
+        #    body=url,
+        #)
+        return HttpResponse("Text sent succesfully.")
+    else:
+        return HttpResponse(
+                json.dumps({"error":"unable to send text."}),
+                content_type="application/json"
+        )
 
 def calculate_score(current_poi, path_segments, walk_factor, preferences):
     empirical_coefficient = 0.0006
