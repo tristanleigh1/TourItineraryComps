@@ -133,6 +133,24 @@ function plotNearbyPois(nearby_pois, centerMarker) {
             summary: nearby_pois[i].summary,
         });
 
+
+            (
+              function (_popRadius, ignore, _marker) {
+                _popRadius.addListener("center_changed", function() {
+                if (ignore) {
+                  console.log("here");
+                  ignore = false;
+                  return;
+                }
+                _popRadius.setEditable(false);
+                ignore = true;
+                console.log("outside");
+                _popRadius.setCenter(_marker.position);
+                _popRadius.setEditable(true);
+              });
+            })(popRadius, false, marker);
+
+
         google.maps.event.addListener(marker.popRadius, 'radius_changed', function() {
             if (marker.popRadius.getRadius() != 500) {
                 findNearbyPOIs(marker);
@@ -332,6 +350,24 @@ function addPoint(newMarkerId, markerId) {
         icon: icon,
         popRadius: popRadius
     });
+
+
+            (
+              function (_popRadius, ignore, _marker) {
+                _popRadius.addListener("center_changed", function() {
+                if (ignore) {
+                  console.log("here");
+                  ignore = false;
+                  return;
+                }
+                _popRadius.setEditable(false);
+                ignore = true;
+                console.log("outside");
+                _popRadius.setCenter(_marker.position);
+                _popRadius.setEditable(true);
+              });
+            })(popRadius, false, newMarker);
+
 
     google.maps.event.addListener(newMarker.popRadius, 'radius_changed', function() {
         if (newMarker.popRadius.getRadius() != 500) {
