@@ -549,7 +549,6 @@ function sendDirections() {
         data : {
             'lat' : marker.getPosition().lat(),
             'lng' : marker.getPosition().lng(),
-            'radius' : marker.popRadius.getRadius(),
             'filter-status' : namespace.filterStatus,
         },
         dataType : 'json',
