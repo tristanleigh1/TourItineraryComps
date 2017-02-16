@@ -45,7 +45,18 @@ input[type="range"]:focus
   margin-left: -11px;
   border: 2px solid #772953;
   background: white
+}
 
+.slider .ui-slider-handle .ui-slider-tip {
+/*    font-size: 1.4em;*/
+    width: 100px;
+    margin-left: -22px;
+    height: 33px;
+    line-height: 30px;
+    top: -40px;
+    background: #434d5a;
+    border-color: #772953;
+    color: white; 
 }
 
 /* pips */

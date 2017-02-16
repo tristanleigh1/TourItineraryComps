@@ -2,8 +2,7 @@
 //    
 //});
 
-function createSlider(name) {
-    var quantifiers = ["None", "Few", "Some", "Many", "Lots!"];
+function createSlider(name, quantifiers) {
     $(name)
         .slider({ 
             min: 0, 
@@ -43,15 +42,15 @@ function startToEnd() {
     <div class="form-group row ">
       <label class="col-sm-3 control-label">Number of Stops</label>
       <div class="col-sm-6">
-        <input type="range" class="form-control slide-input" id="points" name="points" min="0" max="8" step="1"
-      oninput="setVal(this.value,'pointValBox')" onchange="setVal(this.value,'pointValBox')">
+        <div id="points" class="slider"></div>
+        <input type="hidden" id="pointsInput" name="points">
       </div>
     </div>
     <div class="form-group row ">
       <label class="col-sm-3 control-label">Directness</label>
       <div class="col-sm-6">
-        <input type="range" class="form-control slide-input" id="miles" name="miles" min="0" max="12" step="3"
-      oninput="setDirectness(this.value,'distanceValBox')" onchange="setDirectness(this.value,'distanceValBox')">
+        <div id="miles" class="slider"></div>
+        <input type="hidden" id="milesInput" name="miles">
       </div>
     </div>
     <div class="form-group row">
@@ -83,15 +82,16 @@ function startToEnd() {
       </div>
     </div>
     `);
-//    setVal($("#points").val(), "pointValBox");
-//    setDirectness($("#miles").val(), "distanceValBox");
     
-    
-//    createSlider("#miles");
-    createSlider("#museums");
-    createSlider("#landmarks");
-    createSlider("#activities");
-    createSlider("#parks");
+    var points_preference = ["0","1","2","3","4","5","6","7","8"];
+    var directness_preference = ["In a Rush", "More Direct", "Default", "Scenic Route", "Only the Best!"];
+    var category_preference = ["None", "Few", "Some", "Many", "Lots!"];
+    createSlider("#points", points_preference);
+    createSlider("#miles", directness_preference);
+    createSlider("#museums", category_preference);
+    createSlider("#landmarks", category_preference);
+    createSlider("#activities", category_preference);
+    createSlider("#parks", category_preference);
     
     initAutocomplete();
 }

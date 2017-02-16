@@ -18,11 +18,13 @@ namespace = {
 }
 */
 var namespace;
+var zoomIgnore;
 
 /**
 * Initialize parameters and initial route
 */
 function setup(params) {
+    zoomIgnore = false;
     namespace = params;
     addSidebarButtons();
     updateRoute();
@@ -74,6 +76,7 @@ function findNearbyPOIs(marker) {
         plotNearbyPois(nearby_pois, marker);
     }
     */
+    console.log("Nearby POIS: ", nearby_pois)
     plotNearbyPois(nearby_pois, marker);
     },
     cache : false,
@@ -191,8 +194,8 @@ function createInfoWindow(marker, centerMarker) {
         centerMarker.id + ');">Add';
     }
 
-    var content = '<p>' + marker.name + '</p><p>Yelp rating: ' +
-    marker.rating + '/5.0</p><div class="btn btn-primary btn-sm"' + onclick +
+    var content = '<p>' + marker.name + '</p><p>Rating: ' +
+    marker.rating + '/100.0</p><div class="btn btn-primary btn-sm"' + onclick +
     '</div><div class="btn btn-link btn-sm"' +
     'onclick="setInfoWindowContent('+ marker.id + ', ' + centerMarkerId +
     ');">More Info...</div>';
@@ -221,7 +224,7 @@ function setInfoWindowContent(markerId, centerMarkerId) {
     }
 
     var content = '<p>' + marker.name + `</p>
-    <p>Yelp rating: `+ marker.rating + `/5.0</p>
+    <p>Rating: `+ marker.rating + `/100.0</p>
     <div id="myCarousel" class="carousel slide" data-interval="false" >
     <div class="carousel-inner" style="height:150px;width:400px;overflow-y:auto;">
     <div class="active item">
@@ -519,7 +522,6 @@ function modifyIcons() {
 
 function autotab(current) {
     if (current.getAttribute && current.value.length==current.getAttribute("maxlength")) {
-        console.log("current: ");
         $(current).nextAll('input').first().focus();
     }
 }
@@ -547,10 +549,13 @@ function sendDirections() {
     url = url.replace(/,/g, "");
     url += "/data=!4m2!4m1!3e2"; // Data for making travel mode walking
 
+    var phoneNumber = $('input[name=phone1]').val() + $('input[name=phone2]').val() + $('input[name=phone3]').val()
+
     $.ajax({
         url : "/tour/send_directions/",
         type : 'GET',
-        data : { 'url' : url},
+        data : { 'url' : url,
+                'number' : phoneNumber},
         success : function(success) {
             console.log(success);
         },
@@ -568,13 +573,13 @@ function getDirections() {
     if (document.getElementById('accordion').style.display == 'none') {
         document.getElementById('accordion').style.display = 'block';
         document.getElementById('db').innerHTML = "Get Directions!";
-        document.getElementById('sendDirections').style.display = 'none';
+        document.getElementById('modal_trigger').style.display = 'none';
         document.getElementById('panel').style.display = 'none';
         // If the accordion pane is open
     } else {
         document.getElementById('accordion').style.display = 'none';
         document.getElementById('db').innerHTML = "Go back";
-        document.getElementById('sendDirections').style.display = 'inline-block';
+        document.getElementById('modal_trigger').style.display = 'inline-block';
         document.getElementById('panel').style.display = 'block';
         namespace.directionsDisplay.setPanel(document.getElementById('panel'));
     }
@@ -657,8 +662,13 @@ function updateFilter(spot) {
 
 //make sure map isn't zoomed in too much
 function adjustZoom() {
-    var listener = google.maps.event.addListener(namespace.map, "idle", function() {
+    var listener = google.maps.event.addListener(namespace.map, "zoom_changed", function() {
+        if (zoomIgnore) {
+          zoomIgnore = false;
+          return;
+        }
         if (namespace.map.getZoom() > 16) {
+            zoomIgnore = true;
             namespace.map.setZoom(16);
         }
         google.maps.event.removeListener(listener);
