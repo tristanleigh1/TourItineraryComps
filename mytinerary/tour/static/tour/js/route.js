@@ -18,11 +18,13 @@ namespace = {
 }
 */
 var namespace;
+var zoomIgnore;
 
 /**
 * Initialize parameters and initial route
 */
 function setup(params) {
+    zoomIgnore = false;
     namespace = params;
     addSidebarButtons();
     updateRoute();
@@ -659,8 +661,13 @@ function updateFilter(spot) {
 
 //make sure map isn't zoomed in too much
 function adjustZoom() {
-    var listener = google.maps.event.addListener(namespace.map, "idle", function() {
+    var listener = google.maps.event.addListener(namespace.map, "zoom_changed", function() {
+        if (zoomIgnore) {
+          zoomIgnore = false;
+          return;
+        }
         if (namespace.map.getZoom() > 16) {
+            zoomIgnore = true;
             namespace.map.setZoom(16);
         }
         google.maps.event.removeListener(listener);
