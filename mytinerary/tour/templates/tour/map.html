@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {% load static %}
     <link rel="stylesheet" href="https://bootswatch.com/united/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href='{% static "tour/phonemodal.css" %}' />
     <link rel="icon" href='{% static "tour/images/icon.png" %}' />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -226,39 +227,28 @@
                     <br/>Walking Time: <span id="walkingTime"></span>
                     <div class="row">
                         <div class="col-md-6">
-                        <form action="/tour/directions/" method="GET" name="directionsButton" onsubmit="return getDirections()">
                             <div class="btn btn-info btn-sm" id="db" onclick="getDirections();">Get Directions!</div>
-                            <div class="btn btn-info btn-sm" id="sendDirections" onclick="sendDirections();">Text Caleb</div>
-                            <div class="container">
-                                <a id="modal_trigger" href="#modal" class="btn">Text</a>
 
-                                <div id="modal" class="popupContainer" style="display:none;">
-                                <header class="popupHeader">
-                                <span class="header_title">Login</span>
-                                <span class="modal_close"><i class="fa fa-times"></i></span>
-                                </header>
+                            <div class="btn btn-info btn-sm" id="modal_trigger" href="#modal">Text Me Directions</div>
+
+                            <div id="modal" class="popupContainer" style="display:none;">
+                            <header class="popupHeader">
+                            <span class="header_title">Login</span>
+                            <span class="modal_close"><i class="close">X</i></span>
+                            </header>
 
                                 <section class="popupBody">
-                                <!-- Username & Password Login form -->
-                                <div class="user_login">
-                                <form>
-                                <label>Email / Username</label>
-                                <input type="text" />
-                                <br />
-
-                                <div class="action_btns">
-                                <div class="one_half"><a href="#" class="btn back_btn"><i class="fa fa-angle-double-left"></i> Back</a></div>
-                                <div class="one_half last"><a href="#" class="btn btn_red">Login</a></div>
-                                </div>
-                                </form>
-
+                                <div>
+                                <label>Phone: (</label>
+                                    <input type="text" name="phone1" maxlength="3" oninput="autotab(this)">)
+                                    <input type="text" name="phone2" maxlength="3" oninput="autotab(this)"> -
+                                    <input type="text" name="phone3" maxlength="4" oninput="autotab(this)">
+                                <div class="one_half last"><a  href="javascript:sendDirections();" class="btn btn_red">Send</a></div>
                                 </div>
                                 </section>
-                                </div>
                             </div>
                             <input type="hidden" id="startLngLat" name="startCoords">
                             <input type="hidden" id="endLngLat" name="endCoords">
-                        </form>
                         </div>
                         <div class="col-md-6">
                             <div class="btn btn-info btn-sm pull-right" onClick="window.location.reload()">Refresh Route</div>

@@ -517,9 +517,10 @@ function modifyIcons() {
     }
 }
 
-function autotab(current,to) {
+function autotab(current) {
     if (current.getAttribute && current.value.length==current.getAttribute("maxlength")) {
-        to.focus() 
+        console.log("current: ");
+        $(current).nextAll('input').first().focus();
     }
 }
 
@@ -545,7 +546,6 @@ function sendDirections() {
     url = url.replace(/\s/g, "+");
     url = url.replace(/,/g, "");
     url += "/data=!4m2!4m1!3e2"; // Data for making travel mode walking
-    $("#sendDirections").before('<div> Phone: (<form name = "phoneNumber"><input type="text" name="phone-1" maxlength="3" oninput="autotab(this, document.phoneNumber.phone-1)">) <input type="text" name="phone-2" maxlength="3" oninput="autotab(this, document.phoneNumber.phone-2)">- <input type="text" name="phone-3" maxlength="4" oninput="autotab(this, document.phoneNumber.phone-3)"> </div>');
 
     $.ajax({
         url : "/tour/send_directions/",

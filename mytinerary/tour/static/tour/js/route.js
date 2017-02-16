@@ -517,9 +517,9 @@ function modifyIcons() {
     }
 }
 
-function autotab(current,to) {
+function autotab(current) {
     if (current.getAttribute && current.value.length==current.getAttribute("maxlength")) {
-        to.focus() 
+        $(current).nextAll('input').first().focus();
     }
 }
 
@@ -545,12 +545,14 @@ function sendDirections() {
     url = url.replace(/\s/g, "+");
     url = url.replace(/,/g, "");
     url += "/data=!4m2!4m1!3e2"; // Data for making travel mode walking
-    $("#sendDirections").before('<div> Phone: (<form name = "phoneNumber"><input type="text" name="phone-1" maxlength="3" oninput="autotab(this, document.phoneNumber.phone-1)">) <input type="text" name="phone-2" maxlength="3" oninput="autotab(this, document.phoneNumber.phone-2)">- <input type="text" name="phone-3" maxlength="4" oninput="autotab(this, document.phoneNumber.phone-3)"> </div>');
+
+    var phoneNumber = $('input[name=phone1]').val() + $('input[name=phone2]').val() + $('input[name=phone3]').val()
 
     $.ajax({
         url : "/tour/send_directions/",
         type : 'GET',
-        data : { 'url' : url},
+        data : { 'url' : url,
+                'number' : phoneNumber},
         success : function(success) {
             console.log(success);
         },
@@ -568,13 +570,13 @@ function getDirections() {
     if (document.getElementById('accordion').style.display == 'none') {
         document.getElementById('accordion').style.display = 'block';
         document.getElementById('db').innerHTML = "Get Directions!";
-        document.getElementById('sendDirections').style.display = 'none';
+        document.getElementById('modal_trigger').style.display = 'none';
         document.getElementById('panel').style.display = 'none';
         // If the accordion pane is open
     } else {
         document.getElementById('accordion').style.display = 'none';
         document.getElementById('db').innerHTML = "Go back";
-        document.getElementById('sendDirections').style.display = 'inline-block';
+        document.getElementById('modal_trigger').style.display = 'inline-block';
         document.getElementById('panel').style.display = 'block';
         namespace.directionsDisplay.setPanel(document.getElementById('panel'));
     }

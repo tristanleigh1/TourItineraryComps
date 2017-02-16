@@ -1,0 +1,102 @@
+#lean_overlay {
+        position: fixed;
+        z-index: 100;
+        top: 0px;
+        left: 0px;
+        height: 100%;
+        width: 100%;
+        background: #000;
+        display: none;
+}
+
+.popupContainer {
+        position: absolute;
+        width: 330px;
+        height: auto;
+        left: 45%;
+        top: 60px;
+        background: #FFF;
+}
+
+#modal_trigger {
+        display: none;
+        border: 1px solid #DDD;
+        border-radius: 4px;
+}
+
+.one_half {
+        width: 50%;
+        display: block;
+        float: left;
+}
+
+.one_half.last {
+        display: inline-block;
+        text-align: center;
+
+}
+/* Popup Styles*/
+
+.popupHeader {
+        font-size: 16px;
+        text-transform: uppercase;
+}
+
+.popupHeader {
+        background: #F4F4F2;
+        position: relative;
+        padding: 10px 20px;
+        border-bottom: 1px solid #DDD;
+        font-weight: bold;
+}
+
+.popupHeader .modal_close {
+        position: absolute;
+        right: 0;
+        top: 0;
+        padding: 10px 15px;
+        background: #E4E4E2;
+        cursor: pointer;
+        color: #aaa;
+        font-size: 16px;
+}
+
+.popupBody {
+        padding: 20px;
+}
+
+.popupContainer .btn {
+        padding: 10px 20px;
+        background: #F4F4F2;
+}
+
+.popupContainer .btn_red {
+        background: #ED6347;
+        color: #FFF;
+}
+
+.popupContainer .btn:hover {
+        background: #E4E4E2;
+}
+
+.popupContainer .btn_red:hover {
+        background: #C12B05;
+}
+
+.popupContainer a.btn {
+        color: #666;
+        text-align: center;
+        text-decoration: none;
+}
+
+.popupContainer a.btn_red {
+        color: #FFF;
+}
+
+.popupContainer input {
+    width: 15%;
+}
+
+.modal_close {
+    color: #FFF;
+}

@@ -137,11 +137,12 @@ def send_directions(request):
 
     if request.method == 'GET':
         url = request.GET.get('url', None)
-        #client.messages.create(
-        #    to="+15189290834",
-        #    from_="+14135917043",
-        #    body=url,
-        #)
+        phone_number = "+1" + request.GET.get('number', None)
+        client.messages.create(
+           to=phone_number,
+           from_="+14135917043",
+           body=url,
+        )
         return HttpResponse("Text sent succesfully.")
     else:
         return HttpResponse(
