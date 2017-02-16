@@ -86,17 +86,7 @@
             var address = locations[i].address;
             var icon = getIconFromCategory(category, true);
 
-            var popRadius = new google.maps.Circle({
-                center: position,
-                strokeWeight: 0,
-                fillColor: '#FF0000',
-                fillOpacity: 0.35,
-                map: map,
-                radius: 500,
-                visible: false,
-                editable: true,
-                draggable: false
-            });
+            var popRadius = buildPopRadiusCircle(position, map);
 
             var marker = new google.maps.Marker({
                 map: map,

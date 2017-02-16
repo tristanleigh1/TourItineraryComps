@@ -1,13 +1,13 @@
 //$(document).ready(function() {
-//    
+//
 //});
 
 function createSlider(name) {
     var quantifiers = ["None", "Few", "Some", "Many", "Lots!"];
     $(name)
-        .slider({ 
-            min: 0, 
-            max: quantifiers.length-1, 
+        .slider({
+            min: 0,
+            max: quantifiers.length-1,
             value: 2,
             animate: 500,
             slide: function( event, ui ) {
@@ -21,7 +21,7 @@ function createSlider(name) {
         .slider("float", {
             labels: quantifiers
         });
-    
+
     $(name + "Input").val("2");
 }
 
@@ -85,17 +85,17 @@ function startToEnd() {
     `);
 //    setVal($("#points").val(), "pointValBox");
 //    setDirectness($("#miles").val(), "distanceValBox");
-    
-    
+
+
 //    createSlider("#miles");
     createSlider("#museums");
     createSlider("#landmarks");
     createSlider("#activities");
     createSlider("#parks");
-    
+
     initAutocomplete();
 }
 
-function exploratory() {
+function exploratoryMode() {
   $("#start-to-end-fields").empty();
 }
