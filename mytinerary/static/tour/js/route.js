@@ -50,7 +50,7 @@ function findNearbyPOIs(marker) {
         dataType : 'json',
         success : function (json) {
             // Only adds nearby POIs that aren't already in route
-            console.log(json);
+            // console.log(json);
             var nearby_pois = [];
             for (var i=0; i < json["nearby_pois"].length; i++) {
                 for (var j=0; j < namespace.markers.length; j++) {
@@ -76,7 +76,7 @@ function findNearbyPOIs(marker) {
         plotNearbyPois(nearby_pois, marker);
     }
     */
-    console.log("Nearby POIS: ", nearby_pois)
+    // console.log("Nearby POIS: ", nearby_pois)
     plotNearbyPois(nearby_pois, marker);
     },
     cache : false,
@@ -110,17 +110,7 @@ function plotNearbyPois(nearby_pois, centerMarker) {
         }
 
         var icon = getIconFromCategory(nearby_pois[i].category, false);
-        var popRadius = new google.maps.Circle({
-            center: point,
-            strokeWeight: 0,
-            fillColor: '#FF0000',
-            fillOpacity: 0.35,
-            map: namespace.map,
-            radius: 500,
-            visible: false,
-            editable: true,
-            draggable: false
-        });
+        var popRadius = buildPopRadiusCircle(point, namespace.map);
 
         var marker = new google.maps.Marker({
             map: namespace.map,
@@ -141,13 +131,13 @@ function plotNearbyPois(nearby_pois, centerMarker) {
               function (_popRadius, ignore, _marker) {
                 _popRadius.addListener("center_changed", function() {
                 if (ignore) {
-                  console.log("here");
+                  // console.log("here");
                   ignore = false;
                   return;
                 }
                 _popRadius.setEditable(false);
                 ignore = true;
-                console.log("outside");
+                // console.log("outside");
                 _popRadius.setCenter(_marker.position);
                 _popRadius.setEditable(true);
               });
@@ -165,6 +155,20 @@ function plotNearbyPois(nearby_pois, centerMarker) {
         });
         namespace.radiusMarkers.push(marker);
     }
+}
+
+function buildPopRadiusCircle(center, map) {
+    return new google.maps.Circle({
+        center: center,
+        strokeWeight: 0,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35,
+        map: map,
+        radius: 500,
+        visible: false,
+        editable: true,
+        draggable: false
+    });
 }
 
 function createPopRadius(marker) {
@@ -199,7 +203,7 @@ function createInfoWindow(marker, centerMarker) {
     '</div><div class="btn btn-link btn-sm"' +
     'onclick="setInfoWindowContent('+ marker.id + ', ' + centerMarkerId +
     ');">More Info...</div>';
-    console.log(content);
+    // console.log(content);
     namespace.popWindow.marker = marker;
     namespace.popWindow.setContent(content);
     namespace.popWindow.open(namespace.map, marker);
@@ -293,16 +297,7 @@ function removePoint(markerId) {
     addSidebarButtons();
 }
 
-function addPoint(newMarkerId, markerId) {
-    // Make sure we do not exceed Google's limit of 23 waypoints (+ start/end)
-    var MAX_POINTS = 25;
-    if (namespace.markers.length == MAX_POINTS) {
-        var errorMessage = "<p><b>Sorry, you cannot add more stops.</b></p>"
-        $(".btn.btn-primary.btn-sm").before(errorMessage);
-        $(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
-        return false;
-    }
-
+function addPoint(newMarkerId, markerId, verified) {
     var summary = ""
     //************************WE SHOULD GET RID OF THIS************************
     // Synchronous call to get summary for new point added to namespace.map
@@ -326,18 +321,7 @@ function addPoint(newMarkerId, markerId) {
     });
 
     var icon = getIconFromCategory(namespace.radiusMarkers[newMarkerId].category, true);
-
-    var popRadius = new google.maps.Circle({
-        center: namespace.radiusMarkers[newMarkerId].position,
-        strokeWeight: 0,
-        fillColor: '#FF0000',
-        fillOpacity: 0.35,
-        map: namespace.map,
-        radius: 500,
-        visible: false,
-        editable: true,
-        draggable: false
-    });
+    var popRadius = buildPopRadiusCircle(namespace.radiusMarkers[newMarkerId].position, namespace.map);
 
     var newMarker = new google.maps.Marker({
         map: namespace.map,
@@ -354,23 +338,20 @@ function addPoint(newMarkerId, markerId) {
         popRadius: popRadius
     });
 
-
-            (
-              function (_popRadius, ignore, _marker) {
-                _popRadius.addListener("center_changed", function() {
-                if (ignore) {
-                  console.log("here");
-                  ignore = false;
-                  return;
-                }
-                _popRadius.setEditable(false);
-                ignore = true;
-                console.log("outside");
-                _popRadius.setCenter(_marker.position);
-                _popRadius.setEditable(true);
-              });
-            })(popRadius, false, newMarker);
-
+    (function (_popRadius, ignore, _marker) {
+        _popRadius.addListener("center_changed", function() {
+            if (ignore) {
+                console.log("here");
+                ignore = false;
+                return;
+            }
+            _popRadius.setEditable(false);
+            ignore = true;
+            console.log("outside");
+            _popRadius.setCenter(_marker.position);
+            _popRadius.setEditable(true);
+        });
+    })(popRadius, false, newMarker);
 
     google.maps.event.addListener(newMarker.popRadius, 'radius_changed', function() {
         if (newMarker.popRadius.getRadius() != 500) {
@@ -385,31 +366,14 @@ function addPoint(newMarkerId, markerId) {
     });
     namespace.markers.splice(markerId+1, 0, newMarker);
 
-    //refresh namespace.markers on namespace.map with updated labels
-    for (var i = markerId+1; i < namespace.markers.length; i++) {
-        namespace.markers[i].id++;
-        namespace.markers[i].label = i + 1;
-        namespace.markers[i].setMap(null);
-        namespace.markers[i].popRadius.setVisible(false);
-        namespace.markers[i].setMap(namespace.map);
-    }
-
-    updateRoute();
-    adjustZoom();
-
-    for (var i=0; i<namespace.radiusMarkers.length; i++) {
-        marker = namespace.radiusMarkers[i];
-        marker.setMap(null);
-        marker.popRadius.setVisible(false);
-    }
-    namespace.radiusMarkers.length = 0;
-
-    $("#accordion").empty();
-    addSidebarButtons();
-    namespace.selectedMarker = null;
+    updateRoute(markerId+1);
 }
 
-function updateRoute() {
+
+/**
+* Updates the route and directions display to match the current path markers
+*/
+function updateRoute(changedMarkerId) {
     var waypoints = [];
     for (var i = 1; i < namespace.markers.length - 1; i++) {
         waypoints.push({location: namespace.markers[i].getPosition()});
@@ -420,7 +384,6 @@ function updateRoute() {
         destination: namespace.markers[namespace.markers.length - 1].getPosition(),
         waypoints: waypoints,
         travelMode: 'WALKING',
-        optimizeWaypoints: false //we may want to enable this
     }, function(response, status) {
         if (status === 'OK') {
             namespace.directionsDisplay.setDirections(response);
@@ -444,21 +407,51 @@ function updateRoute() {
             }
 
             totalDuration = totalDuration / 60
-            document.getElementById("distance").innerHTML = totalDistance.toFixed(1) + units;
-            document.getElementById("walkingTime").innerHTML = totalDuration.toFixed(0) + " mins";
+            $("#distance").innerHTML = totalDistance.toFixed(1) + units;
+            $("#walkingTime").innerHTML = totalDuration.toFixed(0) + " mins";
 
-        } else if (status === 'MAX_WAYPOINTS_EXCEEDED') {
-            window.alert('You cannot add more than 23 stops.');
-        } else if (status === 'ZERO_RESULTS') {
-            // TODO: Something that actually works for when there aren't results
-            var errorMessage = "<p><b>Sorry, this POI is inaccessable from your path.</b></p>"
-            $(".btn.btn-primary.btn-sm").before(errorMessage);
-            $(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
-            //removePoint(markerId);
-            console.log("zero results");
-            return false;
+            // If we added a point, refresh namespace.markers on namespace.map
+            if (changedMarkerId) {
+                for (var i = changedMarkerId; i < namespace.markers.length; i++) {
+                    namespace.markers[i].id++;
+                    namespace.markers[i].label = i + 1;
+                    namespace.markers[i].setMap(null);
+                    namespace.markers[i].popRadius.setVisible(false);
+                    namespace.markers[i].setMap(namespace.map);
+                }
+            }
+
+            adjustZoom();
+
+            for (var i=0; i<namespace.radiusMarkers.length; i++) {
+                marker = namespace.radiusMarkers[i];
+                marker.setMap(null);
+                marker.popRadius.setVisible(false);
+            }
+            namespace.radiusMarkers.length = 0;
+
+            $("#accordion").empty();
+            addSidebarButtons();
+            namespace.selectedMarker = null;
+
         } else {
-            window.alert('Directions request failed due to ' + status);
+            var errorMessage;
+            switch (status) {
+                case 'MAX_WAYPOINTS_EXCEEDED':
+                    // Google's limit is 23 waypoints (+ start/end)
+                    errorMessage = "Sorry, you cannot add more stops.";
+                    break;
+                case 'ZERO_RESULTS':
+                    errorMessage = "Sorry, this POI is inaccessable from your path.";
+                    namespace.markers[changedMarkerId].setMap(null);
+                    namespace.markers.splice(changedMarkerId, 1);
+                    break;
+                default:
+                    errorMessage = "Directions request failed due to " + status;
+            }
+
+            $(".btn.btn-primary.btn-sm").before("<p><b>" + errorMessage + "</b></p>");
+            $(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
         }
     });
 
@@ -467,8 +460,6 @@ function updateRoute() {
     } else {
         modifyIcons();
     }
-
-    return true;
 }
 
 function addSidebarButtons() {

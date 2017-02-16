@@ -1,12 +1,12 @@
 //$(document).ready(function() {
-//    
+//
 //});
 
 function createSlider(name, quantifiers) {
     $(name)
-        .slider({ 
-            min: 0, 
-            max: quantifiers.length-1, 
+        .slider({
+            min: 0,
+            max: quantifiers.length-1,
             value: 2,
             animate: 500,
             slide: function( event, ui ) {
@@ -20,7 +20,7 @@ function createSlider(name, quantifiers) {
         .slider("float", {
             labels: quantifiers
         });
-    
+
     $(name + "Input").val("2");
 }
 
@@ -82,7 +82,7 @@ function startToEnd() {
       </div>
     </div>
     `);
-    
+
     var points_preference = ["0","1","2","3","4","5","6","7","8"];
     var directness_preference = ["In a Rush", "More Direct", "Default", "Scenic Route", "Only the Best!"];
     var category_preference = ["None", "Few", "Some", "Many", "Lots!"];
@@ -96,6 +96,6 @@ function startToEnd() {
     initAutocomplete();
 }
 
-function exploratory() {
+function exploratoryMode() {
   $("#start-to-end-fields").empty();
 }
