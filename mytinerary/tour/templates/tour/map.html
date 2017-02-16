@@ -40,7 +40,7 @@
                 category: '{{origin.category}}',
                 position: {lat: {{ origin.latitude|stringformat:"f" }},
                            lng: {{ origin.longitude|stringformat:"f" }}},
-                rating: '{{origin.num_stars}}',
+                rating: '{{origin.popularity}}',
                 summary: `{{origin.summary}}`},
 
                 {% for poi in poi_list %}
@@ -50,7 +50,7 @@
                 category: '{{poi.category}}',
                 position: {lat: {{ poi.latitude|stringformat:"f" }},
                            lng: {{ poi.longitude|stringformat:"f" }}},
-                rating: '{{poi.num_stars}}',
+                rating: '{{poi.popularity}}',
                 summary: `{{poi.summary}}`},
                 {% endfor %}
 
@@ -60,7 +60,7 @@
                 category: '{{destination.category}}',
                 position: {lat: {{ destination.latitude|stringformat:"f" }},
                            lng: {{ destination.longitude|stringformat:"f" }}},
-                rating: '{{destination.num_stars}}',
+                rating: '{{destination.popularity}}',
                 summary: `{{destination.summary}}`},
             ];
         {% else %}
@@ -71,7 +71,7 @@
                 category: '{{origin.category}}',
                 position: {lat: {{ origin.latitude|stringformat:"f" }},
                            lng: {{ origin.longitude|stringformat:"f" }}},
-                rating: '{{origin.num_stars}}',
+                rating: '{{origin.popularity}}',
                 summary: `{{origin.summary}}`}
             ];
         {% endif %}

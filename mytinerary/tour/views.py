@@ -104,7 +104,7 @@ def pop_radius(request):
                                                          'longitude' : nearby_poi.longitude,
                                                          'poi_id' : nearby_poi.id,
                                                          'address' : nearby_poi.address,
-                                                         'rating' : nearby_poi.num_stars,
+                                                         'rating' : nearby_poi.popularity,
                                                          'category': nearby_poi.category,
                                                          'summary': nearby_poi.summary
                                                          })

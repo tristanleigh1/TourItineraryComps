@@ -76,6 +76,7 @@ function findNearbyPOIs(marker) {
         plotNearbyPois(nearby_pois, marker);
     }
     */
+    console.log("Nearby POIS: ", nearby_pois)
     plotNearbyPois(nearby_pois, marker);
     },
     cache : false,
@@ -193,8 +194,8 @@ function createInfoWindow(marker, centerMarker) {
         centerMarker.id + ');">Add';
     }
 
-    var content = '<p>' + marker.name + '</p><p>Yelp rating: ' +
-    marker.rating + '/5.0</p><div class="btn btn-primary btn-sm"' + onclick +
+    var content = '<p>' + marker.name + '</p><p>Rating: ' +
+    marker.rating + '/100.0</p><div class="btn btn-primary btn-sm"' + onclick +
     '</div><div class="btn btn-link btn-sm"' +
     'onclick="setInfoWindowContent('+ marker.id + ', ' + centerMarkerId +
     ');">More Info...</div>';
@@ -223,7 +224,7 @@ function setInfoWindowContent(markerId, centerMarkerId) {
     }
 
     var content = '<p>' + marker.name + `</p>
-    <p>Yelp rating: `+ marker.rating + `/5.0</p>
+    <p>Rating: `+ marker.rating + `/100.0</p>
     <div id="myCarousel" class="carousel slide" data-interval="false" >
     <div class="carousel-inner" style="height:150px;width:400px;overflow-y:auto;">
     <div class="active item">
