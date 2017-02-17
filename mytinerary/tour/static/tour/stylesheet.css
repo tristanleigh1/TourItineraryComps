@@ -28,7 +28,6 @@ input[type="range"]:focus
     outline: none
 }
 
-/* background */
 .slider.ui-slider {
   border-radius: 20px;
   background: #772953;
@@ -36,7 +35,6 @@ input[type="range"]:focus
   height: 10px;
   margin-top: 1em; }
  
-/* handle */
 .slider .ui-slider-handle {
   border-radius: 23px;
   height: 23px;
@@ -48,7 +46,6 @@ input[type="range"]:focus
 
 }
 
-/* pips */
 .slider .ui-slider-pip {
   top: 3px; }
                     
@@ -62,14 +59,3 @@ input[type="range"]:focus
 .slider .ui-slider-pip.ui-slider-pip-last .ui-slider-line,
 .slider .ui-slider-pip.ui-slider-pip-first .ui-slider-line {
   display: none; }
-
-.slider .ui-slider-pip.ui-slider-pip-selected-initial {
-font-weight: normal; }
-
-.slider .ui-slider-pip.ui-slider-pip-selected {
-font-weight: bold; }
-
-
-.slider .ui-slider-pip.ui-slider-pip-selected,
-.slider .ui-slider-pip.ui-slider-pip-selected-initial {
-color: #434d5a; }
