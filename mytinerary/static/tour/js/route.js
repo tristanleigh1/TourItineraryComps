@@ -68,6 +68,20 @@ function findNearbyPOIs(marker) {
                 }
             }
 
+<<<<<<< HEAD
+            // console.log("Nearby POIS: ", nearby_pois)
+            plotNearbyPois(nearby_pois, marker);
+        },
+        cache : false,
+        error : function(xhr, errmsg, err) {
+            for (var i=0; i<namespace.radiusMarkers.length; i++) {
+                marker = namespace.radiusMarkers[i];
+                marker.setMap(null);
+            }
+            console.log(errmsg);
+            console.log(xhr.status + " " + xhr.responseText);
+        }
+=======
             /* I (Caleb) am commenting this out because now the user can update the radius
             if (nearby_pois.length == 0 && marker.popRadius.getRadius() <= 18000) {
             marker.popRadius.setRadius(marker.popRadius.getRadius() + 500);
@@ -88,6 +102,7 @@ function findNearbyPOIs(marker) {
     console.log(errmsg);
     console.log(xhr.status + " " + xhr.responseText);
     }
+>>>>>>> cf35791727a832fb189ae4063e1cf75230fdf0a2
     });
 }
 
@@ -553,8 +568,8 @@ function sendDirections() {
         cache : false,
         error : function(xhr, errmsg, err) {
             window.open(url, "_blank");
-        	console.log(errmsg);
-        	console.log(xhr.status + " " + xhr.responseText);
+            console.log(errmsg);
+            console.log(xhr.status + " " + xhr.responseText);
         }
     });
 }
