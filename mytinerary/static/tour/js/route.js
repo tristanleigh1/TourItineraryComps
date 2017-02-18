@@ -191,7 +191,7 @@ function createInfoWindow(marker, centerMarker) {
 
     // There is no centerMarker if the marker is on our path
     if (centerMarker == null) {
-        onclick = ' onclick="removePoint(' + marker.id + ');">' +
+        onclick = ' id="removeBtn" onclick="removePoint(' + marker.id + ');">' +
         '<span class="glyphicon glyphicon-trash"></span>';
     } else {
         centerMarkerId = centerMarker.id;
@@ -220,7 +220,7 @@ function setInfoWindowContent(markerId, centerMarkerId) {
         console.log(marker);
         console.log(markerId);
         console.log(marker.id)
-        onclick = ' onclick="removePoint(' + marker.id + ');">' +
+        onclick = ' id="removeBtn" onclick="removePoint(' + marker.id + ');">' +
         '<span class="glyphicon glyphicon-trash"></span>';
     } else {
         marker = namespace.radiusMarkers[markerId];
@@ -263,7 +263,10 @@ function resetInfoWindow(markerId, centerMarkerId) {
 
 function removePoint(markerId) {
     if (namespace.markers.length == 1) {
-        alert("Cannot delete last POI! Add more than one point to delete one.");
+        var errorMessage = "Cannot delete last POI! Add more than one point to delete one.";
+        $("#removeBtn").before("<p><b>" + errorMessage + "</b></p>");
+        $(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
+        //alert("Cannot delete last POI! Add more than one point to delete one.");
     } else {
         namespace.markers[markerId].popRadius.setVisible(false);
 
@@ -420,6 +423,7 @@ function updateRoute(changedMarkerId) {
                     namespace.markers[i].popRadius.setVisible(false);
                     namespace.markers[i].setMap(namespace.map);
                 }
+                $("#warning").empty();
             }
 
             adjustZoom();
@@ -449,11 +453,19 @@ function updateRoute(changedMarkerId) {
                     errorMessage = "Directions request failed due to " + status;
             }
 
-            // Remove the marker and add the error message
-            namespace.markers[changedMarkerId].setMap(null);
-            namespace.markers.splice(changedMarkerId, 1);
-            $("#addBtn").before("<p><b>" + errorMessage + "</b></p>");
-            $(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
+            if (changedMarkerId) {
+                // Remove the marker and add the error message
+                namespace.markers[changedMarkerId].setMap(null);
+                namespace.markers.splice(changedMarkerId, 1);
+                $("#addBtn").before("<p><b>" + errorMessage + "</b></p>");
+                $(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
+            } else {
+                // The original path is invalid, remove destination and try again
+                $("#warning").html("Sorry! We couldn't find a route to your destination!");
+                namespace.markers[namespace.markers.length - 1].setMap(null);
+                namespace.markers.splice(-1, 1);
+                updateRoute();
+            }
         }
     });
 

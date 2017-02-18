@@ -16,6 +16,10 @@ body {
     background: inherit;
 }
 
+#warning {
+    color: red;
+}
+
 #map-container {
     top: 46px;
 }
