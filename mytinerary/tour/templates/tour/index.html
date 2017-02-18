@@ -3,17 +3,15 @@
 <html>
 <head>
     <title>Home - Mytinerary</title>
+    {% load static %}
     <link rel="stylesheet" href="https://bootswatch.com/united/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.4/themes/flick/jquery-ui.css">
-
-    {% load static %}
     <link rel="icon" href='{% static "tour/images/icon.png" %}' />
-
-    <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
     <link rel="stylesheet" type="text/css" href='{% static "tour/jquery-ui-slider-pips.min.css" %}' />
+    <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
     <link rel="stylesheet" type="text/css" href='{% static "tour/stylesheet.css" %}' />
     <script src='{% static "tour/js/jquery-ui-slider-pips.min.js" %}'></script>
     <script src='{% static "tour/js/autocomplete.js" %}'></script>
@@ -24,7 +22,6 @@
   <div class="col-lg-4 col-lg-offset-4">
     <form action="/tour/map/" method="GET" class="preference-form" name="indexForm" onsubmit="return validateForm()">
       <div class="form-horizontal">
-
         <div class="form-group row">
           <div class="col-sm-3"></div>
           <div class="btn-group col-sm-9" data-toggle="buttons">

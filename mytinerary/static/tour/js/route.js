@@ -67,8 +67,14 @@ function findNearbyPOIs(marker) {
                     nearby_pois.push(json["nearby_pois"][i]);
                 }
             }
-
-<<<<<<< HEAD
+            /* I (Caleb) am commenting this out because now the user can update the radius
+            if (nearby_pois.length == 0 && marker.popRadius.getRadius() <= 18000) {
+            marker.popRadius.setRadius(marker.popRadius.getRadius() + 500);
+            findNearbyPOIs(marker);
+                } else {
+                plotNearbyPois(nearby_pois, marker);
+            }
+            */
             // console.log("Nearby POIS: ", nearby_pois)
             plotNearbyPois(nearby_pois, marker);
         },
@@ -81,28 +87,6 @@ function findNearbyPOIs(marker) {
             console.log(errmsg);
             console.log(xhr.status + " " + xhr.responseText);
         }
-=======
-            /* I (Caleb) am commenting this out because now the user can update the radius
-            if (nearby_pois.length == 0 && marker.popRadius.getRadius() <= 18000) {
-            marker.popRadius.setRadius(marker.popRadius.getRadius() + 500);
-            findNearbyPOIs(marker);
-        } else {
-        plotNearbyPois(nearby_pois, marker);
-    }
-    */
-    // console.log("Nearby POIS: ", nearby_pois)
-    plotNearbyPois(nearby_pois, marker);
-    },
-    cache : false,
-    error : function(xhr, errmsg, err) {
-     for (var i=0; i<namespace.radiusMarkers.length; i++) {
-        marker = namespace.radiusMarkers[i];
-        marker.setMap(null);
-    }
-    console.log(errmsg);
-    console.log(xhr.status + " " + xhr.responseText);
-    }
->>>>>>> cf35791727a832fb189ae4063e1cf75230fdf0a2
     });
 }
 
@@ -176,8 +160,9 @@ function buildPopRadiusCircle(center, map) {
     return new google.maps.Circle({
         center: center,
         strokeWeight: 0,
-        fillColor: '#FF0000',
-        fillOpacity: 0.35,
+//        fillColor: '#FF0000',
+        fillColor: '#772953',
+        fillOpacity: 0.4,
         map: map,
         radius: 500,
         visible: false,
@@ -202,6 +187,7 @@ function createPopRadius(marker) {
 function createInfoWindow(marker, centerMarker) {
     var onclick;
     var centerMarkerId
+    var rating = (marker.rating == "None") ? "" : "Rating: " + Math.round(marker.rating) + "/100";
 
     // There is no centerMarker if the marker is on our path
     if (centerMarker == null) {
@@ -209,12 +195,12 @@ function createInfoWindow(marker, centerMarker) {
         '<span class="glyphicon glyphicon-trash"></span>';
     } else {
         centerMarkerId = centerMarker.id;
-        onclick = ' onclick="addPoint(' + marker.id + ', ' +
+        onclick = 'id="addBtn" onclick="addPoint(' + marker.id + ', ' +
         centerMarker.id + ');">Add';
     }
 
-    var content = '<p>' + marker.name + '</p><p>Rating: ' +
-    marker.rating + '/100.0</p><div class="btn btn-primary btn-sm"' + onclick +
+    var content = '<p>' + marker.name + '</p><p>' +
+    rating + '</p><div class="btn btn-primary btn-sm"' + onclick +
     '</div><div class="btn btn-link btn-sm"' +
     'onclick="setInfoWindowContent('+ marker.id + ', ' + centerMarkerId +
     ');">More Info...</div>';
@@ -224,7 +210,7 @@ function createInfoWindow(marker, centerMarker) {
     namespace.popWindow.open(namespace.map, marker);
 }
 
-//Called when user clicks on "More Info..." button in info window
+// Called when user clicks on "More Info..." button in info window
 function setInfoWindowContent(markerId, centerMarkerId) {
     var marker;
     var onclick;
@@ -238,7 +224,7 @@ function setInfoWindowContent(markerId, centerMarkerId) {
         '<span class="glyphicon glyphicon-trash"></span>';
     } else {
         marker = namespace.radiusMarkers[markerId];
-        onclick = ' onclick="addPoint(' + marker.id + ', ' +
+        onclick = 'id="addBtn" onclick="addPoint(' + marker.id + ', ' +
         centerMarkerId + ');">Add';
     }
 
@@ -422,8 +408,8 @@ function updateRoute(changedMarkerId) {
             }
 
             totalDuration = totalDuration / 60
-            $("#distance").innerHTML = totalDistance.toFixed(1) + units;
-            $("#walkingTime").innerHTML = totalDuration.toFixed(0) + " mins";
+            $("#distance").html(totalDistance.toFixed(1) + units);
+            $("#walkingTime").html(totalDuration.toFixed(0) + " mins");
 
             // If we added a point, refresh namespace.markers on namespace.map
             if (changedMarkerId) {
@@ -458,14 +444,15 @@ function updateRoute(changedMarkerId) {
                     break;
                 case 'ZERO_RESULTS':
                     errorMessage = "Sorry, this POI is inaccessable from your path.";
-                    namespace.markers[changedMarkerId].setMap(null);
-                    namespace.markers.splice(changedMarkerId, 1);
                     break;
                 default:
                     errorMessage = "Directions request failed due to " + status;
             }
 
-            $(".btn.btn-primary.btn-sm").before("<p><b>" + errorMessage + "</b></p>");
+            // Remove the marker and add the error message
+            namespace.markers[changedMarkerId].setMap(null);
+            namespace.markers.splice(changedMarkerId, 1);
+            $("#addBtn").before("<p><b>" + errorMessage + "</b></p>");
             $(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
         }
     });
