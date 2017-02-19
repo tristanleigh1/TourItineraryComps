@@ -94,6 +94,9 @@ function startToEnd() {
     initAutocomplete();
 }
 
+/**
+ * Adds html for the slider given the name of the preference category
+ */
 function addSliderHTML(name) {
     return `<div class="form-group row">
       <label class="col-sm-3 control-label">` + name.charAt(0).toUpperCase() + name.slice(1) + `</label>
