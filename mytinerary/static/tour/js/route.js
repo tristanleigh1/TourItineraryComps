@@ -2,6 +2,8 @@
 *  route.js
 *
 *  This file contains helper functions for map.html.
+*
+*  @author Braun, Jones, Leigh, Tuchow
 *  3/7/16
 */
 
@@ -28,9 +30,9 @@ function setup(params) {
     namespace = params;
     addSidebarButtons();
     updateRoute();
-    //this is making the map load take too long
     adjustZoom();
 }
+
 
 /**
 * Takes a marker on the route and queries the database for POIs that are
@@ -50,7 +52,6 @@ function findNearbyPOIs(marker) {
         dataType : 'json',
         success : function (json) {
             // Only adds nearby POIs that aren't already in route
-            // console.log(json);
             var nearby_pois = [];
             for (var i=0; i < json["nearby_pois"].length; i++) {
                 for (var j=0; j < namespace.markers.length; j++) {
@@ -67,15 +68,6 @@ function findNearbyPOIs(marker) {
                     nearby_pois.push(json["nearby_pois"][i]);
                 }
             }
-            /* I (Caleb) am commenting this out because now the user can update the radius
-            if (nearby_pois.length == 0 && marker.popRadius.getRadius() <= 18000) {
-            marker.popRadius.setRadius(marker.popRadius.getRadius() + 500);
-            findNearbyPOIs(marker);
-                } else {
-                plotNearbyPois(nearby_pois, marker);
-            }
-            */
-            // console.log("Nearby POIS: ", nearby_pois)
             plotNearbyPois(nearby_pois, marker);
         },
         cache : false,
@@ -90,8 +82,12 @@ function findNearbyPOIs(marker) {
     });
 }
 
-function plotNearbyPois(nearby_pois, centerMarker) {
 
+/**
+ * Takes a JSON Object of POIs near the marker on the path that has been selected
+ * and plots them on the map.
+ */
+function plotNearbyPois(nearby_pois, centerMarker) {
     // Get rid of namespace.markers from previous radius
     for (var i=0; i<namespace.radiusMarkers.length; i++) {
         marker = namespace.radiusMarkers[i];
@@ -125,28 +121,21 @@ function plotNearbyPois(nearby_pois, centerMarker) {
             summary: nearby_pois[i].summary,
         });
 
-
-            (
-              function (_popRadius, ignore, _marker) {
-                _popRadius.addListener("center_changed", function() {
+        (function (_popRadius, ignore, _marker) {
+            _popRadius.addListener("center_changed", function() {
                 if (ignore) {
-                  // console.log("here");
-                  ignore = false;
-                  return;
+                    ignore = false;
+                    return;
                 }
                 _popRadius.setEditable(false);
                 ignore = true;
-                // console.log("outside");
                 _popRadius.setCenter(_marker.position);
                 _popRadius.setEditable(true);
               });
-            })(popRadius, false, marker);
-
+        })(popRadius, false, marker);
 
         google.maps.event.addListener(marker.popRadius, 'radius_changed', function() {
-            if (marker.popRadius.getRadius() != 500) {
-                findNearbyPOIs(marker);
-            }
+            findNearbyPOIs(marker);
         });
 
         marker.addListener('click', function() {
@@ -156,11 +145,13 @@ function plotNearbyPois(nearby_pois, centerMarker) {
     }
 }
 
+/**
+ * adds pop radius circle on map
+ */
 function buildPopRadiusCircle(center, map) {
     return new google.maps.Circle({
         center: center,
         strokeWeight: 0,
-//        fillColor: '#FF0000',
         fillColor: '#772953',
         fillOpacity: 0.4,
         map: map,
@@ -171,19 +162,22 @@ function buildPopRadiusCircle(center, map) {
     });
 }
 
+/**
+ * changes selected marker and clears previous popradiuses
+ */
 function createPopRadius(marker) {
-    namespace.selectedMarker = marker;
-    marker.popRadius.setCenter(marker.position);
-    for (var i = 0; i < namespace.markers.length; i++) {
-        namespace.markers[i].popRadius.setVisible(false);
-        if (namespace.markers[i].popRadius.getRadius() != 500) {
-            namespace.markers[i].popRadius.setRadius(500);
-        }
+    if (namespace.selectedMarker) {
+        namespace.selectedMarker.popRadius.setVisible(false);
+        namespace.selectedMarker.popRadius.setRadius(500);
     }
-    marker.popRadius.setVisible(true);
+    namespace.selectedMarker = marker;
+    namespace.selectedMarker.popRadius.setVisible(true);
 }
 
-// Called when POI marker is clicked
+/** Takes a marker and a center marker, and if the marker is on path
+ * the centerMarker will be null. Creates an info window for the selected marker.
+ * Only called when POI marker is clicked.
+ */
 function createInfoWindow(marker, centerMarker) {
     var onclick;
     var centerMarkerId
@@ -204,22 +198,20 @@ function createInfoWindow(marker, centerMarker) {
     '</div><div class="btn btn-link btn-sm"' +
     'onclick="setInfoWindowContent('+ marker.id + ', ' + centerMarkerId +
     ');">More Info...</div>';
-    // console.log(content);
     namespace.popWindow.marker = marker;
     namespace.popWindow.setContent(content);
     namespace.popWindow.open(namespace.map, marker);
 }
 
-// Called when user clicks on "More Info..." button in info window
+/** Changes info window to a More Info window. Called when user clicks
+ * on "More Info..." button in info window.
+ */
 function setInfoWindowContent(markerId, centerMarkerId) {
     var marker;
     var onclick;
 
     if (typeof centerMarkerId === "undefined") {
         marker = namespace.markers[markerId];
-        console.log(marker);
-        console.log(markerId);
-        console.log(marker.id)
         onclick = ' id="removeBtn" onclick="removePoint(' + marker.id + ');">' +
         '<span class="glyphicon glyphicon-trash"></span>';
     } else {
@@ -228,8 +220,9 @@ function setInfoWindowContent(markerId, centerMarkerId) {
         centerMarkerId + ');">Add';
     }
 
+    var rating = (marker.rating == "None") ? "" : "Rating: " + Math.round(marker.rating) + "/100";
     var content = '<p>' + marker.name + `</p>
-    <p>Rating: `+ marker.rating + `/100.0</p>
+    <p>`+ rating + `</p>
     <div id="myCarousel" class="carousel slide" data-interval="false" >
     <div class="carousel-inner" style="height:150px;width:400px;overflow-y:auto;">
     <div class="active item">
@@ -245,11 +238,13 @@ function setInfoWindowContent(markerId, centerMarkerId) {
     <br/>
     <div class="btn btn-primary btn-sm"` + onclick + `</div>
     <div class="btn btn-link btn-sm" onclick="resetInfoWindow(`+ marker.id + ', ' + centerMarkerId + `);">Less Info</div>
-    <div class="btn btn-sm btn-primary pull-right" href="#myCarousel" data-slide="next">Next</div>`;
-
+    <div class="btn btn-sm btn-primary pull-right" href="#myCarousel" onclick="if (this.innerHTML == 'Summary') {this.innerHTML='Back';} else {this.innerHTML = 'Summary';}" data-slide="next">Summary</div>`;
     namespace.popWindow.setContent(content);
 }
 
+/**
+ * Resets info window to Default window. Called when user clicks the less info button.
+ */
 function resetInfoWindow(markerId, centerMarkerId) {
     if (centerMarkerId == null) {
         var marker = namespace.markers[markerId];
@@ -260,12 +255,14 @@ function resetInfoWindow(markerId, centerMarkerId) {
     }
 }
 
+/**
+ * Takes a markerId and removes the corresponding marker (and nearby markers) from the map
+ */
 function removePoint(markerId) {
     if (namespace.markers.length == 1) {
         var errorMessage = "Cannot delete last POI! Add more than one point to delete one.";
         $("#removeBtn").before("<p><b>" + errorMessage + "</b></p>");
         $(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
-        //alert("Cannot delete last POI! Add more than one point to delete one.");
     } else {
         namespace.markers[markerId].popRadius.setVisible(false);
 
@@ -275,9 +272,9 @@ function removePoint(markerId) {
             marker.setMap(null);
         }
         namespace.radiusMarkers.length = 0;
-
         namespace.markers[markerId].setMap(null);
         namespace.markers.splice(markerId, 1);
+
         for (var i = markerId; i < namespace.markers.length; i++) {
             namespace.markers[i].id--;
             namespace.markers[i].label--;
@@ -295,34 +292,15 @@ function removePoint(markerId) {
         marker.popRadius.setVisible(false);
     }
 
-
     $("#accordion").empty();
     addSidebarButtons();
 }
 
-function addPoint(newMarkerId, markerId, verified) {
-    var summary = ""
-    //************************WE SHOULD GET RID OF THIS************************
-    // Synchronous call to get summary for new point added to namespace.map
-    $.ajax({
-        async: false,
-        url : "/tour/get_summary_for_added_point/",
-        contentType: "application/json; charset=utf-8",
-        type : 'GET',
-        data : {
-            'id' : namespace.radiusMarkers[newMarkerId].poi_id
-        },
-        dataType : 'json',
-        success : function(json) {
-            summary = json['summary'];
-        },
-        cache : false,
-        error : function(xhr, errmsg, err) {
-            console.log(errmsg);
-            console.log(xhr.status + " " + xhr.responseText);
-        }
-    });
-
+/**
+ * Takes a nearby poi id in radius markers and the id of a path marker
+ * to create a new point in the route after the selected marker.
+ */
+function addPoint(newMarkerId, markerId) {
     var icon = getIconFromCategory(namespace.radiusMarkers[newMarkerId].category, true);
     var popRadius = buildPopRadiusCircle(namespace.radiusMarkers[newMarkerId].position, namespace.map);
 
@@ -334,7 +312,7 @@ function addPoint(newMarkerId, markerId, verified) {
         id: markerId,
         poi_id: namespace.radiusMarkers[newMarkerId].poi_id,
         label: (markerId+1).toString(),
-        summary: summary,
+        summary: namespace.radiusMarkers[newMarkerId].summary,
         category: namespace.radiusMarkers[newMarkerId].category,
         address: namespace.radiusMarkers[newMarkerId].address,
         icon: icon,
@@ -374,7 +352,9 @@ function addPoint(newMarkerId, markerId, verified) {
 
 
 /**
-* Updates the route and directions display to match the current path markers
+* Updates the route and directions display to match the current path markers.
+* Takes in the ID of the marker being added to the path. If no marker is being
+* added to the path, this value is null.
 */
 function updateRoute(changedMarkerId) {
     var waypoints = [];
@@ -391,7 +371,7 @@ function updateRoute(changedMarkerId) {
         if (status === 'OK') {
             namespace.directionsDisplay.setDirections(response);
 
-            // Compute the total distance of the route
+            // Compute the total distance and duration of the route
             var totalDistance = 0;
             var totalDuration = 0;
             var METERS_TO_MILES = 0.000621371192;
@@ -426,12 +406,13 @@ function updateRoute(changedMarkerId) {
             }
 
             adjustZoom();
-
+/*
             for (var i=0; i<namespace.radiusMarkers.length; i++) {
                 marker = namespace.radiusMarkers[i];
                 marker.setMap(null);
                 marker.popRadius.setVisible(false);
             }
+            */
             namespace.radiusMarkers.length = 0;
 
             $("#accordion").empty();
@@ -460,7 +441,7 @@ function updateRoute(changedMarkerId) {
                 $(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
             } else {
                 // The original path is invalid, remove destination and try again
-                $("#warning").html("Sorry! We couldn't find a route to your destination!");
+                $("#warning").html("Sorry! We couldn't find a route to your destination!<br>");
                 namespace.markers[namespace.markers.length - 1].setMap(null);
                 namespace.markers.splice(-1, 1);
                 updateRoute();
