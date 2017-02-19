@@ -240,7 +240,6 @@ function setInfoWindowContent(markerId, centerMarkerId) {
     <p>` + marker.summary + `</p>
     </div>
     </div>
-    <!--<div class="btn btn-sm btn-info" href="#myCarousel" data-slide="prev">Prev</div>-->
 
     </div>
     <br/>
@@ -554,12 +553,34 @@ function sendDirections() {
     url = url.replace(/,/g, "");
     url += "/data=!4m2!4m1!3e2"; // Data for making travel mode walking
 
+    var long_url = url;
+    var login = "jonesh2";
+    var api_key = "R_7d8d7eb547814128a370162f96dccaa6";
+
+    var short_url; 
+    
+
+    $.getJSON(
+            "http://api.bitly.com/v3/shorten?callback=?", 
+            {
+                "format": "json",
+                "apiKey": api_key,
+                "login": login,
+                "longUrl": long_url
+            },
+            function(response)
+            {
+       //         console.log('Shortened link is: ' + response.data.url);
+                var short_url = response.data.url;
+     //       }
+   // );
     var phoneNumber = $('input[name=phone1]').val() + $('input[name=phone2]').val() + $('input[name=phone3]').val()
 
+   // console.log(short_url);
     $.ajax({
         url : "/tour/send_directions/",
         type : 'GET',
-        data : { 'url' : url,
+        data : { 'url' : short_url,
                 'number' : phoneNumber},
         success : function(success) {
             console.log(success);
@@ -571,6 +592,8 @@ function sendDirections() {
             console.log(xhr.status + " " + xhr.responseText);
         }
     });
+}
+);
 }
 
 function getDirections() {
