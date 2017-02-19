@@ -82,7 +82,7 @@ function startToEnd() {
     var directness_preference = ["In a Rush", "More Direct", "Default", "Scenic Route", "Only the Best!"];
     var category_preference = ["None", "Few", "Some", "Many", "Lots!"];
 
-    createSlider("#miles", directness_preference, 5);
+    createSlider("#miles", directness_preference, 2);
     createSlider("#points", points_preference, 4);
     createSlider("#museums", category_preference, 2);
     createSlider("#landmarks", category_preference, 2);

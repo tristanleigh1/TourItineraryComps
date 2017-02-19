@@ -8,9 +8,10 @@
  * 1/8/17
 */
 
-// This requires the Places library. Include the libraries=places
-// parameter when you first load the API.
 
+/**
+ * Initializes the autocomplete and fills hidden form fields with their value
+ */
 function initAutocomplete() {
     var ac1 = document.getElementById('autocomplete1');
     var ac2 = document.getElementById('autocomplete2');
@@ -46,6 +47,11 @@ function initAutocomplete() {
     });
 }
 
+
+/**
+ * Takes a city name and returns the approximate lat/long of the center
+ * of the city
+ */
 function getCityLatLng(city) {
     switch(city) {
         case 'London':
@@ -62,9 +68,10 @@ function getCityLatLng(city) {
 }
 
 
-
-// Bias the autocomplete object to the user's geographical location,
-// as supplied by the city the user selects
+/**
+ * Bias the autocomplete object to the user's geographical location,
+ * as supplied by the city the user selects
+ */
 function geolocate() {
 
     var city = document.getElementById('citySelect').value;
@@ -76,6 +83,10 @@ function geolocate() {
     autocompleteEnd.setBounds(circle.getBounds());
 }
 
+/**
+ * Ensures that when the form is sumbitted, the inputs are filled correctly
+ * and the start and end are not too far apart
+ */
 function validateForm() {
 	var isValid = true;
 	var form = document.forms["indexForm"];

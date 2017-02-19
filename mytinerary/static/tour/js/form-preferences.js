@@ -1,7 +1,17 @@
-//$(document).ready(function() {
-//
-//});
+/**
+ * form-preferences.js
+ *
+ * Contains functions for the form inputs and changes form format depending
+ * on what mode the user selects.
+ *
+ * @author Braun, Jones, Leigh, Tuchow
+ * 2/19/17
+ */
 
+
+/**
+ * Initializes the slider with given preferences.
+ */
 function createSlider(name, quantifiers, default_val) {
     $(name)
         .slider({
@@ -24,6 +34,18 @@ function createSlider(name, quantifiers, default_val) {
     $(name + "Input").val(default_val);
 }
 
+
+/**
+ * Removes extra form HTML when exploratory mode is selected.
+ */
+function exploratoryMode() {
+  $("#start-to-end-fields").empty();
+}
+
+
+/**
+ * Fills in the HTML for when start-to-end mode is selected.
+ */
 function startToEnd() {
   $("#start-to-end-fields").html(`
     <div class="form-group row">
@@ -53,59 +75,14 @@ function startToEnd() {
         <div id="miles" class="slider"></div>
         <input type="hidden" id="milesInput" name="miles">
       </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-sm-3 control-label">Museums</label>
-      <div class="col-sm-6">
-        <div id="museums" class="slider"></div>
-        <input type="hidden" id="museumsInput" name="museums">
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-sm-3 control-label">Landmarks</label>
-      <div class="col-sm-6">
-        <div id="landmarks" class="slider"></div>
-        <input type="hidden" id="landmarksInput" name="landmarks">
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-sm-3 control-label">Activities</label>
-      <div class="col-sm-6">
-        <div id="activities" class="slider"></div>
-        <input type="hidden" id="activitiesInput" name="activities">
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-sm-3 control-label">Parks</label>
-      <div class="col-sm-6">
-        <div id="parks" class="slider"></div>
-        <input type="hidden" id="parksInput" name="parks">
-      </div>
-    </div>
-    `);
+    </div>` + addSliderHTML("museums") + addSliderHTML("landmarks") + addSliderHTML("activities") + addSliderHTML("parks")
+    );
 
     var points_preference = ["0","1","2","3","4","5","6","7","8"];
     var directness_preference = ["In a Rush", "More Direct", "Default", "Scenic Route", "Only the Best!"];
     var category_preference = ["None", "Few", "Some", "Many", "Lots!"];
-    $("#miles")
-        .slider({
-            min: 0,
-            max: 4,
-            value: 2,
-            animate: 500,
-            slide: function( event, ui ) {
-                $("#milesInput").val(ui.value * 2.5);
-            }
-        })
-        .slider("pips", {
-            first: "pip",
-            last: "pip",
-        })
-        .slider("float", {
-            labels: directness_preference
-        });
-    $("#milesInput").val(5);
 
+    createSlider("#miles", directness_preference, 2);
     createSlider("#points", points_preference, 4);
     createSlider("#museums", category_preference, 2);
     createSlider("#landmarks", category_preference, 2);
@@ -117,6 +94,12 @@ function startToEnd() {
     initAutocomplete();
 }
 
-function exploratoryMode() {
-  $("#start-to-end-fields").empty();
+function addSliderHTML(name) {
+    return `<div class="form-group row">
+      <label class="col-sm-3 control-label">` + name.charAt(0).toUpperCase() + name.slice(1) + `</label>
+      <div class="col-sm-6">
+        <div id="` + name + `" class="slider"></div>
+        <input type="hidden" id="` + name + `Input" name="` + name + `">
+      </div>
+    </div>`;
 }
