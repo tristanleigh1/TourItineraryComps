@@ -7,9 +7,6 @@ import urllib.request
 from urllib.error import HTTPError
 import json
 import base64
-#from apscheduler.schedulers.blocking import BlockingScheduler
-
-#sched = BlockingScheduler()
 
 def calculate_popularity(business, result_dict):
     popularity = 0
@@ -28,7 +25,6 @@ def adjust_lat_lon(lat, lon):
     lon = float(lon)
     return [(radius_lat + lat, radius_lon + lon), (radius_lat - lat, radius_lon - lon), (radius_lat + lat, radius_lon - lon), (radius_lat - lat, radius_lon + lon)]
 
-#@sched.scheduled_job('cron', day_of_week='sun', hour=3)
 def populate_db():
     client_id = 'utuJWCc9bdvLlOHfbkXThA'
     secret = '812V05KxL5KMsYgPTksEl6ZzqILBf9Nv5spXvmtU3M9FAgpxQEYHPLW0QnDP24J8'
@@ -148,7 +144,7 @@ def populate_db():
 
         if not lon:
             continue
-        
+
         dup_lat_lon_pois = POI.objects.filter(latitude = lat, longitude = lon).exclude(business_name = b.get('name', 'N/A'))
         if dup_lat_lon_pois.exists():
             continue
@@ -217,14 +213,6 @@ def populate_db():
             p.save()
 
     print("Complete!")
-
-#sched.start()
-#sched.print_jobs()
-
-#while True:
-#    time.sleep(10)
-
-#sched.shutdown()
 
 def main():
     populate_db()

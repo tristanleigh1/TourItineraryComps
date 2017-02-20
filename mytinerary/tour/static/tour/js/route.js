@@ -7,18 +7,6 @@
 *  3/7/16
 */
 
-/*
-namespace = {
-    markers: markers,
-    radiusMarkers: radiusMarkers,
-    popWindow: popWindow,
-    map: map,
-    directionsService: directionsService,
-    directionsDisplay: directionsDisplay,
-    filterStatus: 31,
-    selectedMarker: null
-}
-*/
 var namespace;
 var zoomIgnore;
 
@@ -32,7 +20,6 @@ function setup(params) {
     updateRoute();
     adjustZoom();
 }
-
 
 /**
 * Takes a marker on the route and queries the database for POIs that are
@@ -82,13 +69,12 @@ function findNearbyPOIs(marker) {
     });
 }
 
-
 /**
- * Takes a JSON Object of POIs near the marker on the path that has been selected
- * and plots them on the map.
- */
+* Takes a JSON Object of POIs near the marker on the path that has been selected
+* and plots them on the map.
+*/
 function plotNearbyPois(nearby_pois, centerMarker) {
-    // Get rid of namespace.markers from previous radius
+    // Get rid of markers from previous radius
     for (var i=0; i<namespace.radiusMarkers.length; i++) {
         marker = namespace.radiusMarkers[i];
         marker.setMap(null);
@@ -131,7 +117,7 @@ function plotNearbyPois(nearby_pois, centerMarker) {
                 ignore = true;
                 _popRadius.setCenter(_marker.position);
                 _popRadius.setEditable(true);
-              });
+            });
         })(popRadius, false, marker);
 
         google.maps.event.addListener(marker.popRadius, 'radius_changed', function() {
@@ -146,8 +132,8 @@ function plotNearbyPois(nearby_pois, centerMarker) {
 }
 
 /**
- * adds pop radius circle on map
- */
+* Adds pop radius circle on map
+*/
 function buildPopRadiusCircle(center, map) {
     return new google.maps.Circle({
         center: center,
@@ -163,8 +149,8 @@ function buildPopRadiusCircle(center, map) {
 }
 
 /**
- * changes selected marker and clears previous popradiuses
- */
+* Changes selected marker and clears previous popradiuses
+*/
 function createPopRadius(marker) {
     if (namespace.selectedMarker) {
         namespace.selectedMarker.popRadius.setVisible(false);
@@ -174,10 +160,11 @@ function createPopRadius(marker) {
     namespace.selectedMarker.popRadius.setVisible(true);
 }
 
-/** Takes a marker and a center marker, and if the marker is on path
- * the centerMarker will be null. Creates an info window for the selected marker.
- * Only called when POI marker is clicked.
- */
+/**
+* Takes a marker and a center marker, and if the marker is on path
+* the centerMarker will be null. Creates an info window for the selected marker.
+* Only called when POI marker is clicked.
+*/
 function createInfoWindow(marker, centerMarker) {
     var onclick;
     var centerMarkerId
@@ -198,14 +185,16 @@ function createInfoWindow(marker, centerMarker) {
     '</div><div class="btn btn-link btn-sm"' +
     'onclick="setInfoWindowContent('+ marker.id + ', ' + centerMarkerId +
     ');">More Info...</div>';
+
     namespace.popWindow.marker = marker;
     namespace.popWindow.setContent(content);
     namespace.popWindow.open(namespace.map, marker);
 }
 
-/** Changes info window to a More Info window. Called when user clicks
- * on "More Info..." button in info window.
- */
+/**
+* Changes info window to a More Info window. Called when user clicks
+* on "More Info..." button in info window.
+*/
 function setInfoWindowContent(markerId, centerMarkerId) {
     var marker;
     var onclick;
@@ -243,8 +232,8 @@ function setInfoWindowContent(markerId, centerMarkerId) {
 }
 
 /**
- * Resets info window to Default window. Called when user clicks the less info button.
- */
+* Resets info window to Default window. Called when user clicks the less info button.
+*/
 function resetInfoWindow(markerId, centerMarkerId) {
     if (centerMarkerId == null) {
         var marker = namespace.markers[markerId];
@@ -256,8 +245,8 @@ function resetInfoWindow(markerId, centerMarkerId) {
 }
 
 /**
- * Takes a markerId and removes the corresponding marker (and nearby markers) from the map
- */
+* Takes a markerId and removes the corresponding marker (and nearby markers) from the map
+*/
 function removePoint(markerId) {
     if (namespace.markers.length == 1) {
         var errorMessage = "Cannot delete last POI! Add more than one point to delete one.";
@@ -266,7 +255,7 @@ function removePoint(markerId) {
     } else {
         namespace.markers[markerId].popRadius.setVisible(false);
 
-        // Remove nearby_pois from map
+        // Remove nearby POIs from map
         for (var i=0; i<namespace.radiusMarkers.length; i++) {
             marker = namespace.radiusMarkers[i];
             marker.setMap(null);
@@ -275,6 +264,7 @@ function removePoint(markerId) {
         namespace.markers[markerId].setMap(null);
         namespace.markers.splice(markerId, 1);
 
+        // Update list of markers after removing point
         for (var i = markerId; i < namespace.markers.length; i++) {
             namespace.markers[i].id--;
             namespace.markers[i].label--;
@@ -286,6 +276,7 @@ function removePoint(markerId) {
         updateRoute();
     }
 
+    // Remove nearby POIs and pop radius
     for (var i=0; i<namespace.radiusMarkers.length; i++) {
         marker = namespace.radiusMarkers[i];
         marker.setMap(null);
@@ -297,9 +288,9 @@ function removePoint(markerId) {
 }
 
 /**
- * Takes a nearby poi id in radius markers and the id of a path marker
- * to create a new point in the route after the selected marker.
- */
+* Takes a nearby poi id in radius markers and the id of a path marker
+* to create a new point in the route after the selected marker.
+*/
 function addPoint(newMarkerId, markerId) {
     var icon = getIconFromCategory(namespace.radiusMarkers[newMarkerId].category, true);
     var popRadius = buildPopRadiusCircle(namespace.radiusMarkers[newMarkerId].position, namespace.map);
@@ -423,14 +414,14 @@ function updateRoute(changedMarkerId) {
             var errorMessage;
             switch (status) {
                 case 'MAX_WAYPOINTS_EXCEEDED':
-                    // Google's limit is 23 waypoints (+ start/end)
-                    errorMessage = "Sorry, you cannot add more stops.";
-                    break;
+                // Google's limit is 23 waypoints (+ start/end)
+                errorMessage = "Sorry, you cannot add more stops.";
+                break;
                 case 'ZERO_RESULTS':
-                    errorMessage = "Sorry, this POI is inaccessable from your path.";
-                    break;
+                errorMessage = "Sorry, this POI is inaccessable from your path.";
+                break;
                 default:
-                    errorMessage = "Directions request failed due to " + status;
+                errorMessage = "Directions request failed due to " + status;
             }
 
             if (changedMarkerId) {
@@ -459,8 +450,8 @@ function updateRoute(changedMarkerId) {
 
 
 /**
- * Add the html for the sidebar for each POI on the route
- */
+* Add the html for the sidebar for each POI on the route
+*/
 function addSidebarButtons() {
     for (var i = 0; i < namespace.markers.length; i++) {
         $("#accordion").append(
@@ -488,8 +479,8 @@ function addSidebarButtons() {
 }
 
 /*
- * Adds a listener to the directions panel for when it's finished loading
- */
+* Adds a listener to the directions panel for when it's finished loading
+*/
 function initDirectionsListener() {
     directionsPanel = document.getElementById("panel");
     if (directionsPanel.addEventListener) {
@@ -544,43 +535,38 @@ function sendDirections() {
     var login = "jonesh2";
     var api_key = "R_7d8d7eb547814128a370162f96dccaa6";
 
-    var short_url; 
-    
+    var short_url;
+
 
     $.getJSON(
-            "http://api.bitly.com/v3/shorten?callback=?", 
-            {
-                "format": "json",
-                "apiKey": api_key,
-                "login": login,
-                "longUrl": long_url
-            },
-            function(response)
-            {
-       //         console.log('Shortened link is: ' + response.data.url);
-                var short_url = response.data.url;
-     //       }
-   // );
-    var phoneNumber = $('input[name=phone1]').val() + $('input[name=phone2]').val() + $('input[name=phone3]').val()
-
-   // console.log(short_url);
-    $.ajax({
-        url : "/tour/send_directions/",
-        type : 'GET',
-        data : { 'url' : short_url,
-                'number' : phoneNumber},
-        success : function(success) {
-            console.log(success);
+        "http://api.bitly.com/v3/shorten?callback=?",
+        {
+            "format": "json",
+            "apiKey": api_key,
+            "login": login,
+            "longUrl": long_url
         },
-        cache : false,
-        error : function(xhr, errmsg, err) {
-            window.open(url, "_blank");
-            console.log(errmsg);
-            console.log(xhr.status + " " + xhr.responseText);
+        function(response) {
+            var short_url = response.data.url;
+            var phoneNumber = $('input[name=phone1]').val() + $('input[name=phone2]').val() + $('input[name=phone3]').val()
+
+            $.ajax({
+                url : "/tour/send_directions/",
+                type : 'GET',
+                data : { 'url' : short_url,
+                'number' : phoneNumber},
+                success : function(success) {
+                    console.log(success);
+                },
+                cache : false,
+                error : function(xhr, errmsg, err) {
+                    window.open(url, "_blank");
+                    console.log(errmsg);
+                    console.log(xhr.status + " " + xhr.responseText);
+                }
+            });
         }
-    });
-}
-);
+    );
 }
 
 function getDirections() {
@@ -598,11 +584,9 @@ function getDirections() {
         document.getElementById('panel').style.display = 'block';
         namespace.directionsDisplay.setPanel(document.getElementById('panel'));
     }
-
-
 }
 
-//drag sidebar buttons to update route
+// Drag sidebar buttons to update route
 $( function() {
     $( "#accordion" ).sortable({
         axis: "y",
@@ -620,8 +604,8 @@ $( function() {
             namespace.markers[start_idx].popRadius.setVisible(false);
             namespace.markers[start_idx].setMap(namespace.map);
 
-            //refresh namespace.markers on namespace.map with updated labels
-            if (start_idx > end_idx) { //drag down
+            // Refreshes markers on map with updated labels
+            if (start_idx > end_idx) { // Drag down
                 namespace.markers.splice(end_idx, 0, namespace.markers[start_idx]);
                 namespace.markers.splice(start_idx+1, 1);
                 for (var i = end_idx + 1; i <= start_idx; i++) {
@@ -631,11 +615,10 @@ $( function() {
                     namespace.markers[i].popRadius.setVisible(false);
                     namespace.markers[i].setMap(namespace.map);
                 }
-            } else { //drag up
+            } else { // Drag up
                 namespace.markers.splice(end_idx+1, 0, namespace.markers[start_idx]);
                 namespace.markers.splice(start_idx, 1);
                 for (var i = start_idx; i < end_idx; i++) {
-                    //***************this doesn't look right to me (but it seems to work)*************
                     namespace.markers[i].id--;
                     namespace.markers[i].label = i + 1;
                     namespace.markers[i].setMap(null);
@@ -675,12 +658,12 @@ function updateFilter(spot) {
     }
 }
 
-//make sure map isn't zoomed in too much
+// Makes sure map isn't zoomed in too much
 function adjustZoom() {
     var listener = google.maps.event.addListener(namespace.map, "zoom_changed", function() {
         if (zoomIgnore) {
-          zoomIgnore = false;
-          return;
+            zoomIgnore = false;
+            return;
         }
         if (namespace.map.getZoom() > 16) {
             zoomIgnore = true;
