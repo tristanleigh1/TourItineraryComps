@@ -115,13 +115,13 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences, path_c
     total_preference_points = .0001 + float(preferences[0]) + float(preferences[1]) + float(preferences[2]) + float(preferences[3])
     score = float("inf")
     if current_poi.category == 'Museums':
-        taste = float(preferences[0])*(.8 - path_cat_dict['Museums']* .15)/total_preference_points
+        taste = float(preferences[0])*(.8 - path_cat_dict['Museums']* .1)/total_preference_points
     elif current_poi.category == 'Landmarks':
-        taste = float(preferences[1])*(.8 - path_cat_dict['Landmarks'] * .15)/total_preference_points
+        taste = float(preferences[1])*(.8 - path_cat_dict['Landmarks'] * .1)/total_preference_points
     elif current_poi.category == 'Activities':
-        taste = float(preferences[2])*(.8 - path_cat_dict['Activities'] * .15)/total_preference_points
+        taste = float(preferences[2])*(.8 - path_cat_dict['Activities'] * .1)/total_preference_points
     else:
-        taste = float(preferences[3])*(.8 - path_cat_dict['Nature'] * .15)/total_preference_points
+        taste = float(preferences[3])*(.8 - path_cat_dict['Nature'] * .1)/total_preference_points
 
     walk_factor = float(walk_factor) * .75
 
