@@ -29,7 +29,7 @@ function initAutocomplete() {
         document.getElementById('endLngLat').value = autocompleteEnd.getPlace().geometry.location;
         document.getElementById('endAddress').value = autocompleteEnd.getPlace().formatted_address;
     });
-    $(ac1).on('input', function() { 
+    $(ac1).on('input', function() {
         document.getElementById('startLngLat').value = '';
     });
 
@@ -88,35 +88,35 @@ function geolocate() {
  * and the start and end are not too far apart
  */
 function validateForm() {
-	var isValid = true;
-	var form = document.forms["indexForm"];
+    var isValid = true;
+    var form = document.forms["indexForm"];
     var cityName = document.getElementById('citySelect').value;
-    var city = getCityLatLng(cityName);  
+    var city = getCityLatLng(cityName);
     var start = form["startCoords"].value.split(",");
     var max = 0.1;
     var errorMsg1 = "<p id=errorMsg1 style='color:crimson'>Start location is too far from " + cityName + "</p>";
     var errorMsg2 = "<p id=errorMsg2 style='color:crimson'>End location is too far from " + cityName + "</p>";
 
     // Remove previous error styling
-	document.getElementById('autocomplete1').removeAttribute("style");
+    document.getElementById('autocomplete1').removeAttribute("style");
     $("#errorMsg1").html('');
 
     // Check if the start location is valid
-	if (!form["startDestination"].value || form["startCoords"].value == '') {
-		document.getElementById('autocomplete1').style.borderColor = "red";
-		isValid = false;
-	} else {
+    if (!form["startDestination"].value || form["startCoords"].value == '') {
+        document.getElementById('autocomplete1').style.borderColor = "red";
+        isValid = false;
+    } else {
         // Check if end location is too far from city
         var startLat = parseFloat(start[0].substring(1));
-        var startLng = parseFloat(start[1].substring(0, start[1].length-1));
-        if (startLat < city.lat - max || startLng < city.lng - max || startLat > city.lat + max || startLng > city.lng + max) {
+        var startLng = parseFloat(start[1].substring(0,  start[1].length-1));
+        if (startLat < city.lat - max || startLng < city.lng - max ||   startLat > city.lat + max || startLng > city.lng + max) {
             $("#autocomplete1").after(errorMsg1);
             isValid = false;
-        } 
-	}
+        }
+    }
 
-	// Check if we're in exploratory mode before checking if end location is valid
-	if ($("#start-to-end-fields").html() != '') {
+      // Check if we're in exploratory mode before checking if end location is valid
+      if ($("#start-to-end-fields").html() != '') {
         var end = form["endCoords"].value.split(",");
 
         // Remove previous error styling
@@ -137,5 +137,5 @@ function validateForm() {
         }
     }
 
-	return isValid;
+  return isValid;
 }

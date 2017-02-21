@@ -463,7 +463,9 @@ function addSidebarButtons() {
             i + `" aria-expanded="false" aria-controls="collapse` + i + `">
             ` + (i + 1) + `: ` + namespace.markers[i].name + `
             </a>
+            
             </h4>
+            <div class="btn btn-link btn-sm pull-right" style="text-decoration:none;position:relative;top:-35px;right:-15px;color:black;" onclick="removePoint(` + i + `);">x</div>
             </div>
             </div>
             <div id="collapse` + i + `" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading` +
@@ -557,6 +559,9 @@ function sendDirections() {
                 'number' : phoneNumber},
                 success : function(success) {
                     console.log(success);
+                    $('.one_half').prop('onclick',null).off('click');
+                    console.log($('.one_half'));
+                    $('.one_half').text('sent!');
                 },
                 cache : false,
                 error : function(xhr, errmsg, err) {
@@ -594,6 +599,10 @@ $( function() {
         start: function(event, ui) {
             var start_idx = ui.item.index();
             ui.item.data('start_idx', start_idx);
+            //************************DELET THIS*****************************
+            createPopRadius(namespace.markers[start_idx]);
+            createInfoWindow(namespace.markers[start_idx], null);
+            findNearbyPOIs(namespace.markers[start_idx]);
         },
         update: function(event, ui) {
             var start_idx = ui.item.data('start_idx');
@@ -634,13 +643,23 @@ $( function() {
                 marker.popRadius.setVisible(false);
             }
             namespace.radiusMarkers.length = 0;
+//            createPopRadius(namespace.markers[end_idx]);
+//            createInfoWindow(namespace.markers[end_idx], null);
+//            findNearbyPOIs(namespace.markers[end_idx]);
 
             $("#accordion").empty();
             addSidebarButtons();
         }
     });
 });
+//$(".panel-heading").hover( function() {
+//    alert(this.index())
+//});
 
+
+/**
+* Updates the filter status by toggling a given category (indicated by the spot)
+*/
 function updateFilterStatus(spot) {
     var shiftedStatus = namespace.filterStatus >> spot;
     if (shiftedStatus % 2 == 0) {
