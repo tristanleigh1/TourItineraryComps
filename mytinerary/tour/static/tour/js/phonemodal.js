@@ -24,6 +24,7 @@ function sendText(url) {
 
     $('.one_half .btn').html('<img src="/static/tour/images/loading.svg">');
     $('.one_half .btn').attr('href', 'javascript:void(0);');
+
     $.ajax({
         url : "/tour/send_directions/",
         type : 'GET',
