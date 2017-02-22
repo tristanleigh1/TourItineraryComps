@@ -12,6 +12,7 @@ def create_path(total_pois, start, end, walk_factor, preferences, num_destinatio
     path_segments = [(start, end)]
     path_pois = []
     total_pois = list(total_pois)
+    path_pois_category_dictionary = {'Museums': 0.0, 'Nature': 0.0, 'Activities': 0.0, 'Landmarks': 0.0}
 
     count = 0
     for poi in total_pois:
@@ -19,9 +20,10 @@ def create_path(total_pois, start, end, walk_factor, preferences, num_destinatio
             total_pois.remove(poi)
 
     while len(path_pois) < MAX_POIS:
-        poi = find_next_poi(total_pois, path_segments, walk_factor, preferences)
+        poi = find_next_poi(total_pois, path_segments, walk_factor, preferences, path_pois_category_dictionary)
         path_pois.append(poi)
         total_pois.remove(poi)
+        path_pois_category_dictionary[poi.category]+=1
 
     final_path_pois = []
     for i in range(len(path_segments)-1):
@@ -62,7 +64,7 @@ def isStartOrEnd(poi, start, end):
     Given a list of all possible POIs, the current segments on the path, and user's input, calculate
     the score of each POI, adds the POI with the highest score to the path, and returns that POI.
 '''
-def find_next_poi(poi_list, path_segments, walk_factor, preferences):
+def find_next_poi(poi_list, path_segments, walk_factor, preferences, path_category_dict):
     poi_to_add = None
     seg_to_add_to = None
     min_score = float("inf")
@@ -77,7 +79,8 @@ def find_next_poi(poi_list, path_segments, walk_factor, preferences):
         # Check to make sure we aren't adding POI that is the same as end point.
         if poi.business_name == path_segments[len(path_segments)-1][1].business_name:
             continue
-        score, segment, where_in_segment = calculate_score(poi, path_segments, walk_factor, preferences)
+        score, segment, where_in_segment = calculate_score(poi, path_segments, walk_factor, preferences, path_category_dict)
+
         if score < min_score:
             poi_to_add = poi
             min_score = score
@@ -94,7 +97,7 @@ def find_next_poi(poi_list, path_segments, walk_factor, preferences):
     Equations used based on equations in original research paper that project
     was inspired by.
 '''
-def calculate_score(current_poi, path_segments, walk_factor, preferences):
+def calculate_score(current_poi, path_segments, walk_factor, preferences, path_cat_dict):
     # empirical_coefficient is constant that helps balance importance of POI's
     # distance to path and how much it fits user's preferences
     empirical_coefficient = 0.0006
@@ -113,13 +116,13 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
     total_preference_points = .0001 + float(preferences[0]) + float(preferences[1]) + float(preferences[2]) + float(preferences[3])
     score = float("inf")
     if current_poi.category == 'Museums':
-        taste = float(preferences[0])*.8/total_preference_points
+        taste = float(preferences[0])*(.8 - path_cat_dict['Museums']* .1)/total_preference_points
     elif current_poi.category == 'Landmarks':
-        taste = float(preferences[1])*.6/total_preference_points
+        taste = float(preferences[1])*(.8 - path_cat_dict['Landmarks'] * .1)/total_preference_points
     elif current_poi.category == 'Activities':
-        taste = float(preferences[2])*.8/total_preference_points
+        taste = float(preferences[2])*(.8 - path_cat_dict['Activities'] * .1)/total_preference_points
     else:
-        taste = float(preferences[3])*.8/total_preference_points
+        taste = float(preferences[3])*(.8 - path_cat_dict['Nature'] * .1)/total_preference_points
 
     walk_factor = float(walk_factor) * .75
 
@@ -179,7 +182,6 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences):
                         where_in_segment = "end"
                     else:
                         where_in_segment = "middle"
-
 
        # Update the smallest distance
         if distance_to_segment < distance_to_path:

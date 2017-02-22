@@ -463,7 +463,6 @@ function addSidebarButtons() {
             i + `" aria-expanded="false" aria-controls="collapse` + i + `">
             ` + (i + 1) + `: ` + namespace.markers[i].name + `
             </a>
-
             </h4>
             <div class="btn btn-link btn-sm pull-right" style="text-decoration:none;position:relative;top:-35px;right:-15px;color:black;" onclick="removePoint(` + i + `);">x</div>
             </div>
