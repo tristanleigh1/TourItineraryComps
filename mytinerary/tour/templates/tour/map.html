@@ -135,6 +135,7 @@
             })(marker);
 
             markers.push(marker);
+
             marker.addListener('click', function() {
                 createPopRadius(this);
                 createInfoWindow(this, null);
@@ -236,6 +237,7 @@
                                     <input type="text" name="phone3" maxlength="4" oninput="autotab(this)">
                                 <div class="one_half last"><a  href="javascript:sendDirections();" class="btn btn_red">Send</a></div>
                                 </div>
+                                <img src="loading.svg">
                                 </section>
                             </div>
                             <input type="hidden" id="startLngLat" name="startCoords">

@@ -15,6 +15,7 @@ $("#modal_trigger").leanModal({
 function sendText(url) {
     var phoneNumber = $('input[name=phone1]').val() + $('input[name=phone2]').val() + $('input[name=phone3]').val()
 
+
     $.ajax({
         url : "/tour/send_directions/",
         type : 'GET',
@@ -64,29 +65,3 @@ function closeSendDirectionsWindow(success) {
     console.log($('.one_half'));
     $('.one_half').text('sent!');
 }
-
-$(function() {
- //       Calling Login Form
-        $("#login_form").click(function() {
-                $(".social_login").hide();
-                    $(".user_login").show();
-                        return false;
-                            });
-
-  //  Calling Register Form
-        $("#register_form").click(function() {
-                $(".social_login").hide();
-                    $(".user_register").show();
-                        $(".header_title").text('Register');
-                            return false;
-                                });
-
-   // Going back to Social Forms
-        $(".back_btn").click(function() {
-                $(".user_login").hide();
-                    $(".user_register").hide();
-                        $(".social_login").show();
-                            $(".header_title").text('Login');
-                                return false;
-                                    });
-});
