@@ -463,7 +463,6 @@ function addSidebarButtons() {
             i + `" aria-expanded="false" aria-controls="collapse` + i + `">
             ` + (i + 1) + `: ` + namespace.markers[i].name + `
             </a>
-            
             </h4>
             <div class="btn btn-link btn-sm pull-right" style="text-decoration:none;position:relative;top:-35px;right:-15px;color:black;" onclick="removePoint(` + i + `);">x</div>
             </div>
@@ -512,33 +511,9 @@ function autotab(current) {
 
 // Constructs the URL for the google.maps version of your route
 function sendDirections() {
-    var url = 'https://www.google.com/maps/dir';
-    var directionsAddresses = []
-    var route = namespace.directionsDisplay.getDirections().routes[0];
-    if (route.legs.length > 13) {
-        alert("Google maps cannot render this many points");
-        return;
-    }
-    for (var i = 0; i < route.legs.length; i++) {
-        if (i == 0) {
-            directionsAddresses.push(route.legs[i].start_address);
-        }
-        directionsAddresses.push(route.legs[i].end_address);
-    }
-
-    for (var i = 0; i < directionsAddresses.length; i++) {
-        url += "/" + directionsAddresses[i];
-    }
-    url = url.replace(/\s/g, "+");
-    url = url.replace(/,/g, "");
-    url += "/data=!4m2!4m1!3e2"; // Data for making travel mode walking
-
-    var long_url = url;
+    var long_url = getDirectionsURL(namespace.directionsDisplay);
     var login = "jonesh2";
     var api_key = "R_7d8d7eb547814128a370162f96dccaa6";
-
-    var short_url;
-
 
     $.getJSON(
         "http://api.bitly.com/v3/shorten?callback=?",
@@ -550,29 +525,11 @@ function sendDirections() {
         },
         function(response) {
             var short_url = response.data.url;
-            var phoneNumber = $('input[name=phone1]').val() + $('input[name=phone2]').val() + $('input[name=phone3]').val()
-
-            $.ajax({
-                url : "/tour/send_directions/",
-                type : 'GET',
-                data : { 'url' : short_url,
-                'number' : phoneNumber},
-                success : function(success) {
-                    console.log(success);
-                    $('.one_half').prop('onclick',null).off('click');
-                    console.log($('.one_half'));
-                    $('.one_half').text('sent!');
-                },
-                cache : false,
-                error : function(xhr, errmsg, err) {
-                    window.open(url, "_blank");
-                    console.log(errmsg);
-                    console.log(xhr.status + " " + xhr.responseText);
-                }
-            });
+            sendText(short_url);
         }
     );
 }
+
 
 function getDirections() {
     // If the directions pane is open
@@ -653,7 +610,7 @@ $( function() {
     });
 });
 //$(".panel-heading").hover( function() {
-  //  alert(this.index())
+//    alert(this.index())
 //});
 
 

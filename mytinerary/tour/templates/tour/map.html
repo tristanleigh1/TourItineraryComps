@@ -135,6 +135,7 @@
             })(marker);
 
             markers.push(marker);
+
             marker.addListener('click', function() {
                 createPopRadius(this);
                 createInfoWindow(this, null);
@@ -220,7 +221,7 @@
                         <div class="col-md-6">
                             <div class="btn btn-info btn-sm" id="db" onclick="getDirections();">Get Directions!</div>
 
-                            <div class="btn btn-info btn-sm" id="modal_trigger" href="#modal">Text Me Directions</div>
+                            <div class="btn btn-info btn-sm" id="modal_trigger" href="#modal">Send Me Directions</div>
 
                             <div id="modal" class="popupContainer" style="display:none;">
                             <header class="popupHeader">
@@ -231,10 +232,13 @@
                                 <section class="popupBody">
                                 <div>
                                 <label>Phone: (</label>
-                                    <input type="text" name="phone1" maxlength="3" oninput="autotab(this)">)
+                                    <input type="text" name="phone1" maxlength="3" oninput="autotab(this)">
+                                    <b>)</b>
                                     <input type="text" name="phone2" maxlength="3" oninput="autotab(this)"> -
                                     <input type="text" name="phone3" maxlength="4" oninput="autotab(this)">
-                                <div class="one_half last"><a  href="javascript:sendDirections();" class="btn btn_red">Send</a></div>
+                                <div class="one_half"><a  href="javascript:sendDirections();" class="btn btn_red">Send</a>
+                                </div>
+                                <a id="gmaps" target="_blank">View in Google Maps</a>
                                 </div>
                                 </section>
                             </div>

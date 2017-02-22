@@ -18,7 +18,7 @@ body {
     height: 10px;
     margin-top: 1em;
 }
- 
+
 .slider .ui-slider-handle {
     border-radius: 23px;
     height: 23px;
@@ -38,7 +38,7 @@ body {
 .slider .ui-slider-pip {
     top: 3px;
 }
-                    
+
 .slider .ui-slider-pip .ui-slider-line {
     width: 4px;
     height: 4px;

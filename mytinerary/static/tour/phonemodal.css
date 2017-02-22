@@ -10,11 +10,8 @@
 }
 
 .popupContainer {
-        position: absolute;
-        width: 330px;
+        width: 360px;
         height: auto;
-        left: 45%;
-        top: 60px;
         background: #FFF;
 }
 
@@ -24,17 +21,19 @@
         border-radius: 4px;
 }
 
-.one_half {
-        width: 50%;
-        display: block;
-        float: left;
+.popupBody img {
+    width: 35px;
+    height: 35px;
+    margin-top: -10px;
 }
 
-.one_half.last {
+.one_half {
+        padding-left: 10px;
         display: inline-block;
         text-align: center;
-
+        max-height: 40px;
 }
+
 /* Popup Styles*/
 
 .popupHeader {
@@ -91,6 +90,8 @@
 
 .popupContainer a.btn_red {
         color: #FFF;
+        max-height: 40px;
+        max-width: 75px;
 }
 
 .popupContainer input {

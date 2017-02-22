@@ -7,17 +7,27 @@ import urllib.request
 from urllib.error import HTTPError
 import json
 import base64
+from decimal import *
 
+'''
+    Calculates popularity score of given business based on equation described in project paper
+'''
 def calculate_popularity(business, result_dict):
     popularity = 0
     max_number_of_reviews = business['review_count']
     for b in result_dict['businesses']:
+        # If the current iteration's business has the same category/rating as the given business, and has more
+        # reviews than the current max number of reviews, update the max number of reviews for that category/rating
         if b['rating'] == business['rating'] and b['review_count'] > max_number_of_reviews and b['categories'] == business['categories']:
             max_number_of_reviews = b['review_count']
 
     popularity = (business['rating'] - 1) * 20 + (business['review_count']/float(max_number_of_reviews)) * 20
     return popularity
 
+'''
+    Creates 4 more latitude/longitude pairs for a given latitude and longitude. These 4 new pairs will be on each "corner"
+    of the given latitude and longitude's radius.
+'''
 def adjust_lat_lon(lat, lon):
     radius_lat = (40000 / 1000) * 0.009043
     radius_lon = 0.004
@@ -25,9 +35,14 @@ def adjust_lat_lon(lat, lon):
     lon = float(lon)
     return [(radius_lat + lat, radius_lon + lon), (radius_lat - lat, radius_lon - lon), (radius_lat + lat, radius_lon - lon), (radius_lat - lat, radius_lon + lon)]
 
+'''
+    Function that populates/updates our DB.
+'''
 def populate_db():
     client_id = 'utuJWCc9bdvLlOHfbkXThA'
     secret = '812V05KxL5KMsYgPTksEl6ZzqILBf9Nv5spXvmtU3M9FAgpxQEYHPLW0QnDP24J8'
+    google_key = 'AIzaSyBm67Q0-cr3JdKnXVOmwqfQkrTIzmsDfi4'
+    cx = '000383868601621521479:vfsikrtcoe8'
 
     print("Connecting...")
     url = 'https://api.yelp.com/oauth2/token'
@@ -35,6 +50,7 @@ def populate_db():
             'client_id': client_id,
             'client_secret': secret}
 
+    # Get access token
     encoded_args = urllib.parse.urlencode(post_fields).encode('utf-8')
     result = urllib.request.urlopen(url, encoded_args).read().decode()
     data = json.loads(result)
@@ -44,6 +60,8 @@ def populate_db():
     list_of_cities = [('37.774929', '-122.419416'), ('44.977753', '-93.265011'), ('40.712784', '-74.005941'), ('51.507351', '-0.127758'), ('40.416775', '-3.703790')]
     list_of_city_names = ['San Francisco', 'Minneapolis', 'New York', 'London', 'Madrid']
 
+    # Create 4 additional lat/lon pairs for each lat/lon in our list of cities, and adjust the list of city names
+    # accordingly to match each lat/lon pair.
     for i in range(5):
         adj_lat_lon_array = adjust_lat_lon(list_of_cities[i][0], list_of_cities[i][1])
         list_of_cities = list_of_cities + adj_lat_lon_array
@@ -52,6 +70,9 @@ def populate_db():
     result_dict = {}
 
     print("Finding POIs...")
+    # Iterate through each city coordinate pair and for each of these coordinates, query yelp for the
+    # given categories and store the results in the dictionary after replacing each business's category
+    # with one of our 5 categories.
     for i, coordinates in enumerate(list_of_cities):
         try:
             query_url1 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'restaurants', '50', 'rating', '40000')
@@ -63,7 +84,6 @@ def populate_db():
                 data1['businesses'][j]['location']['city'] = list_of_city_names[i]
                 result_dict.setdefault('businesses',[]).append(data1['businesses'][j])
         except:
-            raise Exception("21")
             continue
         try:
             query_url2 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'cafes,bagels,bakeries,gelato', '20', 'rating', '40000')
@@ -75,7 +95,6 @@ def populate_db():
                 data2['businesses'][j]['location']['city'] = list_of_city_names[i]
                 result_dict.setdefault('businesses',[]).append(data2['businesses'][j])
         except:
-            raise Exception("20")
             continue
         try:
             query_url3 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'asianfusion,bbq,basque,breakfast_brunch,buffets,caribbean,chinese', '20', 'rating', '40000')
@@ -297,6 +316,43 @@ def populate_db():
 
     print("Storing data...")
     for b in result_dict['businesses']:
+        # If the business doesn't have a latitude or longitude, continue to the next business
+        if not b['coordinates']['latitude']:
+            continue
+
+        if not b['coordinates']['longitude']:
+            continue
+
+        # Lat/lons in DB are length 17 in decimal place, must convert Yelp lat/lon to match.
+        # Python does some weird rounding when trying add zeros to the end of decimals,
+        # hence the ugly code below.
+        str_lat = str(b['coordinates']['latitude'])
+        str_lon = str(b['coordinates']['longitude'])
+        num_lat, dec_lat = str_lat.split('.')
+        num_lon, dec_lon = str_lon.split('.')
+        if len(dec_lat) < 17:
+            zeros = ""
+            num_zeros_added = 17-len(dec_lat)
+            for i in range(0, num_zeros_added):
+            	zeros += "0"
+            str_lat += zeros
+        if len(dec_lon) < 17:
+            zeros = ""
+            num_zeros_added = 17-len(dec_lon)
+            for i in range(0, num_zeros_added):
+            	zeros += "0"
+            str_lon += zeros
+
+        lat = Decimal(str_lat)
+        lon = Decimal(str_lon)
+
+        # If a business in our DB with the same latitude/longitude but a different business name
+        # as the current business of the iteration exists, then continue to the next business
+        dup_lat_lon_pois = POI.objects.filter(latitude = lat, longitude = lon).exclude(business_name = b['name'])
+        if dup_lat_lon_pois.exists():
+            continue
+
+        # Format address
         address_string = ""
         if b['location']['address1']:
             address_string += b['location']['address1'] + " "
@@ -313,52 +369,88 @@ def populate_db():
         if b['location']['country']:
             address_string += b['location']['country']
 
-        lat = b['coordinates']['latitude']
-        lon = b['coordinates']['longitude']
-        if not lat:
-            continue
-
-        if not lon:
-            continue
-
-        dup_lat_lon_pois = POI.objects.filter(business_name=b['name'])
-        if dup_lat_lon_pois.exists():
-            continue
-
         b['popularity'] = calculate_popularity(b, result_dict)
 
+        # If the business is not a restaurant, check wikipedia for a summary for the business.
+        # First, we google search for the wikipedia page of our business, and if no page matches
+        # our business's name, then look for wikipedia pages that match our business's coordinates.
         wiki_summary = ""
+        wiki_business_name = ""
         if b['category'] != "Restaurants":
-            wiki_coordinates ='https://en.wikipedia.org/w/api.php?format=json&action=query&list=geosearch&gsradius=10000&gscoord=%s|%s&gslimit=250' % (lat, lon)
-            wiki_coord_request = urllib.request.Request(wiki_coordinates, None, {})
+            google_search = 'https://www.googleapis.com/customsearch/v1?key=%s&cx=%s&q=%s' % (google_key, cx, b['name'].replace(" ", "+"))
+            google_request = urllib.request.Request(google_search, None, {})
             try:
-                wiki_coord_response = urllib.request.urlopen(wiki_coord_request).read().decode('utf-8')
-                wiki_coord_dict = json.loads(wiki_coord_response)
+                google_response = urllib.request.urlopen(google_request).read().decode('utf-8')
+                google_dict = json.loads(google_response)
+                if google_dict['items'][0]['title'].endswith(' - Wikipedia'):
+                    wiki_business_name = google_dict['items'][0]['title'][:-12]
+                    if wiki_business_name not in b['name']:
+                        wiki_business_name = ""
             except:
-                continue
+                pass
 
-            for item in wiki_coord_dict['query']['geosearch']:
-                if b['name'] == item['title']:
-                    wiki_url = 'https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=%s' % (b['name'].replace(" ", "%20"))
-                    wiki_request = urllib.request.Request(wiki_url, None, {})
-                    try:
-                        wiki_response = urllib.request.urlopen(wiki_request).read().decode('utf-8')
-                        wiki_dict = json.loads(wiki_response)
-                    except:
-                        continue
+            if wiki_business_name == "":
+                wiki_coordinates ='https://en.wikipedia.org/w/api.php?format=json&action=query&list=geosearch&gsradius=10000&gscoord=%s|%s&gslimit=250' % (lat, lon)
+                wiki_coord_request = urllib.request.Request(wiki_coordinates, None, {})
+                try:
+                    wiki_coord_response = urllib.request.urlopen(wiki_coord_request).read().decode('utf-8')
+                    wiki_coord_dict = json.loads(wiki_coord_response)
+                except:
+                    pass
 
-                    page_id = list(wiki_dict['query']['pages'].keys())[0]
-                    if page_id != '-1':
-                        wiki_summary = wiki_dict['query']['pages'][page_id]['extract']
+                for item in wiki_coord_dict['query']['geosearch']:
+                    if b['name'] == item['title']:
+                        wiki_url = 'https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=%s' % (b['name'].replace(" ", "%20"))
+                        wiki_request = urllib.request.Request(wiki_url, None, {})
+                        try:
+                            wiki_response = urllib.request.urlopen(wiki_request).read().decode('utf-8')
+                            wiki_dict = json.loads(wiki_response)
+                        except:
+                            pass
+
+                        page_id = list(wiki_dict['query']['pages'].keys())[0]
+                        if page_id != '-1':
+                            wiki_summary = wiki_dict['query']['pages'][page_id]['extract']
+            else:
+                wiki_url = 'https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=%s' % (wiki_business_name.replace(" ", "%20"))
+                wiki_request = urllib.request.Request(wiki_url, None, {})
+                try:
+                    wiki_response = urllib.request.urlopen(wiki_request).read().decode('utf-8')
+                    wiki_dict = json.loads(wiki_response)
+                except:
+                    pass
+
+                page_id = list(wiki_dict['query']['pages'].keys())[0]
+                if page_id != '-1':
+                    wiki_summary = wiki_dict['query']['pages'][page_id]['extract']
+
+        # If no wikipedia summary has been found, just use the Yelp categories
         if wiki_summary == "":
             list_of_cats = []
             for category in b['categories']:
                 list_of_cats.append(category['title'])
             wiki_summary = ', '.join(list_of_cats)
 
-        p = POI.objects.filter(latitude = lat, longitude = lon)
+        # Find business with the same latitude, longitude, and name. If such a business
+        # exists, just update the business rather than create a duplicate entry
+        p = POI.objects.filter(latitude = lat, longitude = lon, business_name = b['name'])
+        p2 = POI.objects.filter(business_name = b['name'], city = b['location']['city'])
         if p:
             p.update(business_name = b['name'],
+                        latitude = lat,
+                        longitude = lon,
+                        address = address_string,
+                        city = b['location']['city'],
+                        num_stars = b.get('rating',0),
+                        num_reviews = b.get('review_count',0),
+                        phone_number = b.get('phone','N/A'),
+                        price = b.get('price','N/A'),
+                        picture_url = b.get('image_url','N/A'),
+                        category = b.get('category', 'None'),
+                        popularity = b.get('popularity', 0.0),
+                        summary = wiki_summary[:3000])
+        elif p2:
+            p2.update(business_name = b['name'],
                         latitude = lat,
                         longitude = lon,
                         address = address_string,

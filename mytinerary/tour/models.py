@@ -7,8 +7,8 @@ class POI(models.Model):
     def default_category():
         return "None"
     business_name = models.CharField(max_length=400)
-    latitude = models.DecimalField(max_digits=12, decimal_places=9)
-    longitude = models.DecimalField(max_digits=12, decimal_places=9)
+    latitude = models.DecimalField(max_digits=30, decimal_places=17)
+    longitude = models.DecimalField(max_digits=30, decimal_places=17)
     address = models.CharField(max_length=500)
     city = models.CharField(max_length=100)
     num_stars = models.DecimalField(max_digits=2, decimal_places=1)
@@ -19,6 +19,6 @@ class POI(models.Model):
     category = models.CharField(max_length=100)
     popularity = models.DecimalField(max_digits=7, decimal_places=4)
     summary = models.CharField(max_length=3000)
-    
+
     def __str__(self):
         return self.business_name

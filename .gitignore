@@ -2,3 +2,4 @@
 *.pyc
 *.cpython*
 *.swp
+mytinerary/tour/migrations/__pycache__/
