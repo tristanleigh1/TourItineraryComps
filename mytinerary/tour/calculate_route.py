@@ -80,6 +80,7 @@ def find_next_poi(poi_list, path_segments, walk_factor, preferences, path_catego
         if poi.business_name == path_segments[len(path_segments)-1][1].business_name:
             continue
         score, segment, where_in_segment = calculate_score(poi, path_segments, walk_factor, preferences, path_category_dict)
+
         if score < min_score:
             poi_to_add = poi
             min_score = score
@@ -181,7 +182,6 @@ def calculate_score(current_poi, path_segments, walk_factor, preferences, path_c
                         where_in_segment = "end"
                     else:
                         where_in_segment = "middle"
-
 
        # Update the smallest distance
         if distance_to_segment < distance_to_path:
