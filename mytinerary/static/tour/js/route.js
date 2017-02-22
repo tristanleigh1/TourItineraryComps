@@ -26,6 +26,7 @@ function setup(params) {
 * within its pop radius.
 */
 function findNearbyPOIs(marker) {
+    console.log("FindNearbyPOIs", marker.popRadius.visible);
     $.ajax({
         url : "/tour/pop_radius/",
         contentType: "application/json; charset=utf-8",
@@ -55,6 +56,7 @@ function findNearbyPOIs(marker) {
                     nearby_pois.push(json["nearby_pois"][i]);
                 }
             }
+            console.log(nearby_pois, marker.popRadius.visible);
             plotNearbyPois(nearby_pois, marker);
         },
         cache : false,
@@ -86,10 +88,11 @@ function plotNearbyPois(nearby_pois, centerMarker) {
     var center = centerMarker.position;
     for (var i=0; i<nearby_pois.length; i++) {
         var point = new google.maps.LatLng(parseFloat(nearby_pois[i].latitude), parseFloat(nearby_pois[i].longitude));
+        console.log("1");
         if (google.maps.geometry.spherical.computeDistanceBetween(point, center) >= circleRadius) {
             continue;
         }
-
+        console.log("2");
         var icon = getIconFromCategory(nearby_pois[i].category, false);
         var popRadius = buildPopRadiusCircle(point, namespace.map);
 
@@ -129,6 +132,7 @@ function plotNearbyPois(nearby_pois, centerMarker) {
         });
         namespace.radiusMarkers.push(marker);
     }
+    console.log("Done");
 }
 
 /**
@@ -156,6 +160,7 @@ function createPopRadius(marker) {
         namespace.selectedMarker.popRadius.setVisible(false);
         namespace.selectedMarker.popRadius.setRadius(500);
     }
+    console.log("createPopRadius");
     namespace.selectedMarker = marker;
     namespace.selectedMarker.popRadius.setVisible(true);
 }

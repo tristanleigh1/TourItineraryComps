@@ -107,13 +107,11 @@
               function (_popRadius, ignore, _marker) {
                 _popRadius.addListener("center_changed", function() {
                 if (ignore) {
-                  //console.log("here");
                   ignore = false;
                   return;
                 }
                 _popRadius.setEditable(false);
                 ignore = true;
-                //console.log("outside");
                 _popRadius.setCenter(_marker.position);
                 _popRadius.setEditable(true);
               });
@@ -142,6 +140,8 @@
                 findNearbyPOIs(this);
             });
         }
+
+
         setup({
             markers: markers,
             radiusMarkers: radiusMarkers,
@@ -152,6 +152,15 @@
             filterStatus: 31,
             selectedMarker: null
         });
+
+        {% if mode == "exploratory" %}
+            console.log("In here");
+            setTimeout(function () {createInfoWindow(markers[0]);}, 1000);
+            setTimeout(function () {createPopRadius(markers[0]);}, 1000);
+            setTimeout(function () {findNearbyPOIs(markers[0]);}, 1000);
+        {% endif %}
+        console.log(markers[0], markers[0].popRadius.visible);
+        console.log("Done for realz");
     }
     </script>
     <link rel="stylesheet" type="text/css" href='{% static "tour/map.css" %}' />
@@ -240,7 +249,6 @@
                                 </div>
                                 <a id="gmaps" target="_blank">View in Google Maps</a>
                                 </div>
-                                <img src="loading.svg">
                                 </section>
                             </div>
                             <input type="hidden" id="startLngLat" name="startCoords">
