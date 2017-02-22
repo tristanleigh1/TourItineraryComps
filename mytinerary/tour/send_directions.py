@@ -1,4 +1,5 @@
 from twilio.rest import TwilioRestClient
+from twilio import TwilioRestException
 from django.http import HttpResponse, JsonResponse
 
 '''
@@ -15,12 +16,15 @@ def send_directions(request):
     if request.method == 'GET':
         url = request.GET.get('url', None)
         phone_number = "+1" + request.GET.get('number', None)
-        client.messages.create(
-           to=phone_number,
-           from_="+14135917043",
-           body=url,
-        )
-        return HttpResponse("Text sent succesfully.")
+        try:
+            client.messages.create(
+               to=phone_number,
+               from_="+14135917043",
+               body=url,
+            )
+            return HttpResponse("OK")
+        except TwilioRestException as e:
+            return HttpResponse(e.msg)
     else:
         return HttpResponse(
                 json.dumps({"error":"unable to send text."}),

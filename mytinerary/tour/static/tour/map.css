@@ -48,26 +48,6 @@ body {
 	display: none;
 }
 
-#panel {
-    height: 550px;
-    overflow: auto;
-}
-
-.panel-title {
-    height: 100%;
-    width: 100%;
-}
-
-
-
-#panel .adp table {
-	font-family: "Ubuntu",Tahoma,"Helvetica Neue",Helvetica,Arial,sans-serif;
-}
-
-#panel .adp-warnbox {
-	display: none;
-}
-
 .icon-container {
 	position: relative;
 	width: 32px;

@@ -401,8 +401,6 @@ function updateRoute(changedMarkerId) {
                 $("#warning").empty();
             }
 
-            adjustZoom();
-
             // Remove nearby POI markers
             for (var i=0; i<namespace.radiusMarkers.length; i++) {
                 marker = namespace.radiusMarkers[i];
@@ -410,10 +408,12 @@ function updateRoute(changedMarkerId) {
                 marker.popRadius.setVisible(false);
             }
             namespace.radiusMarkers.length = 0;
+            namespace.selectedMarker = null;
 
             $("#accordion").empty();
             addSidebarButtons();
-            namespace.selectedMarker = null;
+            adjustZoom();
+            if ($('#panel').html() != "") { updateDirectionsPanel(); }
 
         } else {
             var errorMessage;
@@ -444,13 +444,6 @@ function updateRoute(changedMarkerId) {
             }
         }
     });
-
-    // TODO: Get icons to update correctly
-    if (document.getElementById('panel').innerHTML == "") {
-        initDirectionsListener();
-    } else {
-        modifyIcons();
-    }
 }
 
 
@@ -485,34 +478,36 @@ function addSidebarButtons() {
 }
 
 /*
-* Adds a listener to the directions panel for when it's finished loading
+* Updates the directions panel to reflect changes to the route. Code adapted
+* from a tutorial by Ryan Stephens found at
+* http://www.sketchpad-media.com/docs/how-to/google-maps-v3-custom-direction-services/
 */
-function initDirectionsListener() {
-    directionsPanel = document.getElementById("panel");
-    if (directionsPanel.addEventListener) {
-        directionsPanel.addEventListener('DOMSubtreeModified', modifyIcons, false);
-    }
-}
-
-function modifyIcons() {
-    document.getElementById("panel").removeEventListener('DOMSubtreeModified', modifyIcons, false);
-
-    var icons = document.getElementsByClassName("adp-marker");
-    var iconLabelsExist = document.getElementsByClassName("icon-label").length;
-    for (var i = 0; i < icons.length; i++) {
-        icons[i].src = namespace.markers[i].icon.url;
-        if (!iconLabelsExist) {
-            $(icons[i]).wrap('<div class="icon-container"></div>');
-            $( '<p class="icon-label">' + (i + 1) + '</p>' ).insertAfter(icons[i]);
+function updateDirectionsPanel() {
+    var output = '';
+    var route = namespace.directionsDisplay.getDirections().routes[0]
+    // Begin our HTML output of the directions
+    for (var i = 0; i < namespace.markers.length - 1; i++) {
+        var dir = route.legs[i]
+        var cat = namespace.markers[i+1].category;
+        if (i == 0) {
+            output += '<div class="dir_start Origin">'+ dir.start_address +'</div>';
         }
+        output += '<div class="dir_summary silver">Travel: '+ dir.distance.text +' - about '+ dir.duration.text +'</div>';
+        output += '<table>';
+        for (var j = 0; j < dir.steps.length; j++){
+            output += '<tr style="border-bottom: 1px solid silver;">';
+            output += '<td class="dir_row"><span class="dir_sprite '+ dir.steps[j].maneuver +'"></span></td>';
+            output += '<td class="dir_row">'+ (j+1) +'.</td>';
+            output += '<td class="dir_row">'+ dir.steps[j].instructions +'</td>';
+            output += '<td class="dir_row" style="white-space:nowrap;">'+ dir.steps[j].distance.text +'</td>';
+            output += '</tr>';
+        }
+        output += '</table>';
+        output += '<div class="dir_end ' + cat + '"' + '>'+ dir.end_address +'</div>';
     }
+    $('#panel').html(output);
 }
 
-function autotab(current) {
-    if (current.getAttribute && current.value.length==current.getAttribute("maxlength")) {
-        $(current).nextAll('input').first().focus();
-    }
-}
 
 // Constructs the URL for the google.maps version of your route
 function sendDirections() {
@@ -549,7 +544,7 @@ function getDirections() {
         document.getElementById('db').innerHTML = "Go back";
         document.getElementById('modal_trigger').style.display = 'inline-block';
         document.getElementById('panel').style.display = 'block';
-        namespace.directionsDisplay.setPanel(document.getElementById('panel'));
+        updateDirectionsPanel();
     }
 }
 
