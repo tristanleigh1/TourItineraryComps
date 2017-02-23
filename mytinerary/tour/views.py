@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
-import json
 from .models import *
-from decimal import *
 from .calculate_route import *
 from .pop_radius import *
 from .send_directions import *
+from decimal import *
+import json
 
 
 ''' Renders the home page. '''

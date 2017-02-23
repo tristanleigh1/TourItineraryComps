@@ -84,7 +84,6 @@ def populate_db():
                 data1['businesses'][j]['location']['city'] = list_of_city_names[i]
                 result_dict.setdefault('businesses',[]).append(data1['businesses'][j])
         except:
-            raise Exception("4")
             continue
         try:
             query_url2 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'cafes,bagels,bubbletea,coffee,bakeries,gelato', '20', 'rating', '40000')
@@ -96,7 +95,6 @@ def populate_db():
                 data2['businesses'][j]['location']['city'] = list_of_city_names[i]
                 result_dict.setdefault('businesses',[]).append(data2['businesses'][j])
         except:
-            raise Exception("5")
             continue
         try:
             query_url3 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'asianfusion,bbq,basque,breakfast_brunch,buffets,caribbean,chinese', '20', 'rating', '40000')
@@ -108,7 +106,6 @@ def populate_db():
                 data3['businesses'][j]['location']['city'] = list_of_city_names[i]
                 result_dict.setdefault('businesses',[]).append(data3['businesses'][j])
         except:
-            raise Exception("6")
             continue
         try:
             query_url4 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'comfortfood,creperies,cuban,diners,delis,dinnertheater,hotdogs,fishnchips,fondue,italian,foodstands,french', '40', 'rating', '40000')
@@ -120,7 +117,6 @@ def populate_db():
                 data4['businesses'][j]['location']['city'] = list_of_city_names[i]
                 result_dict.setdefault('businesses',[]).append(data4['businesses'][j])
         except:
-            raise Exception("7")
             continue
         try:
             query_url5 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'japanese,kebab,kosher,latin,mediterranean,mexican,mideastern,pizza,salad,sandwiches', '20', 'rating', '40000')
@@ -132,7 +128,6 @@ def populate_db():
                 data5['businesses'][j]['location']['city'] = list_of_city_names[i]
                 result_dict.setdefault('businesses',[]).append(data5['businesses'][j])
         except:
-            raise Exception("8")
             continue
         try:
             query_url6 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'portuguese,seafood,soup,steak,spanish,vegetarian', '20', 'rating', '40000')
@@ -144,7 +139,6 @@ def populate_db():
                 data6['businesses'][j]['location']['city'] = list_of_city_names[i]
                 result_dict.setdefault('businesses',[]).append(data6['businesses'][j])
         except:
-            raise Exception("9")
             continue
         try:
             query_url7 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'tapas,vegan,tapasmallplates', '20', 'rating', '40000')
@@ -156,7 +150,6 @@ def populate_db():
                 data7['businesses'][j]['location']['city'] = list_of_city_names[i]
                 result_dict.setdefault('businesses',[]).append(data7['businesses'][j])
         except:
-            raise Exception("10")
             continue
         try:
             query_url8 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'bars', '50', 'rating', '40000')
@@ -168,7 +161,6 @@ def populate_db():
                 data8['businesses'][j]['location']['city'] = list_of_city_names[i]
                 result_dict.setdefault('businesses',[]).append(data8['businesses'][j])
         except:
-            raise Exception("11")
             continue
 
         try:
@@ -193,7 +185,6 @@ def populate_db():
                 data10['businesses'][j]['location']['city'] = list_of_city_names[i]
                 result_dict.setdefault('businesses',[]).append(data10['businesses'][j])
         except:
-            raise Exception("13")
             continue
         try:
             query_url11 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'lakes,farms', '50', 'rating', '40000')
@@ -205,7 +196,6 @@ def populate_db():
                 data11['businesses'][j]['location']['city'] = list_of_city_names[i]
                 result_dict.setdefault('businesses',[]).append(data11['businesses'][j])
         except:
-            raise Exception("14")
             continue
         try:
             query_url12 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'parklets,gardens', '50', 'rating', '40000')
@@ -217,7 +207,6 @@ def populate_db():
                 data12['businesses'][j]['location']['city'] = list_of_city_names[i]
                 result_dict.setdefault('businesses',[]).append(data12['businesses'][j])
         except:
-            raise Exception("15")
             continue
         try:
             query_url13 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'amusementparks,aquariums,bowling,bungeejumping,challengecourses,escapegames,gokarts,lasertag,parasailing,paintball,waterparks,zoos', '50', 'rating', '40000')
@@ -229,7 +218,6 @@ def populate_db():
                 data13['businesses'][j]['location']['city'] = list_of_city_names[i]
                 result_dict.setdefault('businesses',[]).append(data13['businesses'][j])
         except:
-            raise Exception("1")
             continue
         try:
             query_url14 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'casinos,movietheaters,festivals,musicvenues,observatories,racetracks,stadiumsarenas,rodeo,wineries,tastingclasses,arcades,festivals,tablaoflamenco,breweries', '50', 'rating', '40000')
@@ -241,7 +229,6 @@ def populate_db():
                 data14['businesses'][j]['location']['city'] = list_of_city_names[i]
                 result_dict.setdefault('businesses',[]).append(data14['businesses'][j])
         except:
-            raise Exception("2")
             continue
         try:
             query_url16 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'beergarden,comedyclubs,danceclubs,karaoke', '25', 'rating', '40000')
@@ -253,7 +240,6 @@ def populate_db():
                 data16['businesses'][j]['location']['city'] = list_of_city_names[i]
                 result_dict.setdefault('businesses',[]).append(data16['businesses'][j])
         except:
-            raise Exception("3")
             continue
         try:
             query_url17 = 'https://api.yelp.com/v3/businesses/search?latitude=%s&longitude=%s&categories=%s&limit=%s&sort_by=%s&radius=%s' % (coordinates[0], coordinates[1], 'artmuseums', '50', 'rating', '40000')

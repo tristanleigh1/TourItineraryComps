@@ -22,6 +22,7 @@ div.row2 {
 
 div.col-md-9 {
     height: 100%;
+    padding-bottom: 100px;
 }
 
 .navbar-header {
