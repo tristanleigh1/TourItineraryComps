@@ -7,6 +7,7 @@
 *  3/7/16
 */
 
+
 var namespace;
 var zoomIgnore;
 
@@ -26,7 +27,6 @@ function setup(params) {
 * within its pop radius.
 */
 function findNearbyPOIs(marker) {
-    console.log("FindNearbyPOIs", marker.popRadius.visible);
     $.ajax({
         url : "/tour/pop_radius/",
         contentType: "application/json; charset=utf-8",
@@ -56,7 +56,6 @@ function findNearbyPOIs(marker) {
                     nearby_pois.push(json["nearby_pois"][i]);
                 }
             }
-            console.log(nearby_pois, marker.popRadius.visible);
             plotNearbyPois(nearby_pois, marker);
         },
         cache : false,
@@ -88,11 +87,9 @@ function plotNearbyPois(nearby_pois, centerMarker) {
     var center = centerMarker.position;
     for (var i=0; i<nearby_pois.length; i++) {
         var point = new google.maps.LatLng(parseFloat(nearby_pois[i].latitude), parseFloat(nearby_pois[i].longitude));
-        console.log("1");
         if (google.maps.geometry.spherical.computeDistanceBetween(point, center) >= circleRadius) {
             continue;
         }
-        console.log("2");
         var icon = getIconFromCategory(nearby_pois[i].category, false);
         var popRadius = buildPopRadiusCircle(point, namespace.map);
 
@@ -132,7 +129,6 @@ function plotNearbyPois(nearby_pois, centerMarker) {
         });
         namespace.radiusMarkers.push(marker);
     }
-    console.log("Done");
 }
 
 /**
@@ -160,7 +156,6 @@ function createPopRadius(marker) {
         namespace.selectedMarker.popRadius.setVisible(false);
         namespace.selectedMarker.popRadius.setRadius(500);
     }
-    console.log("createPopRadius");
     namespace.selectedMarker = marker;
     namespace.selectedMarker.popRadius.setVisible(true);
 }
@@ -318,13 +313,11 @@ function addPoint(newMarkerId, markerId) {
     (function (_popRadius, ignore, _marker) {
         _popRadius.addListener("center_changed", function() {
             if (ignore) {
-                console.log("here");
                 ignore = false;
                 return;
             }
             _popRadius.setEditable(false);
             ignore = true;
-            console.log("outside");
             _popRadius.setCenter(_marker.position);
             _popRadius.setEditable(true);
         });
@@ -461,7 +454,7 @@ function addSidebarButtons() {
             ` + (i + 1) + `: ` + namespace.markers[i].name + `
             </a>
             </h4>
-            <div class="btn btn-link btn-sm pull-right" style="text-decoration:none;position:relative;top:-35px;right:-15px;color:black;" onclick="removePoint(` + i + `);">x</div>
+            <div class="btn btn-link btn-sm pull-right x-button" onclick="removePoint(` + i + `);">&times</div>
             </div>
             </div>
             <div id="collapse` + i + `" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading` +
@@ -476,7 +469,16 @@ function addSidebarButtons() {
         namespace.markers[i].popRadius.setVisible(false);
     }
 }
+/*
+ * Displays info window, pop radius, and nearby pois for given marker ID. Called from sidebar POIs.
+*/
+function markerSelected(markerId) {
+    marker = namespace.markers[markerId];
+    createPopRadius(marker);
+    createInfoWindow(marker);
+    findNearbyPOIs(marker);
 
+}
 /*
 * Updates the directions panel to reflect changes to the route. Code adapted
 * from a tutorial by Ryan Stephens found at
@@ -516,13 +518,6 @@ function initDirectionsListener() {
     }
 }
 
-function markerSelected(markerId) {
-    marker = namespace.markers[markerId];
-    createPopRadius(marker);
-    createInfoWindow(marker);
-    findNearbyPOIs(marker);
-
-}
 
 function modifyIcons() {
     document.getElementById("panel").removeEventListener('DOMSubtreeModified', modifyIcons, false);
@@ -591,9 +586,7 @@ $( function() {
         start: function(event, ui) {
             var start_idx = ui.item.index();
             ui.item.data('start_idx', start_idx);
-         // createPopRadius(namespace.markers[start_idx]);
-         // createInfoWindow(namespace.markers[start_idx], null);
-         // findNearbyPOIs(namespace.markers[start_idx]);
+            ui.item.data('start_idx', start_idx);
         },
         update: function(event, ui) {
             var start_idx = ui.item.data('start_idx');
@@ -634,9 +627,6 @@ $( function() {
                 marker.popRadius.setVisible(false);
             }
             namespace.radiusMarkers.length = 0;
-//            createPopRadius(namespace.markers[end_idx]);
-//            createInfoWindow(namespace.markers[end_idx], null);
-//            findNearbyPOIs(namespace.markers[end_idx]);
 
             $("#accordion").empty();
             addSidebarButtons();
@@ -665,7 +655,7 @@ function updateFilter(spot) {
     }
 }
 
-// Makes sure map isn't zoomed in too much
+// Makes sure map isn't zoomed in too much. Uses ignore as a way to avoid recursive calling.
 function adjustZoom() {
     var listener = google.maps.event.addListener(namespace.map, "zoom_changed", function() {
         if (zoomIgnore) {
@@ -684,23 +674,23 @@ function getIconFromCategory(category, scale) {
     var icon;
     switch (category) {
         case "Museums":
-        icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/blue.png"}
-        break;
+            icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/blue.png"}
+            break;
         case "Landmarks":
-        icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/pink.png"}
-        break;
+            icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/pink.png"}
+            break;
         case "Activities":
-        icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/yellow.png"}
-        break;
+            icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/yellow.png"}
+            break;
         case "Nature":
-        icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/green.png"}
-        break;
+            icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/green.png"}
+            break;
         case "Restaurants":
-        icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/red.png"}
-        break;
+            icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/red.png"}
+            break;
         default:
-        icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/purple.png"}
-        break;
+            icon = {url: "https://maps.gstatic.com/mapfiles/ms2/micons/purple.png"}
+            break;
     }
     if (scale == true) {
         icon["scaledSize"] = new google.maps.Size(45, 45);

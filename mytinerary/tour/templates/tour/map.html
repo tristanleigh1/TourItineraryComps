@@ -119,10 +119,6 @@
             })(popRadius, false, marker);
 
 
-            // (function (_popRadius, _marker) {
-            //   _popRadius.bindTo("center", _marker, "center");
-            // })(popRadius, marker);
-
   // Needs to be in a closure for proper scoping: http://stackoverflow.com/questions/8909652/adding-click-event-listeners-in-loop
             (function (_marker) {
               google.maps.event.addListener(_marker.popRadius, 'radius_changed', function() {
@@ -154,21 +150,18 @@
             selectedMarker: null
         });
 
+        // Load map with pop radius, info window, and nearby POIs visible if in exploratory mode
         {% if mode == "exploratory" %}
-            console.log("In here");
             setTimeout(function () {createInfoWindow(markers[0]);}, 1000);
             setTimeout(function () {createPopRadius(markers[0]);}, 1000);
             setTimeout(function () {findNearbyPOIs(markers[0]);}, 1000);
         {% endif %}
-        console.log(markers[0], markers[0].popRadius.visible);
-        console.log("Done for realz");
     }
     </script>
     <link rel="stylesheet" type="text/css" href='{% static "tour/map.css" %}' />
     <link rel="stylesheet" type="text/css" href='{% static "tour/header.css" %}' />
 </head>
 <body>
-    <!--    <h3>{{city}}</h3>-->
     <div id="body">
         {% include "tour/navbar.html" %}
         <div class="container-fluid">
@@ -270,7 +263,6 @@
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhEeD2Dgvw-AAxGR9_qL7P9JlTeO-WjvM&callback=initialize">
     </script>
-    <!--<script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>-->
     <script src='http://andwecode.com/wp-content/uploads/2015/10/jquery.leanModal.min_.js'></script>
     <script src='{% static "tour/js/phonemodal.js" %}'></script>
 </body>

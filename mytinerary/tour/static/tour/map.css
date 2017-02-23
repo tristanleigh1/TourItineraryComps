@@ -41,7 +41,7 @@ body {
 
 #accordion {
     height: 550px;
-    overflow: auto;
+    overflow-y: auto;
 }
 
 #sendDirections {
@@ -73,32 +73,30 @@ img.adp-marker {
 
 .Museums {
     background-color: #6890fb;
-/*    background-color: #6890fb;*/
 }
+
 .Landmarks {
     background-color: #e661ac;
-/*    background-color: #e661ac;*/
 }
+
 .Activities {
     background-color: #fdf569;
-/*    background-color: #fdf569;*/
 }
+
 .Nature {
     background-color: #00e64d;
-/*    background-color: #00e64d;*/
 }
+
 .Restaurants {
     background-color: #fd7567;
-/*    background-color: #fd7567;*/
 }
 
 .Origin {
     background-color: #8e67fd;
-/*    background-color: #8e67fd;*/
 }
+
 .Destination {
     background-color: #8e67fd;
-/*    background-color: #8e67fd;*/
 }
 
 .shell {
@@ -110,12 +108,6 @@ img.adp-marker {
     cursor: pointer;
     height: 100%;
 }
-
-/*
-.panel-title {
-    border-radius: 3px;
-}
-*/
 
 .checkbox-slider > input[type="checkbox"] {
     display: none;
@@ -135,7 +127,7 @@ img.adp-marker {
     content: '';
     height: 16px;
     margin-top: -8px;
-    position:absolute;
+    position: absolute;
     opacity: 0.3;
     transition: all 0.2s ease-in-out;
     width: 40px;
@@ -163,4 +155,17 @@ img.adp-marker {
 .checkbox-slider > input[type="checkbox"]:checked + label::after {
     background: inherit;
     left: 20px;
+}
+
+.x-button {
+    text-decoration:none;
+    position:relative;
+    top:-35px;
+    right:-15px;
+    color:black;
+}
+
+.x-button:hover {
+    text-decoration:none;
+    color:black;
 }
