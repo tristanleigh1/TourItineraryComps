@@ -292,6 +292,7 @@ function removePoint(markerId) {
 * to create a new point in the route after the selected marker.
 */
 function addPoint(newMarkerId, markerId) {
+    $(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
     var icon = getIconFromCategory(namespace.radiusMarkers[newMarkerId].category, true);
     var popRadius = buildPopRadiusCircle(namespace.radiusMarkers[newMarkerId].position, namespace.map);
 
@@ -448,7 +449,7 @@ function addSidebarButtons() {
         //$("#accordion").append(
             var panelDiv =
             `<div class="panel panel-default">
-            <div class="shell `+ namespace.markers[i].category +`" onclick="markerSelected(`+ i +`);">  
+            <div class="shell `+ namespace.markers[i].category +`" onclick="markerSelected(`+ i +`);">
             <div class="panel-heading" role="tab" id="heading`+ i +`">
             <h4 class="panel-title">
             ` + (i + 1) + `: ` + namespace.markers[i].name + `
