@@ -7,6 +7,7 @@
     {% load static %}
     <link rel="stylesheet" href="https://bootswatch.com/united/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href='{% static "tour/phonemodal.css" %}' />
+    <link rel="stylesheet" type="text/css" href='{% static "tour/directions.css" %}' />
     <link rel="icon" href='{% static "tour/images/icon.png" %}' />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -247,6 +248,7 @@
                                     <input type="text" name="phone3" maxlength="4" oninput="autotab(this)">
                                 <div class="one_half"><a  href="javascript:sendDirections();" class="btn btn_red">Send</a>
                                 </div>
+                                <span id="textWarning"></span>
                                 <a id="gmaps" target="_blank">View in Google Maps</a>
                                 </div>
                                 </section>

@@ -401,8 +401,6 @@ function updateRoute(changedMarkerId) {
                 $("#warning").empty();
             }
 
-            adjustZoom();
-
             // Remove nearby POI markers
             for (var i=0; i<namespace.radiusMarkers.length; i++) {
                 marker = namespace.radiusMarkers[i];
@@ -410,10 +408,12 @@ function updateRoute(changedMarkerId) {
                 marker.popRadius.setVisible(false);
             }
             namespace.radiusMarkers.length = 0;
+            namespace.selectedMarker = null;
 
             $("#accordion").empty();
             addSidebarButtons();
-            namespace.selectedMarker = null;
+            adjustZoom();
+            if ($('#panel').html() != "") { updateDirectionsPanel(); }
 
         } else {
             var errorMessage;
@@ -444,13 +444,6 @@ function updateRoute(changedMarkerId) {
             }
         }
     });
-
-    // TODO: Get icons to update correctly
-    if (document.getElementById('panel').innerHTML == "") {
-        initDirectionsListener();
-    } else {
-        modifyIcons();
-    }
 }
 
 
@@ -485,7 +478,9 @@ function addSidebarButtons() {
 }
 
 /*
-* Adds a listener to the directions panel for when it's finished loading
+* Updates the directions panel to reflect changes to the route. Code adapted
+* from a tutorial by Ryan Stephens found at
+* http://www.sketchpad-media.com/docs/how-to/google-maps-v3-custom-direction-services/
 */
 function initDirectionsListener() {
     directionsPanel = document.getElementById("panel");
@@ -557,7 +552,7 @@ function getDirections() {
         document.getElementById('db').innerHTML = "Go back";
         document.getElementById('modal_trigger').style.display = 'inline-block';
         document.getElementById('panel').style.display = 'block';
-        namespace.directionsDisplay.setPanel(document.getElementById('panel'));
+        updateDirectionsPanel();
     }
 }
 

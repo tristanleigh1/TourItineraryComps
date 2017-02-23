@@ -1,0 +1,56 @@
+/*
+	MAP DIRECTIONS
+    Table styling from http://www.sketchpad-media.com/docs/how-to/google-maps-v3-custom-direction-services/
+*/
+
+#panel {
+    height: 550px;
+    overflow: auto;
+    display: none;
+}
+
+.panel-title {
+    height: 100%;
+    width: 100%;
+}
+
+#panel .adp table {
+	font-family: "Ubuntu",Tahoma,"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+#panel .adp-warnbox {
+	display: none;
+}
+
+.dir_start {
+	font-weight: bold; padding: 5px; color: #000;
+}
+.dir_end {
+	font-weight: bold; padding: 5px; color: #000;
+}
+.dir_summary {
+	padding: 5px;
+}
+.dir_row{
+	font-size: 14px;
+	padding-right: 10px;
+}
+.dir_sprite{
+	width:	20px;
+	height:	20px;
+	display: block;
+}
+.turn-sharp-left{ background: url('images/maneuvers-new.png') 0px 0px ;	}
+.turn-sharp-right{ background: url('images/maneuvers-new.png') 0px -20px ; }
+.turn-left{	background: url('images/maneuvers-new.png') 0px -40px ;	}
+.turn-right{ background: url('images/maneuvers-new.png') 0px -60px ; }
+.turn-slight-left{ background: url('images/maneuvers-new.png') 0px -80px ; }
+.turn-slight-right{	background: url('images/maneuvers-new.png') 0px -100px ; }
+.ramp-left{	background: url('images/maneuvers-new.png') 0px -120px ; }
+.ramp-right{ background: url('images/maneuvers-new.png') 0px -140px ; }
+.fork-left{	background: url('images/maneuvers-new.png') 0px -160px ; }
+.fork-right{ background: url('images/maneuvers-new.png') 0px -180px ; }
+.straight{ background: url('images/maneuvers-new.png') 0px -200px ; }
+.merge{ background: url('images/maneuvers-new.png') 0px -220px ; }
+.roundabout-left{ background: url('images/maneuvers-new.png') 0px -240px ; }
+.roundabout-right{ background: url('images/maneuvers-new.png') 0px -260px ; }
