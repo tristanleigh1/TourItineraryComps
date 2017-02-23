@@ -459,13 +459,12 @@ function updateRoute(changedMarkerId) {
 */
 function addSidebarButtons() {
     for (var i = 0; i < namespace.markers.length; i++) {
-        $("#accordion").append(
+        //$("#accordion").append(
+            var panelDiv =
             `<div class="panel panel-default">
-            <div class="shell `+ namespace.markers[i].category +`">
+            <div class="shell `+ namespace.markers[i].category +`" onclick="markerSelected(`+ i +`);">  
             <div class="panel-heading" role="tab" id="heading`+ i +`">
             <h4 class="panel-title">
-            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse` +
-            i + `" aria-expanded="false" aria-controls="collapse` + i + `">
             ` + (i + 1) + `: ` + namespace.markers[i].name + `
             </a>
             </h4>
@@ -478,8 +477,9 @@ function addSidebarButtons() {
             ` + namespace.markers[i].summary + `
             </div>
             </div>
-            </div>`
-        );
+            </div>`;
+
+        $("#accordion").append(panelDiv);
         namespace.markers[i].popRadius.setVisible(false);
     }
 }
@@ -492,6 +492,14 @@ function initDirectionsListener() {
     if (directionsPanel.addEventListener) {
         directionsPanel.addEventListener('DOMSubtreeModified', modifyIcons, false);
     }
+}
+
+function markerSelected(markerId) {
+    marker = namespace.markers[markerId];
+    createPopRadius(marker);
+    createInfoWindow(marker);
+    findNearbyPOIs(marker);
+
 }
 
 function modifyIcons() {
@@ -561,10 +569,9 @@ $( function() {
         start: function(event, ui) {
             var start_idx = ui.item.index();
             ui.item.data('start_idx', start_idx);
-            //************************DELET THIS*****************************
-            createPopRadius(namespace.markers[start_idx]);
-            createInfoWindow(namespace.markers[start_idx], null);
-            findNearbyPOIs(namespace.markers[start_idx]);
+         // createPopRadius(namespace.markers[start_idx]);
+         // createInfoWindow(namespace.markers[start_idx], null);
+         // findNearbyPOIs(namespace.markers[start_idx]);
         },
         update: function(event, ui) {
             var start_idx = ui.item.data('start_idx');
@@ -614,9 +621,6 @@ $( function() {
         }
     });
 });
-//$(".panel-heading").hover( function() {
-//    alert(this.index())
-//});
 
 
 /**
