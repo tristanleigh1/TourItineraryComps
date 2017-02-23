@@ -450,9 +450,9 @@ function addSidebarButtons() {
         //$("#accordion").append(
             var panelDiv =
             `<div class="panel panel-default">
-            <div class="shell `+ namespace.markers[i].category +`" onclick="markerSelected(`+ i +`);">
+            <div class="shell `+ namespace.markers[i].category +`">
             <div class="panel-heading" role="tab" id="heading`+ i +`">
-            <h4 class="panel-title">
+            <h4 class="panel-title" onclick="markerSelected(`+ i +`);">
             ` + (i + 1) + `: ` + namespace.markers[i].name + `
             </a>
             </h4>
