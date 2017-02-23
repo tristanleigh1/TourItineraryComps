@@ -54,15 +54,16 @@ def pop_radius(request):
         response_data['nearby_pois'] = list()
         for nearby_pois in nearby_POI_querySets:
             for nearby_poi in nearby_pois:
-                response_data['nearby_pois'].append({'name' : nearby_poi.business_name,
-                                                         'latitude' : nearby_poi.latitude,
-                                                         'longitude' : nearby_poi.longitude,
-                                                         'poi_id' : nearby_poi.id,
-                                                         'address' : nearby_poi.address,
-                                                         'rating' : nearby_poi.popularity,
-                                                         'category': nearby_poi.category,
-                                                         'summary': nearby_poi.summary
-                                                         })
+                response_data['nearby_pois'].append({
+                    'name' : nearby_poi.business_name,
+                    'latitude' : nearby_poi.latitude,
+                    'longitude' : nearby_poi.longitude,
+                    'poi_id' : nearby_poi.id,
+                    'address' : nearby_poi.address,
+                    'rating' : nearby_poi.popularity,
+                    'category': nearby_poi.category,
+                    'summary': nearby_poi.summary
+                })
         return JsonResponse(response_data)
     else:
         return HttpResponse(
