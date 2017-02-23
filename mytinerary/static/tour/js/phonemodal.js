@@ -11,6 +11,13 @@ $("#modal_trigger").click(function() {
     $('#gmaps').attr('href', getDirectionsURL(namespace.directionsDisplay));
 });
 
+
+function autotab(current) {
+    if (current.getAttribute && current.value.length==current.getAttribute("maxlength")) {
+        $(current).nextAll('input').first().focus();
+    }
+}
+
 /**
  * Given a url, gets a phone number from the phone input and sends the url to
  * that number.
@@ -18,7 +25,7 @@ $("#modal_trigger").click(function() {
 function sendText(url) {
     var phoneNumber = $('input[name=phone1]').val() + $('input[name=phone2]').val() + $('input[name=phone3]').val()
     if (phoneNumber.length != 10 || !/^\d+$/.test(phoneNumber)) {
-        alert("Invalid phone number.");
+        $('#textWarning').html("<p style='color:indigo'>Invalid phone number.</p>");
         return;
     }
 
@@ -30,12 +37,17 @@ function sendText(url) {
         type : 'GET',
         data : {'url' : url,
                 'number' : phoneNumber},
-        success : function(success) {
-            closeSendDirectionsWindow(success);
+        success : function(status) {
+            if (status === 'OK') {
+                closeSendDirectionsWindow();
+            } else {
+                $('#textWarning').html("<p style='color:indigo'>" + status + "</p>");
+                $('.one_half .btn').attr('href', 'javascript:sendDirections();');
+                $('.one_half .btn').html('Send');
+            }
         },
         cache : false,
         error : function(xhr, errmsg, err) {
-            console.log(errmsg);
             console.log(xhr.status + " " + xhr.responseText);
         }
     });
@@ -67,7 +79,8 @@ function getDirectionsURL(directionsDisplay) {
 }
 
 
-function closeSendDirectionsWindow(success) {
+function closeSendDirectionsWindow() {
+    $('#textWarning').html("");
     $('.one_half .btn').html('Sent!');
     setTimeout(function(){
         $('.modal_close').trigger('click');

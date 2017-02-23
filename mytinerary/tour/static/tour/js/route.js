@@ -482,6 +482,33 @@ function addSidebarButtons() {
 * from a tutorial by Ryan Stephens found at
 * http://www.sketchpad-media.com/docs/how-to/google-maps-v3-custom-direction-services/
 */
+function updateDirectionsPanel() {
+    var output = '';
+    var route = namespace.directionsDisplay.getDirections().routes[0]
+        for (var i = 0; i < namespace.markers.length - 1; i++) {
+            var dir = route.legs[i]
+            var cat = namespace.markers[i+1].category;
+            if (i == 0) {
+                output += '<div class="dir_start Origin">'+ dir.start_address +'</div>';
+            }
+            output += '<div class="dir_summary silver">Travel: '+ dir.distance.text +' - about '+ dir.duration.text +'</div>';
+            output += '<table>';
+            for (var j = 0; j < dir.steps.length; j++){
+                output += '<tr style="border-bottom: 1px solid silver;">';
+                output += '<td class="dir_row"><span class="dir_sprite '+ dir.steps[j].maneuver +'"></span></td>';
+                output += '<td class="dir_row">'+ (j+1) +'.</td>';
+                output += '<td class="dir_row">'+ dir.steps[j].instructions +'</td>';
+                output += '<td class="dir_row" style="white-space:nowrap;">'+ dir.steps[j].distance.text +'</td>';
+                output += '</tr>';
+            }
+                output += '</table>';
+                output += '<div class="dir_end ' + cat + '"' + '>'+ dir.end_address +'</div>';
+        }
+    $('#panel').html(output);
+}
+
+
+
 function initDirectionsListener() {
     directionsPanel = document.getElementById("panel");
     if (directionsPanel.addEventListener) {
