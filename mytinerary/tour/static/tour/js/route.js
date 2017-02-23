@@ -222,7 +222,6 @@ function setInfoWindowContent(markerId, centerMarkerId) {
     <p>` + marker.summary + `</p>
     </div>
     </div>
-
     </div>
     <br/>
     <div class="btn btn-primary btn-sm"` + onclick + `</div>
@@ -292,7 +291,6 @@ function removePoint(markerId) {
 * to create a new point in the route after the selected marker.
 */
 function addPoint(newMarkerId, markerId) {
-    $(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
     var icon = getIconFromCategory(namespace.radiusMarkers[newMarkerId].category, true);
     var popRadius = buildPopRadiusCircle(namespace.radiusMarkers[newMarkerId].position, namespace.map);
 

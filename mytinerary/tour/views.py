@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 import json
 from .models import *
-import math
 from decimal import *
 from .calculate_route import *
 from .pop_radius import *

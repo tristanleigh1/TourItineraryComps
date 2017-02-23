@@ -2,6 +2,9 @@ from __future__ import unicode_literals
 
 from django.db import models
 
+'''
+    A POI object represents a point of interest as obtained from Yelp.
+'''
 class POI(models.Model):
 
     def default_category():

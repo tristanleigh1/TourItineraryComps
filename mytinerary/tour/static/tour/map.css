@@ -1,10 +1,27 @@
+html, body {
+    height: 100%;
+}
+
 body {
     background-color: #e5e3df;
+}
+
+#body {
+    height: 100%;
 }
 
 .container-fluid {
     padding-left:0px;
     padding-right:0px;
+    height: 100%;
+}
+
+div.row2 {
+    height: 100%;
+}
+
+div.col-md-9 {
+    height: 100%;
 }
 
 .navbar-header {
@@ -36,11 +53,11 @@ body {
 }
 
 #map {
-    height:700px;
+    height:100%;
+    padding-bottom: 100px;
 }
 
 #accordion {
-    height: 550px;
     overflow-y: auto;
 }
 

@@ -31,6 +31,12 @@
         });
         popWindow  = new google.maps.InfoWindow();
         map = new google.maps.Map(document.getElementById('map'));
+        google.maps.event.addDomListener(window, 'load', initialize);
+        google.maps.event.addDomListener(window, "resize", function() {
+            var center = map.getCenter();
+            google.maps.event.trigger(map, "resize");
+            map.setCenter(center);
+        });
         directionsDisplay.setMap(map);
         var locations;
         {% if mode == "startToEnd" %}
@@ -165,7 +171,7 @@
     <div id="body">
         {% include "tour/navbar.html" %}
         <div class="container-fluid">
-            <div class="row">
+            <div class="row1">
                 <div class="col-md-12" id="filter-bar">
                     <ul class="list-group">
                         <li>
@@ -211,7 +217,7 @@
                 </ul>
             </div>
         </div>
-        <div class="row">
+        <div class="row2">
             <div class="col-md-9">
                 <div id="map"></div>
             </div>
