@@ -222,7 +222,6 @@ function setInfoWindowContent(markerId, centerMarkerId) {
     <p>` + marker.summary + `</p>
     </div>
     </div>
-
     </div>
     <br/>
     <div class="btn btn-primary btn-sm"` + onclick + `</div>
@@ -448,7 +447,7 @@ function addSidebarButtons() {
         //$("#accordion").append(
             var panelDiv =
             `<div class="panel panel-default">
-            <div class="shell `+ namespace.markers[i].category +`" onclick="markerSelected(`+ i +`);">  
+            <div class="shell `+ namespace.markers[i].category +`" onclick="markerSelected(`+ i +`);">
             <div class="panel-heading" role="tab" id="heading`+ i +`">
             <h4 class="panel-title">
             ` + (i + 1) + `: ` + namespace.markers[i].name + `

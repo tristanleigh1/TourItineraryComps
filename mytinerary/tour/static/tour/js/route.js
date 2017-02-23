@@ -222,7 +222,6 @@ function setInfoWindowContent(markerId, centerMarkerId) {
     <p>` + marker.summary + `</p>
     </div>
     </div>
-
     </div>
     <br/>
     <div class="btn btn-primary btn-sm"` + onclick + `</div>
