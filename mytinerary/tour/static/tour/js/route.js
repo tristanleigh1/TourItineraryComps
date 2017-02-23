@@ -372,10 +372,12 @@ function updateRoute(changedMarkerId) {
 
             // Let Google determine if we should use miles or km
             var units = mytinerary.legs[0].distance.text.substr(-2);
-            if (units == "km") {
-                totalDistance = totalDistance / 1000;
-            } else {
+            if (units == "mi" || units == "ft") {
                 totalDistance = totalDistance * METERS_TO_MILES;
+                units = "mi";
+            } else {
+                totalDistance = totalDistance / 1000;
+                units = "km";
             }
 
             totalDuration = totalDuration / 60
