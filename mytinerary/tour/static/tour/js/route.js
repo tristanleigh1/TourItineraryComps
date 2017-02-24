@@ -339,7 +339,6 @@ function addPoint(newMarkerId, markerId) {
     updateRoute(markerId+1);
 }
 
-
 /**
 * Updates the route and directions display to match the current path markers.
 * Takes in the ID of the marker being added to the path. If no marker is being
@@ -439,7 +438,6 @@ function updateRoute(changedMarkerId) {
     });
 }
 
-
 /**
 * Add the html for the sidebar for each POI on the route
 */
@@ -452,7 +450,6 @@ function addSidebarButtons() {
             <div class="panel-heading" role="tab" id="heading`+ i +`">
             <h4 class="panel-title" onclick="markerSelected(`+ i +`);">
             ` + (i + 1) + `: ` + namespace.markers[i].name + `
-            </a>
             </h4>
             <div class="btn btn-link btn-sm pull-right x-button" onclick="removePoint(` + i + `);">&times</div>
             </div>
@@ -469,7 +466,8 @@ function addSidebarButtons() {
         namespace.markers[i].popRadius.setVisible(false);
     }
 }
-/*
+
+/**
  * Displays info window, pop radius, and nearby pois for given marker ID. Called from sidebar POIs.
 */
 function markerSelected(markerId) {
@@ -479,7 +477,8 @@ function markerSelected(markerId) {
     findNearbyPOIs(marker);
 
 }
-/*
+
+/**
 * Updates the directions panel to reflect changes to the route. Code adapted
 * from a tutorial by Ryan Stephens found at
 * http://www.sketchpad-media.com/docs/how-to/google-maps-v3-custom-direction-services/
@@ -509,8 +508,9 @@ function updateDirectionsPanel() {
     $('#panel').html(output);
 }
 
-
-
+/**
+ * add an event listener to the directions panel div
+ */
 function initDirectionsListener() {
     directionsPanel = document.getElementById("panel");
     if (directionsPanel.addEventListener) {
@@ -518,7 +518,9 @@ function initDirectionsListener() {
     }
 }
 
-
+/**
+ * Modifies icons in direction panel
+ */
 function modifyIcons() {
     document.getElementById("panel").removeEventListener('DOMSubtreeModified', modifyIcons, false);
 
@@ -533,13 +535,17 @@ function modifyIcons() {
     }
 }
 
+/**
+ */
 function autotab(current) {
     if (current.getAttribute && current.value.length==current.getAttribute("maxlength")) {
         $(current).nextAll('input').first().focus();
     }
 }
 
-// Constructs the URL for the google.maps version of your route
+/**
+ * Constructs the URL for the google.maps version of your route
+ */
 function sendDirections() {
     var long_url = getDirectionsURL(namespace.directionsDisplay);
     var login = "jonesh2";
@@ -560,7 +566,9 @@ function sendDirections() {
     );
 }
 
-
+/**
+ * Get directions for the route 
+ */
 function getDirections() {
     // If the directions pane is open
     if (document.getElementById('accordion').style.display == 'none') {
@@ -586,7 +594,6 @@ $( function() {
         start: function(event, ui) {
             var start_idx = ui.item.index();
             ui.item.data('start_idx', start_idx);
-            ui.item.data('start_idx', start_idx);
         },
         update: function(event, ui) {
             var start_idx = ui.item.data('start_idx');
@@ -598,7 +605,7 @@ $( function() {
             namespace.markers[start_idx].setMap(namespace.map);
 
             // Refreshes markers on map with updated labels
-            if (start_idx > end_idx) { // Drag down
+            if (start_idx > end_idx) { // Drag down in value (up in map)
                 namespace.markers.splice(end_idx, 0, namespace.markers[start_idx]);
                 namespace.markers.splice(start_idx+1, 1);
                 for (var i = end_idx + 1; i <= start_idx; i++) {
@@ -608,7 +615,7 @@ $( function() {
                     namespace.markers[i].popRadius.setVisible(false);
                     namespace.markers[i].setMap(namespace.map);
                 }
-            } else { // Drag up
+            } else { // Drag up in value, (down in map)
                 namespace.markers.splice(end_idx+1, 0, namespace.markers[start_idx]);
                 namespace.markers.splice(start_idx, 1);
                 for (var i = start_idx; i < end_idx; i++) {
@@ -634,7 +641,6 @@ $( function() {
     });
 });
 
-
 /**
 * Updates the filter status by toggling a given category (indicated by the spot)
 */
@@ -648,6 +654,10 @@ function updateFilterStatus(spot) {
     }
 }
 
+/**
+ * Spot indicates which category was updated in the filter bar
+ * Updates the nearby POIs in accordance with the new filter status
+ */
 function updateFilter(spot) {
     updateFilterStatus(spot);
     if (namespace.selectedMarker) {
@@ -655,7 +665,9 @@ function updateFilter(spot) {
     }
 }
 
-// Makes sure map isn't zoomed in too much. Uses ignore as a way to avoid recursive calling.
+/** Makes sure map isn't zoomed in too much.
+ * Uses ignore as a way to avoid recursive calling.
+ */
 function adjustZoom() {
     var listener = google.maps.event.addListener(namespace.map, "zoom_changed", function() {
         if (zoomIgnore) {
@@ -670,6 +682,10 @@ function adjustZoom() {
     });
 }
 
+/**
+ * Takes in a POI category string and scale boolean and returns an icon object.
+ * If scale is false, returns a nearby POI icon instead of an icon on the route.
+ */
 function getIconFromCategory(category, scale) {
     var icon;
     switch (category) {
