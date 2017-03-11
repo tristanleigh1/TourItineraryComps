@@ -1,4 +1,5 @@
 .DS_Store
+.ftpconfig
 ._*
 *.pyc
 *.cpython*
