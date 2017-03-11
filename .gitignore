@@ -4,6 +4,6 @@
 *.pyc
 *.cpython*
 *.swp
-mytinerary/tour/migrations/__pycache__/
+mytinerary/tour/migrations/
 mysite/
 
