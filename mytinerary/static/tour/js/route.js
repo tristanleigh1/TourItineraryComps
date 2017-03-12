@@ -169,6 +169,7 @@ function createInfoWindow(marker, centerMarker) {
     var onclick;
     var centerMarkerId
     var rating = (marker.rating == "None") ? "" : "Rating: " + Math.round(marker.rating) + "/100";
+    var errorMessage = ($("#err").length) ? $("#err").html() : "";
 
     // There is no centerMarker if the marker is on our path
     if (centerMarker == null) {
@@ -176,12 +177,13 @@ function createInfoWindow(marker, centerMarker) {
         '<span class="glyphicon glyphicon-trash"></span>';
     } else {
         centerMarkerId = centerMarker.id;
-        onclick = 'id="addBtn" onclick="addPoint(' + marker.id + ', ' +
+        onclick = ' id="addBtn" onclick="addPoint(' + marker.id + ', ' +
         centerMarker.id + ');">Add';
     }
 
     var content = '<p>' + marker.name + '</p><p>' +
-    rating + '</p><div class="btn btn-primary btn-sm"' + onclick +
+    rating + '</p><p id="err">' + errorMessage +
+    '</p><div class="btn btn-primary btn-sm"' + onclick +
     '</div><div class="btn btn-link btn-sm"' +
     'onclick="setInfoWindowContent('+ marker.id + ', ' + centerMarkerId +
     ');">More Info...</div>';
@@ -205,11 +207,12 @@ function setInfoWindowContent(markerId, centerMarkerId) {
         '<span class="glyphicon glyphicon-trash"></span>';
     } else {
         marker = namespace.radiusMarkers[markerId];
-        onclick = 'id="addBtn" onclick="addPoint(' + marker.id + ', ' +
+        onclick = ' id="addBtn" onclick="addPoint(' + marker.id + ', ' +
         centerMarkerId + ');">Add';
     }
 
     var rating = (marker.rating == "None") ? "" : "Rating: " + Math.round(marker.rating) + "/100";
+    var errorMessage = ($("#err").length) ? $("#err").html() : "";
     var content = '<p>' + marker.name + `</p>
     <p>`+ rating + `</p>
     <div id="myCarousel" class="carousel slide" data-interval="false" >
@@ -223,7 +226,7 @@ function setInfoWindowContent(markerId, centerMarkerId) {
     </div>
     </div>
     </div>
-    <br/>
+    <br/><p id="err">` + errorMessage + `</p>
     <div class="btn btn-primary btn-sm"` + onclick + `</div>
     <div class="btn btn-link btn-sm" onclick="resetInfoWindow(`+ marker.id + ', ' + centerMarkerId + `);">Less Info</div>
     <div class="btn btn-sm btn-primary pull-right" href="#myCarousel" onclick="if (this.innerHTML == 'Summary') {this.innerHTML='Back';} else {this.innerHTML = 'Summary';}" data-slide="next">Summary</div>`;
@@ -249,38 +252,32 @@ function resetInfoWindow(markerId, centerMarkerId) {
 function removePoint(markerId) {
     if (namespace.markers.length == 1) {
         var errorMessage = "Cannot delete last POI! Add more than one point to delete one.";
-        $("#removeBtn").before("<p><b>" + errorMessage + "</b></p>");
-        $(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
-    } else {
-        namespace.markers[markerId].popRadius.setVisible(false);
-
-        // Remove nearby POIs from map
-        for (var i=0; i<namespace.radiusMarkers.length; i++) {
-            marker = namespace.radiusMarkers[i];
-            marker.setMap(null);
-        }
-        namespace.radiusMarkers.length = 0;
-        namespace.markers[markerId].setMap(null);
-        namespace.markers.splice(markerId, 1);
-
-        // Update list of markers after removing point
-        for (var i = markerId; i < namespace.markers.length; i++) {
-            namespace.markers[i].id--;
-            namespace.markers[i].label--;
-            namespace.markers[i].setMap(null)
-            namespace.markers[i].popRadius.setVisible(false);
-            namespace.markers[i].setMap(namespace.map);
-        }
-
-        updateRoute();
+        $("#err").html("<b>" + errorMessage + "</b>");
+        return;
     }
 
-    // Remove nearby POIs and pop radius
+    // Remove marker from map and marker array
+    namespace.markers[markerId].popRadius.setVisible(false);
+    namespace.markers[markerId].setMap(null);
+    namespace.markers.splice(markerId, 1);
+
+    // Update array of markers after removing point
+    for (var i = markerId; i < namespace.markers.length; i++) {
+        namespace.markers[i].setLabel((i+1).toString());
+        namespace.markers[i].id--;
+        // namespace.markers[i].label--;
+        // namespace.markers[i].setMap(null)
+        // namespace.markers[i].setMap(namespace.map);
+    }
+
+    updateRoute();
+
+    // Remove nearby POIs from map
     for (var i=0; i<namespace.radiusMarkers.length; i++) {
         marker = namespace.radiusMarkers[i];
         marker.setMap(null);
-        marker.popRadius.setVisible(false);
     }
+    namespace.radiusMarkers.length = 0;
 
     $("#accordion").empty();
     addSidebarButtons();
@@ -371,10 +368,12 @@ function updateRoute(changedMarkerId) {
 
             // Let Google determine if we should use miles or km
             var units = mytinerary.legs[0].distance.text.substr(-2);
-            if (units == "km") {
-                totalDistance = totalDistance / 1000;
-            } else {
+            if (units == "mi" || units == "ft") {
                 totalDistance = totalDistance * METERS_TO_MILES;
+                units = "mi";
+            } else {
+                totalDistance = totalDistance / 1000;
+                units = "km";
             }
 
             totalDuration = totalDuration / 60
@@ -425,8 +424,7 @@ function updateRoute(changedMarkerId) {
                 // Remove the marker and add the error message
                 namespace.markers[changedMarkerId].setMap(null);
                 namespace.markers.splice(changedMarkerId, 1);
-                $("#addBtn").before("<p><b>" + errorMessage + "</b></p>");
-                $(".btn.btn-primary.btn-sm").prop('onclick',null).off('click');
+                $("#err").html("<b>" + errorMessage + "</b>");
             } else {
                 // The original path is invalid, remove destination and try again
                 $("#warning").html("Sorry! We couldn't find a route to your destination!<br>");
@@ -567,7 +565,7 @@ function sendDirections() {
 }
 
 /**
- * Get directions for the route 
+ * Get directions for the route
  */
 function getDirections() {
     // If the directions pane is open
